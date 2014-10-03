@@ -22,6 +22,8 @@ static NSString * const kOAuthClientAuthURL = @"http://auth-finished.invalid/";
 
 static NSString * const kServiceNameForKeychain = @"DMIOS";
 
+static ServerManager *_sharedServerManager = nil;
+
 @interface ServerManager ()<LROAuth2ClientDelegate>
 
 @property (nonatomic, retain) NSString *accessToken;
@@ -31,6 +33,13 @@ static NSString * const kServiceNameForKeychain = @"DMIOS";
 @end
 
 @implementation ServerManager
+
++ (ServerManager *)sharedInstance
+{
+    if (_sharedServerManager == nil)
+        _sharedServerManager = [[ServerManager alloc] init];
+    return _sharedServerManager;
+}
 
 -(void)oauthClientDidRefreshAccessToken:(LROAuth2Client *)client {}
 -(void)oauthClientDidReceiveAccessToken:(LROAuth2Client *)client {}
@@ -255,8 +264,8 @@ static NSString * const kServiceNameForKeychain = @"DMIOS";
         [self.delegate serverManager:self didStoreData:NO];
     else
     {
-        NSString *success = data[@"success"];
-        if ([success isEqualToString:@"true"])
+        NSNumber *success = data[@"success"];
+        if ([success boolValue])
             [self.delegate serverManager:self didStoreData:YES];
         else
             [self.delegate serverManager:self didStoreData:NO];
@@ -269,8 +278,8 @@ static NSString * const kServiceNameForKeychain = @"DMIOS";
         [self.delegate serverManager:self didRetrieveData:nil success:NO];
     else
     {
-        NSString *success = data[@"success"];
-        if ([success isEqualToString:@"true"])
+        NSNumber *success = data[@"success"];
+        if ([success boolValue])
             [self.delegate serverManager:self didRetrieveData:data success:YES];
         else
             [self.delegate serverManager:self didRetrieveData:data success:NO];

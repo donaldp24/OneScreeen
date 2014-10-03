@@ -49,7 +49,7 @@ static const int kPackageID = 0xDEB93390;
 
 - (void)stopScan {
     [[self bluetoothCentralManager] stopScan];
-    NSLog(@"Stopped scan");
+    //NSLog(@"Stopped scan");
 }
 
 - (void)restartScan {
@@ -146,7 +146,7 @@ static const int kPackageID = 0xDEB93390;
         if(![[manufacturedData subdataWithRange:NSMakeRange(0, 4)] isEqualToData:
              [NSData dataWithBytes:&kPackageID length:4]])
         {
-            NSLog(@"Third party package was received.");
+            //NSLog(@"Third party package was received.");
             if (self.delegate)
                 [self.delegate scanManager:self didFindElseDevice:nil];
             return;
@@ -172,7 +172,7 @@ static const int kPackageID = 0xDEB93390;
         if(![[[uuid1 data] subdataWithRange:NSMakeRange(5, 4)] isEqualToData:
              [NSData dataWithBytes:&packageID length:4]])
         {
-            NSLog(@"Third party package was received.");
+            //NSLog(@"Third party package was received.");
             if (self.delegate)
                 [self.delegate scanManager:self didFindElseDevice:nil];
             return;
@@ -207,7 +207,7 @@ static const int kPackageID = 0xDEB93390;
         [dataToParse getBytes:&c range:NSMakeRange(ix, 1)];
         outputString = [outputString stringByAppendingFormat:@"%02X ",c];
     }
-    NSLog(@"Debug output sensor data: %@",outputString);
+    //NSLog(@"Debug output sensor data: %@",outputString);
 #endif
 
     [[self delegate] scanManager:self

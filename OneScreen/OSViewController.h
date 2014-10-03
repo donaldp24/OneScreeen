@@ -10,4 +10,6 @@
 
 @interface OSViewController : UIViewController
 
++ (OSViewController *)sharedInstance;
+
 @end

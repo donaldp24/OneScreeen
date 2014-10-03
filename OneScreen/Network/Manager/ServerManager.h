@@ -13,6 +13,8 @@
 
 @interface ServerManager : NSObject <ServerGatewayDelegate>
 
++ (ServerManager *)sharedInstance;
+
 @property (nonatomic, assign) id<ServerManagerDelegate> delegate;
 @property (nonatomic, retain) ServerGateway *serverGateway;
 @property (nonatomic, retain) NSString * username;

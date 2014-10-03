@@ -15,7 +15,7 @@
 #import "OSSaltSolutionManager.h"
 #import "iToast.h"
 
-const int scanDelay = 1;
+const int scanDelay = 5;
 
 #define kFontBebasNeue(fSize)           [UIFont fontWithName:@"BebasNeue" size:fSize]
 #define kFontMyriadProRegular(fSize)    [UIFont fontWithName:@"MyriadPro-Regular" size:fSize]
@@ -34,6 +34,8 @@ const int scanDelay = 1;
 #define kLastViewFoldAlpha      (0.3f)
 #define kLastViewUnfoldAlpha    (1.0f)
 #define kLastViewRightMargin    (10.f)
+
+static OSViewController *_sharedOSViewController = nil;
 
 @interface OSViewController () <ScanManagerDelegate, ServerManagerDelegate, UIGestureRecognizerDelegate, UITableViewDataSource, UITableViewDelegate, OSSaltsCellDelegate>
 
@@ -95,6 +97,11 @@ const int scanDelay = 1;
 
 @implementation OSViewController
 
++ (OSViewController *)sharedInstance
+{
+    return _sharedOSViewController;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -110,7 +117,7 @@ const int scanDelay = 1;
     self.scanManager = [[ScanManager alloc] initWithDelegate:self];
     //[self.scanManager startScan];
     
-    self.serverManager = [[ServerManager alloc] init];
+    self.serverManager = [ServerManager sharedInstance];
     self.serverManager.delegate = self;
     
     
@@ -186,6 +193,12 @@ const int scanDelay = 1;
     self.viewLast.layer.borderWidth = 1.0;
     self.leftConstraintOfViewLast.constant = self.view.frame.size.width - kLastViewFoldWidth;
     self.viewLast.alpha = kLastViewFoldAlpha;
+    
+    self.dicLastData = [[NSMutableDictionary alloc] init];
+    
+    [self showLastCalData:nil];
+    
+    _sharedOSViewController = self;
     
 }
 
@@ -343,24 +356,47 @@ const int scanDelay = 1;
     }
 }
 
-- (void)showResultForCalResult:(CalCheckResult)result
+- (NSString *)resultForCalcResult:(CalCheckResult)result
 {
     NSString *strResult = @"";
     if (result == CalCheckResultError)
     {
         strResult = @"ERROR";
-        self.labelResult.textColor = [UIColor redColor];
     }
     else if (result == CalCheckResultPass)
     {
         strResult = @"PASS";
-        self.labelResult.textColor = [UIColor greenColor];
     }
     else if (result == CalCheckResultFail)
     {
         strResult = @"FAIL";
-        self.labelResult.textColor = [UIColor redColor];
     }
+    return strResult;
+}
+
+- (UIColor *)colorForCalcResult:(CalCheckResult)result
+{
+    UIColor *labelColor = [UIColor redColor];
+    if (result == CalCheckResultError)
+    {
+        labelColor = [UIColor redColor];
+    }
+    else if (result == CalCheckResultPass)
+    {
+        labelColor = [UIColor greenColor];
+    }
+    else if (result == CalCheckResultFail)
+    {
+        labelColor = [UIColor redColor];
+    }
+    return labelColor;
+}
+
+- (void)showResultForCalResult:(CalCheckResult)result
+{
+    NSString *strResult = [self resultForCalcResult:result];
+    UIColor *labelColor = [self colorForCalcResult:result];
+    self.labelResult.textColor = labelColor;
     self.labelResult.text = strResult;
 }
 
@@ -393,7 +429,7 @@ const int scanDelay = 1;
             self.tableView.frame = CGRectMake(rtFrame.origin.x, rtFrame.origin.y, rtFrame.size.width, 0);
         } completion:^(BOOL finished) {
             //[self.tableView reloadData];
-            if (self.currSensor == nil)
+            if (self.currSensor == nil || self.currSensor.length == 0)
                 return;
             if ([self.dicCurrentSalt objectForKey:self.currSensor] == nil)
             {
@@ -409,19 +445,21 @@ const int scanDelay = 1;
 
 - (void)onSaltChanged:(OSSaltSolution *)saltSolution
 {
-    self.btnStore.enabled = saltSolution.storable;
-    self.labelForResult.hidden = !saltSolution.calculable;
-    self.labelResult.hidden = !saltSolution.calculable;
-    if (self.currSensor == nil)
-    {
-        [self.btnStore setEnabled:NO];
+    self.btnStore.enabled = NO;
+    self.labelResult.hidden = YES;
+    self.labelForResult.hidden = YES;
+    if (self.currSensor == nil || self.currSensor.length == 0)
         return;
-    }
     
     NSDictionary *dicData = [self.dicSensorData objectForKey:self.currSensor];
     if (dicData == nil)
         return;
-
+    
+    self.btnStore.enabled = saltSolution.storable;
+    self.labelForResult.hidden = !saltSolution.calculable;
+    self.labelResult.hidden = !saltSolution.calculable;
+   
+    
     [self.dicCurrentSalt setObject:saltSolution forKey:self.currSensor];
     
     if (saltSolution.calculable)
@@ -451,8 +489,8 @@ const int scanDelay = 1;
 - (void)onRetrievedData:(NSDictionary *)data
 {
     dispatch_async(dispatch_get_main_queue(), ^(){
-        NSString *success = data[@"success"];
-        if ([success isEqualToString:@"true"])
+        NSNumber *success = data[@"success"];
+        if ([success boolValue])
         {
             NSString *sensorSerial = data[@"ssn"];
             [self.dicLastData setObject:data forKey:sensorSerial];
@@ -474,6 +512,8 @@ const int scanDelay = 1;
     self.labelLastTemp.text = @"";
     self.labelLastSaltSolution.text = @"";
     self.labelLastResult.text = @"";
+    if (sensorSerial == nil)
+        return;
     NSDictionary *data = [self.dicLastData objectForKey:sensorSerial];
     if (data == nil)
         return;
@@ -488,6 +528,16 @@ const int scanDelay = 1;
     CGFloat rh = [strRh floatValue] / 10.0f;
     CGFloat temp = [strTemp floatValue] / 10.0f;
     NSDate *date = [NSDate dateWithString:strCalCheck withFormat:kUploadDataDateFormat];
+    
+    OSSaltSolution *saltSoltion = [[OSSaltSolutionManager sharedInstance] saltSolutionWithSolution:strSaltSolution];
+    if (saltSoltion.calculable)
+    {
+        CalCheckResult result = [[OSSaltSolutionManager sharedInstance] calCheckWithRh:rh temp_f:temp saltSolution:saltSoltion];
+        NSString *strResult = [self resultForCalcResult:result];
+        UIColor *labelColor = [self colorForCalcResult:result];
+        self.labelLastResult.textColor = labelColor;
+        self.labelLastResult.text = strResult;
+    }
     
     self.labelLastCalCheck.text = [date toStringWithFormat:kDateFormat];
     self.labelLastRH.text = [NSString stringWithFormat:@"%.1f", rh];
@@ -552,6 +602,9 @@ const int scanDelay = 1;
         self.isLoggingIn = NO;
         self.labelStatus.text = @"Logged in successfully!";
         [self.indicator stopAnimating];
+        
+        if (self.currSensor != nil && self.currSensor.length > 0)
+            [self.serverManager retrieveData:self.currSensor];
     });
 }
 
@@ -686,7 +739,7 @@ const int scanDelay = 1;
 #pragma mark - save action
 - (IBAction)onStoreCalCheck:(id)sender
 {
-    if (self.currSensor == nil)
+    if (self.currSensor == nil || self.currSensor.length == 0)
         return;
     OSSaltSolution *saltSolution = [self.dicCurrentSalt objectForKey:self.currSensor];
     if (saltSolution == nil)
@@ -778,7 +831,7 @@ CGFloat firstX = 0, firstY = 0;
         self.leftConstraintOfViewLast.constant = finalX;
         
         CGFloat animationDuration = (ABS(velocityX)*.0002)+.2;
-        NSLog(@"the duration is: %f", animationDuration);
+        //NSLog(@"the duration is: %f", animationDuration);
         
         [UIView animateWithDuration:animationDuration
                               delay:0
