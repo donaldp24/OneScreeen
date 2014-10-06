@@ -81,6 +81,13 @@ static OSSaltSolutionManager *_sharedSaltSolutionManager = nil;
             Salt_delta[i] = Salt_KCl_delta[i];
         }
     }
+    else
+    {
+        for (int i = 0; i <= 9; i++) {
+            Salt_Base[i] = 0;
+            Salt_delta[i] = 0;
+        }
+    }
 
     // convert fahrenheit to Celsius
     TEMP_C = (TEMP_F - 32) * (5.f / 9.f);

@@ -20,4 +20,12 @@
 
 #define kSqliteName                             @"Model.sqlite"
 
+// constants for storing/retrieving data on/from server
+#define kDataSuccessKey                         @"success"
+#define kDataSensorSerialKey                    @"ssn"
+#define kDataSaltSolutionKey                    @"salt_name"
+#define kDataRhKey                              @"rh"
+#define kDataTempKey                            @"temp"
+#define kDataDateKey                            @"date"
+
 #endif

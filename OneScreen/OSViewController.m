@@ -92,6 +92,7 @@ static OSViewController *_sharedOSViewController = nil;
 
 @property (nonatomic, retain) NSMutableDictionary *dicCurrentSalt;
 @property (nonatomic, retain) NSMutableDictionary *dicLastData;
+@property (nonatomic, retain) NSMutableDictionary *dicStoringData;
 
 @end
 
@@ -477,6 +478,9 @@ static OSViewController *_sharedOSViewController = nil;
 {
     self.currSensor = newSensorSerial;
     
+    // show last data locally
+    [self showLastCalData:self.currSensor];
+    
     // fetching information from server
     [self retrieveDataForSensor:newSensorSerial];
 }
@@ -489,12 +493,13 @@ static OSViewController *_sharedOSViewController = nil;
 - (void)onRetrievedData:(NSDictionary *)data
 {
     dispatch_async(dispatch_get_main_queue(), ^(){
-        NSNumber *success = data[@"success"];
+        NSNumber *success = data[kDataSuccessKey];
         if ([success boolValue])
         {
-            NSString *sensorSerial = data[@"ssn"];
+            NSString *sensorSerial = data[kDataSensorSerialKey];
             [self.dicLastData setObject:data forKey:sensorSerial];
-            [self showLastCalData:sensorSerial];
+            if ([self.currSensor isEqualToString:sensorSerial])
+                [self showLastCalData:sensorSerial];
         }
         else
         {
@@ -517,8 +522,6 @@ static OSViewController *_sharedOSViewController = nil;
     NSDictionary *data = [self.dicLastData objectForKey:sensorSerial];
     if (data == nil)
         return;
-    
-    //NSString *success = data[@"success"];
 
     NSString *strRh = data[@"rh"];
     NSString *strTemp = data[@"temp"];
@@ -640,6 +643,10 @@ static OSViewController *_sharedOSViewController = nil;
     {
         NSString *message = [NSString stringWithFormat:@"stored successfully!"];
         [[[[iToast makeText:message] setGravity:iToastGravityBottom] setDuration:iToastDurationNormal] show];
+        
+        // retrieve data
+        [self.dicStoringData setObject:@(YES) forKey:kDataSuccessKey];
+        [self onRetrievedData:self.dicStoringData];
     }
     else
     {
@@ -660,6 +667,9 @@ static OSViewController *_sharedOSViewController = nil;
     else
     {
         //message = [NSString stringWithFormat:@"Retrieve failed"];
+        dispatch_async(dispatch_get_main_queue(), ^() {
+            [self showLastCalData:nil];
+        });
     }
     
 }
@@ -755,11 +765,14 @@ static OSViewController *_sharedOSViewController = nil;
    
     NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
     
-    [data setObject:self.currSensor forKey:@"ssn"];
-    [data setObject:@((int)(rh * 10)) forKey:@"rh"];
-    [data setObject:@((int)(temp * 10)) forKey:@"temp"];
-    [data setObject:saltSolution.solution forKey:@"salt_name"];
-    [data setObject:[[NSDate date] toStringWithFormat:kUploadDataDateFormat] forKey:@"date"];
+    [data setObject:self.currSensor forKey:kDataSensorSerialKey];
+    [data setObject:@((int)((rh + 0.05) * 10)) forKey:kDataRhKey];
+    [data setObject:@((int)((temp + 0.05) * 10)) forKey:kDataTempKey];
+    [data setObject:saltSolution.solution forKey:kDataSaltSolutionKey];
+    [data setObject:[[NSDate date] toStringWithFormat:kUploadDataDateFormat] forKey:kDataDateKey];
+    
+    // save to temp, and show it when stored successfully
+    self.dicStoringData = [data mutableCopy];
     
     [self.serverManager storeData:data];
 }

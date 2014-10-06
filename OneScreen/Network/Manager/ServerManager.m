@@ -264,7 +264,7 @@ static ServerManager *_sharedServerManager = nil;
         [self.delegate serverManager:self didStoreData:NO];
     else
     {
-        NSNumber *success = data[@"success"];
+        NSNumber *success = data[kDataSuccessKey];
         if ([success boolValue])
             [self.delegate serverManager:self didStoreData:YES];
         else
@@ -278,7 +278,7 @@ static ServerManager *_sharedServerManager = nil;
         [self.delegate serverManager:self didRetrieveData:nil success:NO];
     else
     {
-        NSNumber *success = data[@"success"];
+        NSNumber *success = data[kDataSuccessKey];
         if ([success boolValue])
             [self.delegate serverManager:self didRetrieveData:data success:YES];
         else

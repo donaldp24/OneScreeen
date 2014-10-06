@@ -148,11 +148,11 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
 }
 
 - (void)storeData:(NSDictionary *)data accessToken:(NSString *)access {
-    NSString *ssn = data[@"ssn"];
-    NSNumber *rh = data[@"rh"];
-    NSNumber *temp = data[@"temp"];
-    NSString *salt_name = data[@"salt_name"];
-    NSString *date = data[@"date"];
+    NSString *ssn = data[kDataSensorSerialKey];
+    NSNumber *rh = data[kDataRhKey];
+    NSNumber *temp = data[kDataTempKey];
+    NSString *salt_name = data[kDataSaltSolutionKey];
+    NSString *date = data[kDataDateKey];
     
     NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=upload_cal_check&access_token=%@&ssn=%@&rh=%d&temp=%d&salt_name=%@&date=%@", access, ssn, [rh intValue], [temp intValue], [salt_name urlencode], date];
     
