@@ -14,6 +14,11 @@
 #define kSaltSolutionNaCl       @"NaCl"
 #define kSaltSolutionKCl        @"KCl"
 
+#define kSaltSolutionNameDefault    @"Normal Reading"
+#define kSaltSolutionNameNaCl       @"Sodium Chloride (NaCl)"
+#define kSaltSolutionNameNaBr       @"Sodium Bromide (NaBr)"
+#define kSaltSolutionNameKCl        @"Potassium Chloride (KCl)"
+
 typedef NS_ENUM(int, CalCheckResult) {
     CalCheckResultError = -1,
     CalCheckResultPass = 0,

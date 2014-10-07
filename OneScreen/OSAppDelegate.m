@@ -15,6 +15,8 @@
 {
     // Override point for customization after application launch.
     
+    [TestFlight takeOff:@"6157733d-7939-490c-a235-356c766ce804"];
+    
     //Customize Of Navigation Controller for All page
     [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"NavigationBar_BgImage"] forBarMetrics:UIBarMetricsDefault];
     

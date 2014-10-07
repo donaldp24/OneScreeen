@@ -41,7 +41,11 @@ static OSViewController *_sharedOSViewController = nil;
 
 {
     NSTimeInterval prevTakenTime;
+    UIImage *imageBluetooth;
+    UIImage *imageBluetooth_blue;
 }
+
+@property (weak, nonatomic) IBOutlet UIImageView *ivBluetoothIcon;
 
 @property (weak, nonatomic) IBOutlet UILabel *labelRh;
 @property (weak, nonatomic) IBOutlet UILabel *labelTemp;
@@ -93,6 +97,7 @@ static OSViewController *_sharedOSViewController = nil;
 @property (nonatomic, retain) NSMutableDictionary *dicCurrentSalt;
 @property (nonatomic, retain) NSMutableDictionary *dicLastData;
 @property (nonatomic, retain) NSMutableDictionary *dicStoringData;
+@property (nonatomic, retain) OSSaltSolution *currSalt;
 
 @end
 
@@ -176,6 +181,7 @@ static OSViewController *_sharedOSViewController = nil;
     self.tableView.layer.borderWidth = 1.0;
     
     self.dicCurrentSalt = [[NSMutableDictionary alloc] init];
+    self.currSalt = [[OSSaltSolutionManager sharedInstance] defaultSolution];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(backgroundTap:)];
     [self.view addGestureRecognizer:tap];
@@ -200,6 +206,11 @@ static OSViewController *_sharedOSViewController = nil;
     [self showLastCalData:nil];
     
     _sharedOSViewController = self;
+    
+    // bluetooth icon
+    imageBluetooth = [UIImage imageNamed:@"Bluetooth"];
+    imageBluetooth_blue = [UIImage imageNamed:@"Bluetooth_blue"];
+    self.ivBluetoothIcon.image = imageBluetooth;
     
 }
 
@@ -276,6 +287,7 @@ static OSViewController *_sharedOSViewController = nil;
     [self performSelector:@selector(onReadSensorData:) withObject:sensorData afterDelay:0.5];
 }
 
+// called when read data from sensor
 - (void)onReadSensorData:(NSDictionary*)sensorData {
     
     if (self.dicSensorData == nil)
@@ -285,6 +297,13 @@ static OSViewController *_sharedOSViewController = nil;
     if (sensorSerial == nil)
         return;
     [self.dicSensorData setObject:sensorData forKey:sensorSerial];
+    
+    // change bluetooth icon
+    [UIView animateWithDuration:0.3 animations:^() {
+        self.ivBluetoothIcon.image = imageBluetooth_blue;
+    } completion:^(BOOL finished) {
+        self.ivBluetoothIcon.image = imageBluetooth;
+    }];
     
     ///since we recieved 3 2-bytes packages of serialNumber in little endian format we'll have to transform it so the string has appropriate look
     
@@ -305,7 +324,7 @@ static OSViewController *_sharedOSViewController = nil;
         [self.arraySensorSerial addObject:sensorSerial];
     if ([self.currSensor isEqualToString:sensorSerial])
     {
-        //
+        // same sensor
     }
     else
     {
@@ -321,7 +340,11 @@ static OSViewController *_sharedOSViewController = nil;
     }
     
     // calculate result
+#if 0
     OSSaltSolution *saltSolution = [self.dicCurrentSalt objectForKey:self.currSensor];
+#else
+    OSSaltSolution *saltSolution = self.currSalt;
+#endif
     if (saltSolution)
     {
         if (saltSolution.calculable)
@@ -366,11 +389,11 @@ static OSViewController *_sharedOSViewController = nil;
     }
     else if (result == CalCheckResultPass)
     {
-        strResult = @"PASS";
+        strResult = @"PASSED";
     }
     else if (result == CalCheckResultFail)
     {
-        strResult = @"FAIL";
+        strResult = @"FAILED";
     }
     return strResult;
 }
@@ -401,6 +424,8 @@ static OSViewController *_sharedOSViewController = nil;
     self.labelResult.text = strResult;
 }
 
+// calculate expiration date from calibration date
+// expiration date = calibration date + 2 years
 - (NSDate *)expireDateWithCalibrationDate:(NSDate *)expireDate
 {
     if (expireDate == nil)
@@ -444,6 +469,7 @@ static OSViewController *_sharedOSViewController = nil;
     }
 }
 
+// called when user changed salt solution on combobox(salt solution table view)
 - (void)onSaltChanged:(OSSaltSolution *)saltSolution
 {
     self.btnStore.enabled = NO;
@@ -462,7 +488,9 @@ static OSViewController *_sharedOSViewController = nil;
    
     
     [self.dicCurrentSalt setObject:saltSolution forKey:self.currSensor];
+    self.currSalt = saltSolution;
     
+    // re-calc result
     if (saltSolution.calculable)
     {
         CGFloat rh = [[dicData objectForKey:kSensorDataRHKey] floatValue];
@@ -474,6 +502,8 @@ static OSViewController *_sharedOSViewController = nil;
     }
 }
 
+
+// called when reading new sensor's data.
 - (void)onSensorChanged:(NSString *)newSensorSerial
 {
     self.currSensor = newSensorSerial;

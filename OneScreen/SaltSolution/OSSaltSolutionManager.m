@@ -154,11 +154,11 @@ static OSSaltSolutionManager *_sharedSaltSolutionManager = nil;
 + (NSString *)nameForSaltSolution:(NSString *)saltSolution
 {
     if ([saltSolution isEqualToString:kSaltSolutionNaBr])
-        return @"Sodium Bromide (NaBr)";
+        return kSaltSolutionNameNaBr;
     else if ([saltSolution isEqualToString:kSaltSolutionNaCl])
-        return @"Sodium Chloride (NaCl)";
+        return kSaltSolutionNameNaCl;
     else if ([saltSolution isEqualToString:kSaltSolutionKCl])
-        return @"Potassium Chloride (KCl)";
+        return kSaltSolutionNameKCl;
     return @"";
 }
 
@@ -175,10 +175,10 @@ static OSSaltSolutionManager *_sharedSaltSolutionManager = nil;
     
     // init saltsolutions
     self.arraySalts = [[NSMutableArray alloc] init];
-    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:@"Normal Reading" solution:kSaltSolutionNone calculable:NO storable:NO]];
-    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:@"Sodium Chloride (NaCl)" solution:kSaltSolutionNaCl calculable:YES storable:YES]];
-    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:@"Sodium Bromide (NaBr)" solution:kSaltSolutionNaBr calculable:YES storable:YES]];
-    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:@"Potassium Chloride (KCl)" solution:kSaltSolutionKCl calculable:YES storable:YES]];
+    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:kSaltSolutionNameDefault solution:kSaltSolutionNone calculable:NO storable:NO]];
+    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:kSaltSolutionNameNaCl solution:kSaltSolutionNaCl calculable:YES storable:YES]];
+    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:kSaltSolutionNameNaBr solution:kSaltSolutionNaBr calculable:YES storable:YES]];
+    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:kSaltSolutionNameKCl solution:kSaltSolutionKCl calculable:YES storable:YES]];
     return self;
 }
 
