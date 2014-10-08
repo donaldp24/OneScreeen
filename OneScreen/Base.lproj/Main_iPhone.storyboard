@@ -19,6 +19,7 @@
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Background" translatesAutoresizingMaskIntoConstraints="NO" id="XUb-7e-Hyh">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <gestureRecognizers/>
                             </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" image="Bluetooth" translatesAutoresizingMaskIntoConstraints="NO" id="M2Z-Bf-Td4">
                                 <rect key="frame" x="20" y="39" width="15" height="25"/>
@@ -331,10 +332,14 @@
                                     <outletCollection property="gestureRecognizers" destination="V83-ef-nQU" appends="YES" id="h2f-jv-2YA"/>
                                 </connections>
                             </view>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="mMf-ig-eD2">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="mMf-ig-eD2">
                                 <rect key="frame" x="125" y="66" width="187" height="0.0"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="187" id="lLB-Fa-VCt"/>
+                                    <constraint firstAttribute="height" id="lPh-X9-wW4"/>
+                                </constraints>
                                 <color key="separatorColor" red="0.95294117647058818" green="0.5607843137254902" blue="0.11372549019607843" alpha="1" colorSpace="calibratedRGB"/>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="saltcell" id="3kF-9v-dZX" customClass="OSSaltsCell">
@@ -379,12 +384,14 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="mMf-ig-eD2" firstAttribute="top" secondItem="R3h-6R-jdQ" secondAttribute="top" constant="66" id="0HA-l5-QtP"/>
                             <constraint firstItem="kJ2-Mv-Tu6" firstAttribute="leading" secondItem="R3h-6R-jdQ" secondAttribute="leading" constant="63" id="7CL-fy-5P3"/>
                             <constraint firstItem="XUb-7e-Hyh" firstAttribute="leading" secondItem="R3h-6R-jdQ" secondAttribute="leading" id="AU5-gb-jEm"/>
                             <constraint firstItem="XUb-7e-Hyh" firstAttribute="top" secondItem="R3h-6R-jdQ" secondAttribute="top" id="BQl-7K-F5I"/>
                             <constraint firstItem="kJ2-Mv-Tu6" firstAttribute="top" secondItem="R3h-6R-jdQ" secondAttribute="top" constant="214" id="DMJ-oC-xgW"/>
                             <constraint firstAttribute="trailing" secondItem="XUb-7e-Hyh" secondAttribute="trailing" id="Q5Q-KX-wMa"/>
                             <constraint firstItem="wsZ-yv-82o" firstAttribute="top" secondItem="XUb-7e-Hyh" secondAttribute="bottom" id="cWw-Tp-bgn"/>
+                            <constraint firstItem="mMf-ig-eD2" firstAttribute="leading" secondItem="R3h-6R-jdQ" secondAttribute="leading" constant="125" id="jMO-Sx-it8"/>
                             <constraint firstItem="Dww-bP-nmA" firstAttribute="leading" secondItem="R3h-6R-jdQ" secondAttribute="leading" constant="113" id="knQ-Ll-VbD"/>
                             <constraint firstItem="Dww-bP-nmA" firstAttribute="top" secondItem="R3h-6R-jdQ" secondAttribute="top" constant="341" id="vgU-Aa-Sre"/>
                         </constraints>
@@ -394,6 +401,7 @@
                     <connections>
                         <outlet property="btnSalts" destination="Al3-D1-Fdk" id="POx-eN-7na"/>
                         <outlet property="btnStore" destination="moo-ag-ZBc" id="33f-9n-4nb"/>
+                        <outlet property="heightConstraintOfDropdown" destination="lPh-X9-wW4" id="BXf-L7-UHq"/>
                         <outlet property="indicator" destination="ePm-Q3-huV" id="ZS1-gu-6X0"/>
                         <outlet property="ivBattery" destination="Rsk-xi-g6M" id="R7f-6B-aNB"/>
                         <outlet property="ivBluetoothIcon" destination="M2Z-Bf-Td4" id="5fT-gp-dRD"/>
@@ -414,6 +422,8 @@
                         <outlet property="labelStatus" destination="dPk-g0-nhO" id="nMZ-s7-9AY"/>
                         <outlet property="labelTemp" destination="Ac0-el-cUu" id="cpD-k0-zkE"/>
                         <outlet property="leftConstraintOfViewLast" destination="7CL-fy-5P3" id="39I-fI-4Gl"/>
+                        <outlet property="leftGesture" destination="ueP-Kc-o3n" id="0cf-Hq-0Iw"/>
+                        <outlet property="panGesture" destination="V83-ef-nQU" id="WWx-3t-1Ag"/>
                         <outlet property="tableView" destination="mMf-ig-eD2" id="HN3-p7-DCE"/>
                         <outlet property="topConstraintOfViewLast" destination="DMJ-oC-xgW" id="JCi-lC-fyc"/>
                         <outlet property="viewLast" destination="kJ2-Mv-Tu6" id="uIJ-hq-cyu"/>
@@ -424,15 +434,22 @@
                 <panGestureRecognizer minimumNumberOfTouches="1" maximumNumberOfTouches="1" id="V83-ef-nQU">
                     <connections>
                         <action selector="moveViewLast:" destination="B6Z-13-UD0" id="M41-1l-zRV"/>
+                        <outlet property="delegate" destination="B6Z-13-UD0" id="n4a-C6-O0X"/>
                     </connections>
                 </panGestureRecognizer>
+                <swipeGestureRecognizer direction="left" id="ueP-Kc-o3n">
+                    <connections>
+                        <action selector="onSwipeLeft:" destination="B6Z-13-UD0" id="tpW-gG-uA9"/>
+                        <outlet property="delegate" destination="B6Z-13-UD0" id="jc0-kV-d3x"/>
+                    </connections>
+                </swipeGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="333" y="100"/>
         </scene>
-        <!--Table View Controller-->
+        <!--Sensor Inventory Table View Controller-->
         <scene sceneID="oPf-iS-shG">
             <objects>
-                <tableViewController id="wey-zv-VMx" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="OSSensorInventoryTableViewController" id="wey-zv-VMx" customClass="OSSensorInventoryTableViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="66" sectionHeaderHeight="22" sectionFooterHeight="22" id="cpy-T0-jPK">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D00A8FA819E4A3E800A4A95C /* OSSensorInventoryTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D00A8FA719E4A3E800A4A95C /* OSSensorInventoryTableViewController.m */; };
+		D00A8FAD19E4A64C00A4A95C /* PushAnimatedTransitioning.m in Sources */ = {isa = PBXBuildFile; fileRef = D00A8FAA19E4A64C00A4A95C /* PushAnimatedTransitioning.m */; };
+		D00A8FAE19E4A64C00A4A95C /* PushTransitioningDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D00A8FAC19E4A64C00A4A95C /* PushTransitioningDelegate.m */; };
+		D00A8FB119E4A66C00A4A95C /* UIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D00A8FB019E4A66C00A4A95C /* UIManager.m */; };
 		D00DB25419D50CC500C62136 /* OSTemperatureHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = D00DB25319D50CC500C62136 /* OSTemperatureHelper.m */; };
 		D01A314319DD3D49008C924F /* OSSaltSolutionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D01A314219DD3D49008C924F /* OSSaltSolutionManager.m */; };
 		D01A314619DD479C008C924F /* OSSaltSolution.m in Sources */ = {isa = PBXBuildFile; fileRef = D01A314519DD479C008C924F /* OSSaltSolution.m */; };
@@ -72,6 +76,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D00A8FA619E4A3E800A4A95C /* OSSensorInventoryTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSSensorInventoryTableViewController.h; sourceTree = "<group>"; };
+		D00A8FA719E4A3E800A4A95C /* OSSensorInventoryTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSSensorInventoryTableViewController.m; sourceTree = "<group>"; };
+		D00A8FA919E4A64C00A4A95C /* PushAnimatedTransitioning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushAnimatedTransitioning.h; sourceTree = "<group>"; };
+		D00A8FAA19E4A64C00A4A95C /* PushAnimatedTransitioning.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PushAnimatedTransitioning.m; sourceTree = "<group>"; };
+		D00A8FAB19E4A64C00A4A95C /* PushTransitioningDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushTransitioningDelegate.h; sourceTree = "<group>"; };
+		D00A8FAC19E4A64C00A4A95C /* PushTransitioningDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PushTransitioningDelegate.m; sourceTree = "<group>"; };
+		D00A8FAF19E4A66C00A4A95C /* UIManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIManager.h; sourceTree = "<group>"; };
+		D00A8FB019E4A66C00A4A95C /* UIManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIManager.m; sourceTree = "<group>"; };
 		D00DB25019D50C6700C62136 /* OSDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSDefine.h; sourceTree = "<group>"; };
 		D00DB25219D50CC500C62136 /* OSTemperatureHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSTemperatureHelper.h; sourceTree = "<group>"; };
 		D00DB25319D50CC500C62136 /* OSTemperatureHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSTemperatureHelper.m; sourceTree = "<group>"; };
@@ -199,6 +211,12 @@
 		D00DB25119D50CB400C62136 /* Helper */ = {
 			isa = PBXGroup;
 			children = (
+				D00A8FAF19E4A66C00A4A95C /* UIManager.h */,
+				D00A8FB019E4A66C00A4A95C /* UIManager.m */,
+				D00A8FA919E4A64C00A4A95C /* PushAnimatedTransitioning.h */,
+				D00A8FAA19E4A64C00A4A95C /* PushAnimatedTransitioning.m */,
+				D00A8FAB19E4A64C00A4A95C /* PushTransitioningDelegate.h */,
+				D00A8FAC19E4A64C00A4A95C /* PushTransitioningDelegate.m */,
 				D00DB25219D50CC500C62136 /* OSTemperatureHelper.h */,
 				D00DB25319D50CC500C62136 /* OSTemperatureHelper.m */,
 			);
@@ -232,6 +250,8 @@
 				D0D934BE19D8BE4200D92C7B /* OSSaltsCell.m */,
 				D0BEAAFF19D3B9CB00514B19 /* OSViewController.h */,
 				D0BEAB0019D3B9CB00514B19 /* OSViewController.m */,
+				D00A8FA619E4A3E800A4A95C /* OSSensorInventoryTableViewController.h */,
+				D00A8FA719E4A3E800A4A95C /* OSSensorInventoryTableViewController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -598,6 +618,7 @@
 				D0BEAB5119D3BB4400514B19 /* EmulatorReadingParser.m in Sources */,
 				D0BEAB5D19D3BD2F00514B19 /* NSDate+String.m in Sources */,
 				D00DB25419D50CC500C62136 /* OSTemperatureHelper.m in Sources */,
+				D00A8FAE19E4A64C00A4A95C /* PushTransitioningDelegate.m in Sources */,
 				D01D6E6919DCC34300EF4B37 /* NSString+UrlEncoding.m in Sources */,
 				D0D934BF19D8BE4200D92C7B /* OSSaltsCell.m in Sources */,
 				D0BEAB4619D3BA7500514B19 /* NSDictionary+QueryString.m in Sources */,
@@ -608,11 +629,13 @@
 				D0BEAB4019D3BA7500514B19 /* SBJsonBase.m in Sources */,
 				D0BEAB4219D3BA7500514B19 /* SBJsonWriter.m in Sources */,
 				D0F984FC19D8A8AA003B2E74 /* Model.xcdatamodeld in Sources */,
+				D00A8FAD19E4A64C00A4A95C /* PushAnimatedTransitioning.m in Sources */,
 				D0BEAB4519D3BA7500514B19 /* LRURLRequestOperation.m in Sources */,
 				D0BEAB6C19D3CD0200514B19 /* SFHFKeychainUtils.m in Sources */,
 				D01A314319DD3D49008C924F /* OSSaltSolutionManager.m in Sources */,
 				D0BEAAF419D3B9CB00514B19 /* main.m in Sources */,
 				D0BEAB4119D3BA7500514B19 /* SBJsonParser.m in Sources */,
+				D00A8FB119E4A66C00A4A95C /* UIManager.m in Sources */,
 				D0BEAB6819D3CC5D00514B19 /* ServerManager.m in Sources */,
 				D0F984FF19D8A96C003B2E74 /* Reading.m in Sources */,
 				D0BEAB5219D3BB4400514B19 /* ScanManager.m in Sources */,
@@ -624,6 +647,7 @@
 				D0BEAB4319D3BA7500514B19 /* LROAuth2AccessToken.m in Sources */,
 				D01A314619DD479C008C924F /* OSSaltSolution.m in Sources */,
 				D0BEAB0119D3B9CB00514B19 /* OSViewController.m in Sources */,
+				D00A8FA819E4A3E800A4A95C /* OSSensorInventoryTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

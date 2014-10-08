@@ -14,6 +14,8 @@
 #import "OSSaltsCell.h"
 #import "OSSaltSolutionManager.h"
 #import "iToast.h"
+#import "OSSensorInventoryTableViewController.h"
+#import "UIManager.h"
 
 const int scanDelay = 5;
 
@@ -47,6 +49,8 @@ static OSViewController *_sharedOSViewController = nil;
 
 @property (weak, nonatomic) IBOutlet UIImageView *ivBluetoothIcon;
 
+
+
 @property (weak, nonatomic) IBOutlet UILabel *labelRh;
 @property (weak, nonatomic) IBOutlet UILabel *labelTemp;
 @property (weak, nonatomic) IBOutlet UILabel *labelAmbientRh;
@@ -59,8 +63,10 @@ static OSViewController *_sharedOSViewController = nil;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *indicator;
 @property (weak, nonatomic) IBOutlet UILabel *labelStatus;
 
+// dropbdown
 @property (weak, nonatomic) IBOutlet UIButton *btnSalts;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *heightConstraintOfDropdown;
 
 @property (weak, nonatomic) IBOutlet UIImageView *ivProgress;
 @property (weak, nonatomic) IBOutlet UIImageView *ivBattery;
@@ -82,7 +88,8 @@ static OSViewController *_sharedOSViewController = nil;
 @property (weak, nonatomic) IBOutlet UILabel *labelForResult;
 @property (weak, nonatomic) IBOutlet UILabel *labelResult;
 
-
+// swipe left
+@property (weak, nonatomic) IBOutlet UISwipeGestureRecognizer *leftGesture;
 
 
 @property (retain, nonatomic) ScanManager *scanManager;
@@ -212,6 +219,9 @@ static OSViewController *_sharedOSViewController = nil;
     imageBluetooth_blue = [UIImage imageNamed:@"Bluetooth_blue"];
     self.ivBluetoothIcon.image = imageBluetooth;
     
+    // left gesture
+    [self.view addGestureRecognizer:self.leftGesture];
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -222,7 +232,6 @@ static OSViewController *_sharedOSViewController = nil;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self performSelector:@selector(onSaltsSelectCancel:) withObject:nil afterDelay:1];
 }
 
 - (void)didReceiveMemoryWarning
@@ -284,6 +293,8 @@ static OSViewController *_sharedOSViewController = nil;
     self.labelTemp.text = @"--.--";
     self.labelResult.text = @"----";
     
+    self.ivBluetoothIcon.image = imageBluetooth_blue;
+    
     [self performSelector:@selector(onReadSensorData:) withObject:sensorData afterDelay:0.5];
 }
 
@@ -299,11 +310,12 @@ static OSViewController *_sharedOSViewController = nil;
     [self.dicSensorData setObject:sensorData forKey:sensorSerial];
     
     // change bluetooth icon
-    [UIView animateWithDuration:0.3 animations:^() {
-        self.ivBluetoothIcon.image = imageBluetooth_blue;
-    } completion:^(BOOL finished) {
+    //[UIView animateWithDuration:1 animations:^() {
+    
+    //} completion:^(BOOL finished) {
+    //[self.ivBluetoothIcon performSelector:@selector(setImage:) withObject:imageBluetooth afterDelay:1.0];
         self.ivBluetoothIcon.image = imageBluetooth;
-    }];
+    //}];
     
     ///since we recieved 3 2-bytes packages of serialNumber in little endian format we'll have to transform it so the string has appropriate look
     
@@ -439,20 +451,20 @@ static OSViewController *_sharedOSViewController = nil;
 - (IBAction)onSaltsSelectCancel:(id)sender
 {
     // show modes
-    if (self.tableView.frame.size.height == 0)
+    if (self.heightConstraintOfDropdown.constant == 0)
     {
+        self.heightConstraintOfDropdown.constant = kSaltCellHeight * [OSSaltSolutionManager sharedInstance].arraySalts.count;
         [UIView animateWithDuration:kDropdownAnimateDuration animations:^() {
-            CGRect rtFrame = self.tableView.frame;
-            self.tableView.frame = CGRectMake(rtFrame.origin.x, rtFrame.origin.y, rtFrame.size.width, kSaltCellHeight * [OSSaltSolutionManager sharedInstance].arraySalts.count);
+            [self.view layoutIfNeeded];
         } completion:^(BOOL finished) {
             [self.tableView reloadData];
         }];
     }
     else
     {
+        self.heightConstraintOfDropdown.constant = 0;
         [UIView animateWithDuration:kDropdownAnimateDuration animations:^() {
-            CGRect rtFrame = self.tableView.frame;
-            self.tableView.frame = CGRectMake(rtFrame.origin.x, rtFrame.origin.y, rtFrame.size.width, 0);
+            [self.view layoutIfNeeded];
         } completion:^(BOOL finished) {
             //[self.tableView reloadData];
             if (self.currSensor == nil || self.currSensor.length == 0)
@@ -770,9 +782,9 @@ static OSViewController *_sharedOSViewController = nil;
     [self.btnSalts setTitle:cell.saltSolution.name forState:UIControlStateNormal];
     [self onSaltChanged:cell.saltSolution];
     
+    self.heightConstraintOfDropdown.constant = 0;
     [UIView animateWithDuration:kDropdownAnimateDuration animations:^{
-        CGRect rtFrame = self.tableView.frame;
-        self.tableView.frame = CGRectMake(rtFrame.origin.x, rtFrame.origin.y, rtFrame.size.width, 0);
+        [self.view layoutIfNeeded];
     }];
 }
 
@@ -817,9 +829,19 @@ static OSViewController *_sharedOSViewController = nil;
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
-    if (gestureRecognizer.view != self.tableView)
-        return YES;
-    return NO;
+    if (gestureRecognizer == self.panGesture)
+    {
+        if (gestureRecognizer.view != self.tableView)
+            return YES;
+        return NO;
+    }
+    else if (gestureRecognizer == self.leftGesture)
+    {
+        if (gestureRecognizer.view != self.tableView && gestureRecognizer.view != self.viewLast)
+            return YES;
+        return NO;
+    }
+    return YES;
 }
 
 CGFloat firstX = 0, firstY = 0;
@@ -900,4 +922,15 @@ CGFloat firstX = 0, firstY = 0;
 #endif
     }
 }
+
+#pragma mark - swipe left
+- (IBAction)onSwipeLeft:(id)sender
+{
+    // show table view
+    OSSensorInventoryTableViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"OSSensorInventoryTableViewController"];
+    vc.transitioningDelegate = [UIManager pushTransitioingDelegate];
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+
 @end
