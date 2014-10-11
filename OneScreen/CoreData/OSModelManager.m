@@ -7,7 +7,7 @@
 //
 
 #import "OSModelManager.h"
-
+#import "NSDate+convenience.h"
 
 @implementation OSModelManager
 
@@ -27,29 +27,325 @@
     return (OSModelManager*)sharedInstance;
 }
 
-- (NSMutableArray *)retrieveReadings
+- (NSMutableArray *)retrieveCalCheckForSensor:(NSString *)ssn
 {
     NSMutableArray * allRecords = [NSMutableArray arrayWithCapacity:0];
+    if (ssn == nil || ssn.length == 0)
+        return allRecords;
+    
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription
-                                   entityForName:@"Readings"
+                                   entityForName:@"CDCalCheck"
                                    inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ssn == %@", ssn];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"date"
+                                 ascending:NO];
     
     [fetchRequest setEntity:entity];
-    
-    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
-                                 initWithKey:@"time"
-                                 ascending:NO];
+    [fetchRequest setPredicate:predicate];
     [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
     
-    NSError *error=nil;
+    NSError *error = nil;
     NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-    if(fetchedObjects){
-        for (NSManagedObject *obj in fetchedObjects){
-            [allRecords addObject:obj];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        if(fetchedObjects) {
+            for (NSManagedObject *obj in fetchedObjects){
+                [allRecords addObject:obj];
+            }
         }
     }
     return allRecords;
+}
+
+- (CDCalibrationDate *)getCalibrationDateForSensor:(NSString *)ssn
+{
+    if (ssn == nil || ssn.length == 0)
+        return nil;
+    
+    CDCalibrationDate *ret = nil;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDCalibrationDate"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ssn == %@", ssn];
+
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        if(fetchedObjects && fetchedObjects.count > 0) {
+            ret = [fetchedObjects objectAtIndex:0];
+        }
+    }
+    return ret;
+}
+
+- (CDCalCheck *)getOldestCalCheckForSensor:(NSString *)ssn
+{
+    if (ssn == nil || ssn.length == 0)
+        return nil;
+    
+    CDCalCheck *ret = nil;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDCalCheck"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ssn == %@", ssn];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"date"
+                                 ascending:YES];
+    
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        if(fetchedObjects && fetchedObjects.count > 0) {
+            ret = [fetchedObjects objectAtIndex:0];
+        }
+    }
+    return ret;
+}
+
+- (CDCalCheck *)getLatestCalCheckForSensor:(NSString *)ssn
+{
+    if (ssn == nil || ssn.length == 0)
+        return nil;
+    
+    CDCalCheck *ret = nil;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDCalCheck"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ssn == %@", ssn];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"date"
+                                 ascending:NO];
+    
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        if(fetchedObjects && fetchedObjects.count > 0) {
+            ret = [fetchedObjects objectAtIndex:0];
+        }
+    }
+    return ret;
+}
+
+- (NSMutableArray *)retrieveSensors
+{
+    NSMutableArray *sensors = [[NSMutableArray alloc] init];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDCalCheck"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"date"
+                                 ascending:NO];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    [fetchRequest setEntity:entity];
+   
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        for (CDCalCheck *calCheck in fetchedObjects) {
+            if (![sensors containsObject:calCheck.ssn])
+                [sensors addObject:[NSString stringWithFormat:@"%@", calCheck.ssn]];
+        }
+    }
+    
+    fetchRequest = [[NSFetchRequest alloc] init];
+    entity = [NSEntityDescription
+              entityForName:@"CDCalibrationDate"
+              inManagedObjectContext:self.managedObjectContext];
+    
+    [fetchRequest setEntity:entity];
+    
+    error = nil;
+    fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        for (CDCalibrationDate *cdCalibrationDate in fetchedObjects) {
+            if (![sensors containsObject:cdCalibrationDate.ssn])
+                [sensors addObject:[NSString stringWithFormat:@"%@", cdCalibrationDate.ssn]];
+        }
+    }
+    return sensors;
+
+}
+
+- (CDCalCheck *)getCalCheckForSensor:(NSString *)ssn date:(NSDate *)date
+{
+    if (ssn == nil || ssn.length == 0)
+        return nil;
+    
+    CDCalCheck *ret = nil;
+    
+    // search equal calcheck
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDCalCheck"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ssn == %@", ssn];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"date"
+                                 ascending:NO];
+    
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        for (CDCalCheck *calCheck in fetchedObjects) {
+            //if ([calCheck.date compareWithoutHour:date])
+            if ([calCheck.date compare:date])
+            {
+                ret = calCheck;
+                break;
+            }
+        }
+    }
+
+    return ret;
+}
+
+- (void)setCalibrationDate:(NSDate *)date sensorSerial:(NSString *)ssn
+{
+    if (ssn == nil || ssn.length == 0)
+        return;
+    
+    CDCalibrationDate *cdCalibrationDate = [self getCalibrationDateForSensor:ssn];
+    if (cdCalibrationDate == nil)
+        cdCalibrationDate = [NSEntityDescription
+                             insertNewObjectForEntityForName:@"CDCalibrationDate"
+                             inManagedObjectContext:self.managedObjectContext];
+    cdCalibrationDate.ssn = ssn;
+    cdCalibrationDate.calibrationDate = date;
+    
+    [self saveContext];
+}
+
+- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name oldest:(BOOL)oldest
+{
+    if (ssn == nil || ssn.length == 0)
+        return;
+    
+    if (!oldest)
+    {
+        // search equal calcheck
+        CDCalCheck *existCalCheck = [self getCalCheckForSensor:ssn date:date];
+        if (existCalCheck == nil)
+            existCalCheck = [NSEntityDescription
+                             insertNewObjectForEntityForName:@"CDCalCheck"
+                             inManagedObjectContext:self.managedObjectContext];
+        existCalCheck.ssn = ssn;
+        existCalCheck.date = date;
+        existCalCheck.rh = @(rh);
+        existCalCheck.temp = @(temp);
+        existCalCheck.salt_name = salt_name;
+        
+        [self saveContext];
+    }
+    else
+    {
+        // search prior calcheck
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        NSEntityDescription *entity = [NSEntityDescription
+                                       entityForName:@"CDCalCheck"
+                                       inManagedObjectContext:self.managedObjectContext];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ssn == %@", ssn];
+        NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                     initWithKey:@"date"
+                                     ascending:NO];
+        
+        [fetchRequest setEntity:entity];
+        [fetchRequest setPredicate:predicate];
+        [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+        
+        NSError *error = nil;
+        NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+        if (error != nil)
+        {
+            NSLog(@"error in fetching : %@", error);
+        }
+        else
+        {
+            NSMutableArray *arrayRemoves = [[NSMutableArray alloc] init];
+            for (CDCalCheck *calCheck in fetchedObjects) {
+                NSComparisonResult compareResult = [calCheck.date compare:date];
+                if (compareResult == NSOrderedAscending)
+                {
+                    [arrayRemoves addObject:calCheck];
+                }
+            }
+            
+            // remove data that is older than oldest one
+            for (CDCalCheck *calCheck in arrayRemoves) {
+                [self deleteObject:calCheck];
+            }
+        }
+        
+        // search equal calcheck
+        CDCalCheck *existCalCheck = [self getCalCheckForSensor:ssn date:date];
+        if (existCalCheck == nil)
+            existCalCheck = [NSEntityDescription
+                             insertNewObjectForEntityForName:@"CDCalCheck"
+                             inManagedObjectContext:self.managedObjectContext];
+        existCalCheck.ssn = ssn;
+        existCalCheck.date = date;
+        existCalCheck.rh = @(rh);
+        existCalCheck.temp = @(temp);
+        existCalCheck.salt_name = salt_name;
+        
+        [self saveContext];
+
+    }
 }
 
 #pragma mark - CoreData stack

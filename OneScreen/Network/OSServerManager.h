@@ -8,6 +8,27 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol OSServerManagerDelegate <NSObject>
+
+@optional
+- (void)didLogin:(BOOL)success;
+- (void)didRetrieveCalibrationDate:(NSString *)ssn success:(BOOL)success;
+- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success oldest:(BOOL)oldest;
+- (void)didStoreCalCheck:(NSString *)ssn success:(BOOL)success;
+
+@end
+
 @interface OSServerManager : NSObject
+
+@property (nonatomic, retain) id<OSServerManagerDelegate> delegate;
+
++ (OSServerManager *)sharedInstance;
+
+- (void)storeCalCheck:(NSDictionary *)calCheck;
+- (void)retrieveCalCheckForSensor:(NSString *)sensor oldest:(BOOL)oldest;
+- (void)retrieveCalibrationDateForSensor:(NSString *)sensor;
+
+- (void)loginWithUserName:(NSString *)userName password:(NSString *)password;
+- (void)logout;
 
 @end

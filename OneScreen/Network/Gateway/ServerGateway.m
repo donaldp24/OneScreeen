@@ -167,13 +167,15 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
     
     NSLog(@"request : %@", url);
     
+    NSDictionary *storingData = data;
+    
     //__block NSString *serialNumber = [ssn copy];
     
     [NSURLConnection sendAsynchronousRequest:request
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (!response) {
-                                   [[self delegate] serverGatewayDidStore:nil];
+                                   [[self delegate] serverGatewayDidStore:storingData withResponse:nil];
                                    NSLog(@"store failed : %@", connectionError);
                                    return;
                                }
@@ -185,13 +187,15 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                
                                NSLog(@"response for storeData: %@", dict);
                                
-                               [[self delegate] serverGatewayDidStore:dict];
+                               [[self delegate] serverGatewayDidStore:storingData withResponse:dict];
                            }];
 }
 
-- (void)retrieveData:(NSString *)ssn accessToken:(NSString *)access {
+- (void)retrieveData:(NSString *)ssn oldest:(BOOL)oldest accessToken:(NSString *)access {
     
     NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=get_cal_check&access_token=%@&ssn=%@", access, ssn];
+    if (oldest)
+        getString = [NSString stringWithFormat:@"%@&oldest=true", getString];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     
@@ -208,7 +212,7 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (!response) {
-                                   [[self delegate] serverGatewayDidRetrieve:nil];
+                                   [[self delegate] serverGatewayDidRetrieve:ssn data:nil];
                                    return;
                                }
                                
@@ -219,7 +223,10 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                
                                NSLog(@"response for retrieveData: %@", dict);
                                
-                               [[self delegate] serverGatewayDidRetrieve:dict];
+                               if (!oldest)
+                                   [[self delegate] serverGatewayDidRetrieve:ssn data:dict];
+                               else
+                                   [[self delegate] serverGatewayDidRetrieveOldest:ssn data:dict];
                            }];
 }
 

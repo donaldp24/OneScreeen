@@ -9,13 +9,16 @@
 #import "OSViewController.h"
 #import "ScanManagerDelegate.h"
 #import "ScanManager.h"
-#import "ServerManager.h"
+#import "OSServerManager.h"
 #import "NSDate+String.h"
 #import "OSSaltsCell.h"
 #import "OSSaltSolutionManager.h"
 #import "iToast.h"
 #import "OSSensorInventoryTableViewController.h"
 #import "UIManager.h"
+#import "OSExpirationManager.h"
+#import "OSCertificationManager.h"
+#import "OSModelManager.h"
 
 const int scanDelay = 5;
 
@@ -37,19 +40,21 @@ const int scanDelay = 5;
 #define kLastViewUnfoldAlpha    (1.0f)
 #define kLastViewRightMargin    (10.f)
 
+#define kLabelWarningAnimateDuration    (0.5f)
+
 static OSViewController *_sharedOSViewController = nil;
 
-@interface OSViewController () <ScanManagerDelegate, ServerManagerDelegate, UIGestureRecognizerDelegate, UITableViewDataSource, UITableViewDelegate, OSSaltsCellDelegate>
+@interface OSViewController () <ScanManagerDelegate, OSServerManagerDelegate, UIGestureRecognizerDelegate, UITableViewDataSource, UITableViewDelegate, OSSaltsCellDelegate>
 
 {
     NSTimeInterval prevTakenTime;
     UIImage *imageBluetooth;
     UIImage *imageBluetooth_blue;
+    NSTimeInterval prevLoginTryTime;
+    NSTimer *timer;
 }
 
 @property (weak, nonatomic) IBOutlet UIImageView *ivBluetoothIcon;
-
-
 
 @property (weak, nonatomic) IBOutlet UILabel *labelRh;
 @property (weak, nonatomic) IBOutlet UILabel *labelTemp;
@@ -58,10 +63,6 @@ static OSViewController *_sharedOSViewController = nil;
 @property (weak, nonatomic) IBOutlet UILabel *labelSensorSerial;
 @property (weak, nonatomic) IBOutlet UILabel *labelExpireDate;
 @property (weak, nonatomic) IBOutlet UILabel *labelCalibrationDate;
-
-
-@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *indicator;
-@property (weak, nonatomic) IBOutlet UILabel *labelStatus;
 
 // dropbdown
 @property (weak, nonatomic) IBOutlet UIButton *btnSalts;
@@ -91,19 +92,14 @@ static OSViewController *_sharedOSViewController = nil;
 // swipe left
 @property (weak, nonatomic) IBOutlet UISwipeGestureRecognizer *leftGesture;
 
+// warning label
+@property (weak, nonatomic) IBOutlet UILabel *labelWarning;
 
 @property (retain, nonatomic) ScanManager *scanManager;
-@property (nonatomic) BOOL isLoggingIn;
+@property (nonatomic, retain) OSServerManager *serverManager;
 
 @property (nonatomic, retain) NSMutableDictionary *dicSensorData;
-@property (nonatomic, retain) ServerManager *serverManager;
-@property (nonatomic, retain) NSMutableDictionary *calibrationDates;
-@property (nonatomic, retain) NSMutableArray *arraySensorSerial;
 @property (nonatomic, retain) NSString *currSensor;
-
-@property (nonatomic, retain) NSMutableDictionary *dicCurrentSalt;
-@property (nonatomic, retain) NSMutableDictionary *dicLastData;
-@property (nonatomic, retain) NSMutableDictionary *dicStoringData;
 @property (nonatomic, retain) OSSaltSolution *currSalt;
 
 @end
@@ -122,32 +118,15 @@ static OSViewController *_sharedOSViewController = nil;
     
     self.navigationItem.title = @"SCAN";
     
-    self.calibrationDates = [[NSMutableDictionary alloc] init];
-    self.arraySensorSerial = [[NSMutableArray alloc] init];
     self.currSensor = @"";
     
-
+    // start scan
     self.scanManager = [[ScanManager alloc] initWithDelegate:self];
     //[self.scanManager startScan];
     
-    self.serverManager = [ServerManager sharedInstance];
+    self.serverManager = [OSServerManager sharedInstance];
     self.serverManager.delegate = self;
-    
-    
-    
-    [self.serverManager setUsername:kGlobalUserName];
-    [self.serverManager setUserpassword:kGlobalUserPass];
-    
-    self.isLoggingIn = [self.serverManager login];
-    if (self.isLoggingIn)
-    {
-        [self didStartLogin];
-    }
-    else
-    {
-        [self didAlreadyLoggedIn];
-        //[self.serverManager getExpirationDateForSensor:@"asdf"];
-    }
+    [self.serverManager loginWithUserName:kGlobalUserName password:kGlobalUserPass];
     
     // initialize fonts
     [self.labelRh setFont:kFontBebasNeue(kRhFontSize)];
@@ -171,27 +150,23 @@ static OSViewController *_sharedOSViewController = nil;
     self.ivProgress.image = self.imgProgress;
     self.fWidthOfProgress = self.widthConstraintOfProgress.constant;
     
-    // salts
+    // drop down
     self.btnSalts.layer.cornerRadius = 3.0;
     self.btnSalts.clipsToBounds = YES;
     
     self.btnSalts.layer.borderColor = [UIColor colorWithRed:243/255.0 green:143/255.0 blue:29/255.0 alpha:1.0].CGColor;
     self.btnSalts.layer.borderWidth = 1.0;
-        
-    //CGRect rtFrame = self.tableView.frame;
-    //self.tableView.frame = CGRectMake(rtFrame.origin.x, rtFrame.origin.y, rtFrame.size.width, 0);
-    
+
     self.tableView.layer.cornerRadius = 3.0;
     self.tableView.clipsToBounds = YES;
     
     self.tableView.layer.borderColor = [UIColor colorWithRed:243/255.0 green:143/255.0 blue:29/255.0 alpha:1.0].CGColor;
     self.tableView.layer.borderWidth = 1.0;
     
-    self.dicCurrentSalt = [[NSMutableDictionary alloc] init];
-    self.currSalt = [[OSSaltSolutionManager sharedInstance] defaultSolution];
-    
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(backgroundTap:)];
     [self.view addGestureRecognizer:tap];
+    
+    self.currSalt = [[OSSaltSolutionManager sharedInstance] defaultSolution];
     
     prevTakenTime = 0;
     
@@ -208,8 +183,6 @@ static OSViewController *_sharedOSViewController = nil;
     self.leftConstraintOfViewLast.constant = self.view.frame.size.width - kLastViewFoldWidth;
     self.viewLast.alpha = kLastViewFoldAlpha;
     
-    self.dicLastData = [[NSMutableDictionary alloc] init];
-    
     [self showLastCalData:nil];
     
     _sharedOSViewController = self;
@@ -222,16 +195,39 @@ static OSViewController *_sharedOSViewController = nil;
     // left gesture
     [self.view addGestureRecognizer:self.leftGesture];
     
+    // warning label
+    self.labelWarning.alpha = 0;
+    self.labelWarning.text = @"";
+    self.labelWarning.layer.borderColor = self.labelWarning.textColor.CGColor;
+    self.labelWarning.layer.cornerRadius = 2.0;
+    self.labelWarning.clipsToBounds = YES;
+
+    // notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedData:) name:kLastCalCheckChanged object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedOldestData:) name:kOldestCalCheckChanged object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedCalibrationDate:) name:kCalibrationDateChanged object:nil];
+    
+    prevLoginTryTime = 0;
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(onTimer:) userInfo:nil repeats:YES];
+    
+    self.serverManager.delegate = self;
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
+    if (timer)
+    {
+        [timer invalidate];
+        timer = nil;
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -310,15 +306,9 @@ static OSViewController *_sharedOSViewController = nil;
     [self.dicSensorData setObject:sensorData forKey:sensorSerial];
     
     // change bluetooth icon
-    //[UIView animateWithDuration:1 animations:^() {
-    
-    //} completion:^(BOOL finished) {
-    //[self.ivBluetoothIcon performSelector:@selector(setImage:) withObject:imageBluetooth afterDelay:1.0];
-        self.ivBluetoothIcon.image = imageBluetooth;
-    //}];
+    self.ivBluetoothIcon.image = imageBluetooth;
     
     ///since we recieved 3 2-bytes packages of serialNumber in little endian format we'll have to transform it so the string has appropriate look
-    
     [self setProgress:[[sensorData objectForKey:kSensorDataBatteryKey] floatValue]];
     
     CGFloat rh = [[sensorData objectForKey:kSensorDataRHKey] floatValue];
@@ -332,8 +322,6 @@ static OSViewController *_sharedOSViewController = nil;
     // sensor serial
     self.labelSensorSerial.text = sensorSerial;
     
-    if (![self.arraySensorSerial containsObject:sensorSerial])
-        [self.arraySensorSerial addObject:sensorSerial];
     if ([self.currSensor isEqualToString:sensorSerial])
     {
         // same sensor
@@ -344,50 +332,14 @@ static OSViewController *_sharedOSViewController = nil;
     }
     self.currSensor = sensorSerial;
     
-    NSDate *calibrationDate = [self.calibrationDates objectForKey:sensorSerial];
-    if (calibrationDate != nil)
-    {
-        self.labelCalibrationDate.text = [calibrationDate toStringWithFormat:kDateFormat];
-        self.labelExpireDate.text = [[self expireDateWithCalibrationDate:calibrationDate] toStringWithFormat:kDateFormat];
-    }
-    
     // calculate result
-#if 0
-    OSSaltSolution *saltSolution = [self.dicCurrentSalt objectForKey:self.currSensor];
-#else
     OSSaltSolution *saltSolution = self.currSalt;
-#endif
     if (saltSolution)
     {
         if (saltSolution.calculable)
         {
             CalCheckResult result = [[OSSaltSolutionManager sharedInstance] calCheckWithRh:rh temp_f:temp_f saltSolution:saltSolution];
             [self showResultForCalResult:result];
-        }
-    }
-    
-    // fetch
-    if (self.isLoggingIn)
-    {
-        //
-    }
-    else
-    {
-        if ([self.serverManager isUserLoggedIn])
-        {
-            if (calibrationDate == nil)
-            {
-                [self didStartFetching];
-                [self.serverManager getExpirationDateForSensor:sensorSerial];
-            }
-        }
-        else
-        {
-            self.isLoggingIn = [self.serverManager login];
-            if (self.isLoggingIn)
-            {
-                [self didStartLogin];
-            }
         }
     }
 }
@@ -437,17 +389,15 @@ static OSViewController *_sharedOSViewController = nil;
 }
 
 // calculate expiration date from calibration date
-// expiration date = calibration date + 2 years
-- (NSDate *)expireDateWithCalibrationDate:(NSDate *)expireDate
+- (NSDate *)expireDateWithCalibrationDate:(NSDate *)calibrationDate
 {
-    if (expireDate == nil)
-        return nil;
-    
-    NSDate * newDate = [NSDate dateWithTimeInterval:365*24*3600*2 sinceDate:expireDate];
-    return newDate;
+    return [OSExpirationManager expirationDateWithCalibrationDate:calibrationDate];
 }
 
 #pragma mark - salt selection
+
+// salt selection canceled
+// called when user tap dropdown again or tap background
 - (IBAction)onSaltsSelectCancel:(id)sender
 {
     // show modes
@@ -458,6 +408,7 @@ static OSViewController *_sharedOSViewController = nil;
             [self.view layoutIfNeeded];
         } completion:^(BOOL finished) {
             [self.tableView reloadData];
+            [self.view bringSubviewToFront:self.tableView];
         }];
     }
     else
@@ -466,17 +417,7 @@ static OSViewController *_sharedOSViewController = nil;
         [UIView animateWithDuration:kDropdownAnimateDuration animations:^() {
             [self.view layoutIfNeeded];
         } completion:^(BOOL finished) {
-            //[self.tableView reloadData];
-            if (self.currSensor == nil || self.currSensor.length == 0)
-                return;
-            if ([self.dicCurrentSalt objectForKey:self.currSensor] == nil)
-            {
-                //OSSaltSolution *saltSolution = [[OSSaltSolutionManager sharedInstance] defaultSolution];
-                //[self onSaltChanged:saltSolution];
-                return;
-            }
-            //OSSaltSolution *currentSalt = [self.dicCurrentSalt objectForKey:self.currSensor];
-            //[self onSaltChanged:currentSalt];
+            //
         }];
     }
 }
@@ -499,7 +440,6 @@ static OSViewController *_sharedOSViewController = nil;
     self.labelResult.hidden = !saltSolution.calculable;
    
     
-    [self.dicCurrentSalt setObject:saltSolution forKey:self.currSensor];
     self.currSalt = saltSolution;
     
     // re-calc result
@@ -520,33 +460,135 @@ static OSViewController *_sharedOSViewController = nil;
 {
     self.currSensor = newSensorSerial;
     
+    // show calibration date
+    CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:newSensorSerial];
+    if (cdCalibrationDate != nil)
+    {
+        self.labelCalibrationDate.text = [cdCalibrationDate.calibrationDate toStringWithFormat:kDateFormat];
+        self.labelExpireDate.text = [[self expireDateWithCalibrationDate:cdCalibrationDate.calibrationDate] toStringWithFormat:kDateFormat];
+    }
+    else
+    {
+        self.labelCalibrationDate.text = @"";
+        self.labelExpireDate.text = @"";
+    }
+
     // show last data locally
     [self showLastCalData:self.currSensor];
     
+    // check certification
+    [self setLabelWarningCalibrationChecking:NO];
+    
     // fetching information from server
     [self retrieveDataForSensor:newSensorSerial];
+    
+    // fetching calibration date
+    [self.serverManager retrieveCalibrationDateForSensor:newSensorSerial];
+}
+
+// check calibration due and will represent it on UIs
+- (BOOL)setLabelWarningCalibrationChecking:(BOOL)bShowAlert
+{
+    // check certification
+    CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:self.currSensor];
+    NSDate *calibrationDate = (cdCalibrationDate == nil) ? nil : cdCalibrationDate.calibrationDate;
+    CDCalCheck *oldestData = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:self.currSensor];
+    NSDate *firstCalCheckDate;
+    if (oldestData == nil)
+        firstCalCheckDate = nil;
+    else
+        firstCalCheckDate = oldestData.date;
+    if ([OSCertificationManager shouldRecertificationWithCalibrationDate:calibrationDate firstCalCheckDate:firstCalCheckDate])
+    {
+        if (bShowAlert)
+        {
+            // alert message
+            [self showMessageForRecertification];
+        }
+        
+        // show warning label
+        self.labelWarning.text = [OSCertificationManager messageForDueRecertification];
+        if (self.labelWarning.alpha < 1)
+        {
+            [UIView animateWithDuration:0.5 animations:^() {
+                self.labelWarning.alpha = 1.0;
+            }];
+        }
+        
+        return NO;
+    }
+    else
+    {
+        // show warning label
+        int days = [OSCertificationManager isInWarningPeriodWithCalibrationDate:calibrationDate firstCalCheckDate:firstCalCheckDate];
+        if (days > 0)
+        {
+            // show appropriate spot
+            self.labelWarning.text = [OSCertificationManager messageForBeforeRecertification:days];
+            
+            if (self.labelWarning.alpha < 1)
+            {
+                [UIView animateWithDuration:kLabelWarningAnimateDuration animations:^() {
+                    self.labelWarning.alpha = 1.0;
+                }];
+            }
+        }
+        else
+        {
+            if (self.labelWarning.alpha > 0)
+            {
+                [UIView animateWithDuration:kLabelWarningAnimateDuration animations:^() {
+                    self.labelWarning.alpha = 0;
+                }];
+            }
+        }
+        
+        return YES;
+    }
 }
 
 - (void)retrieveDataForSensor:(NSString *)sensorSerial
 {
-    [self.serverManager retrieveData:sensorSerial];
+    [self.serverManager retrieveCalCheckForSensor:sensorSerial oldest:NO];
+    [self.serverManager retrieveCalCheckForSensor:sensorSerial oldest:YES];
 }
 
-- (void)onRetrievedData:(NSDictionary *)data
+- (void)onRetrievedData:(NSNotification *)notification
 {
     dispatch_async(dispatch_get_main_queue(), ^(){
-        NSNumber *success = data[kDataSuccessKey];
-        if ([success boolValue])
+       [self showLastCalData:self.currSensor];
+    });
+}
+
+- (void)onRetrievedOldestData:(NSNotification *)notification
+{
+    dispatch_async(dispatch_get_main_queue(), ^(){
+        // check calibration due
+        [self setLabelWarningCalibrationChecking:NO];
+    });
+}
+
+- (void)onRetrievedCalibrationDate:(NSNotification *)notification
+{
+    dispatch_async(dispatch_get_main_queue(), ^() {
+        // show calibration/expiration date
+        CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:self.currSensor];
+        
+        if (cdCalibrationDate == nil)
+            return;
+        
+        if (cdCalibrationDate.calibrationDate)
         {
-            NSString *sensorSerial = data[kDataSensorSerialKey];
-            [self.dicLastData setObject:data forKey:sensorSerial];
-            if ([self.currSensor isEqualToString:sensorSerial])
-                [self showLastCalData:sensorSerial];
+            self.labelCalibrationDate.text = [cdCalibrationDate.calibrationDate toStringWithFormat:kDateFormat];
+            self.labelExpireDate.text = [[self expireDateWithCalibrationDate:cdCalibrationDate.calibrationDate] toStringWithFormat:kDateFormat];
         }
         else
         {
-            [self showLastCalData:nil];
+            self.labelCalibrationDate.text = @"";
+            self.labelExpireDate.text = @"";
         }
+        
+        [self setLabelWarningCalibrationChecking:NO];
     });
 }
 
@@ -559,180 +601,28 @@ static OSViewController *_sharedOSViewController = nil;
     self.labelLastTemp.text = @"";
     self.labelLastSaltSolution.text = @"";
     self.labelLastResult.text = @"";
-    if (sensorSerial == nil)
+    if (sensorSerial == nil || sensorSerial.length == 0)
         return;
-    NSDictionary *data = [self.dicLastData objectForKey:sensorSerial];
-    if (data == nil)
+    
+    CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:sensorSerial];
+    if (calCheck == nil)
         return;
-
-    NSString *strRh = data[@"rh"];
-    NSString *strTemp = data[@"temp"];
-    NSString *strSaltSolution = data[@"salt_name"];
-    NSString *strCalCheck = data[@"date"];
     
-    CGFloat rh = [strRh floatValue] / 10.0f;
-    CGFloat temp = [strTemp floatValue] / 10.0f;
-    NSDate *date = [NSDate dateWithString:strCalCheck withFormat:kUploadDataDateFormat];
-    
-    OSSaltSolution *saltSoltion = [[OSSaltSolutionManager sharedInstance] saltSolutionWithSolution:strSaltSolution];
+    OSSaltSolution *saltSoltion = [[OSSaltSolutionManager sharedInstance] saltSolutionWithSolution:calCheck.salt_name];
     if (saltSoltion.calculable)
     {
-        CalCheckResult result = [[OSSaltSolutionManager sharedInstance] calCheckWithRh:rh temp_f:temp saltSolution:saltSoltion];
+        CalCheckResult result = [[OSSaltSolutionManager sharedInstance] calCheckWithRh:[calCheck.rh floatValue] temp_f:[calCheck.temp floatValue] saltSolution:saltSoltion];
         NSString *strResult = [self resultForCalcResult:result];
         UIColor *labelColor = [self colorForCalcResult:result];
         self.labelLastResult.textColor = labelColor;
         self.labelLastResult.text = strResult;
     }
     
-    self.labelLastCalCheck.text = [date toStringWithFormat:kDateFormat];
-    self.labelLastRH.text = [NSString stringWithFormat:@"%.1f", rh];
-    self.labelLastTemp.text = [NSString stringWithFormat:@"%.1f", temp];
-    self.labelLastSaltSolution.text = strSaltSolution;
-}
-
-#pragma mark - server manager delegate
-- (void)serverManager:(ServerManager *)serverManager
-    didReceiveExpirationDate:(NSDate *)date
-    forSensor:(NSString *)sensorSerial
-{
-    NSLog(@"didReceiveExpirationDate --- %@ : %@", date, sensorSerial);
-    dispatch_async(dispatch_get_main_queue(), ^() {
-        if (date != nil)
-        {
-            NSDate * calibrationDate = date;
-            NSDate * expireDate = [self expireDateWithCalibrationDate:calibrationDate];
-            [self.calibrationDates setObject:calibrationDate forKey:sensorSerial];
-            if ([self.currSensor isEqualToString:sensorSerial])
-            {
-                self.labelCalibrationDate.text = [calibrationDate toStringWithFormat:kDateFormat];
-                self.labelExpireDate.text = [expireDate toStringWithFormat:kDateFormat];
-            }
-        }
-        
-        [self.indicator stopAnimating];
-        [self.labelStatus setText:@"Retrieved success"];
-    });
-}
-
-- (void)serverManager:(ServerManager *)serverManager didFailReceivingExpirationDateForSensor:(NSString *)sensorSerial
-{
-    dispatch_async(dispatch_get_main_queue(), ^() {
-        [self.indicator stopAnimating];
-        [self.labelStatus setText:@"Retrieve failed"];
-    });
-}
-
-- (void)serverManagerDidFinishUpload:(ServerManager *)serverManager {
-    //
-}
-
-- (void)serverManagerUploadDidFailed:(ServerManager *)serverManager withError:(NSError *)error {
-    //
-}
-
--(void)serverManagerDidFailConnectingToServer:(ServerManager *)serverManager {
-    NSLog(@"serverManagerDidFailConnectingToServer ---");
-}
-
--(void)serverManagerDidSuccessfullyConnectToServer:(ServerManager *)serverManager {
-    // fetch expire dates
-    NSLog(@"serverManagerDidSuccessfullyConnectToServer ---");
-}
-
--(void)serverManagerDidSuccessfullyLogin
-{
-    NSLog(@"serverManagerDidSuccessfullyLogin ---");
-    
-    dispatch_async(dispatch_get_main_queue(), ^() {
-        self.isLoggingIn = NO;
-        self.labelStatus.text = @"Logged in successfully!";
-        [self.indicator stopAnimating];
-        
-        if (self.currSensor != nil && self.currSensor.length > 0)
-            [self.serverManager retrieveData:self.currSensor];
-    });
-}
-
--(void)serverManagerDidFailLogin
-{
-    NSLog(@"serverManagerDidFailLogin ---");
-    
-    dispatch_async(dispatch_get_main_queue(), ^() {
-        self.isLoggingIn = NO;
-        [self.indicator stopAnimating];
-        self.labelStatus.text = @"error - Log in failed";
-    });
-}
-
-- (void)serverManager:(ServerManager *)serverManager willLoadOAuthInWebView:(UIWebView *)webView
-{
-    //
-}
-
-- (void)serverManager:(ServerManager *)serverManager didFinishOAuthInWebView:(UIWebView *)webView
-{
-    //
-}
-
-- (UIWebView *)webviewToLoadOAuth
-{
-    return nil;
-}
-
-- (void)serverManager:(ServerManager *)serverManager didStoreData:(BOOL)success
-{
-    if (success)
-    {
-        NSString *message = [NSString stringWithFormat:@"stored successfully!"];
-        [[[[iToast makeText:message] setGravity:iToastGravityBottom] setDuration:iToastDurationNormal] show];
-        
-        // retrieve data
-        [self.dicStoringData setObject:@(YES) forKey:kDataSuccessKey];
-        [self onRetrievedData:self.dicStoringData];
-    }
-    else
-    {
-        NSString *message = [NSString stringWithFormat:@"store failed"];
-        [[[[iToast makeText:message] setGravity:iToastGravityBottom] setDuration:iToastDurationNormal] show];
-    }
-}
-
-- (void)serverManager:(ServerManager *)serverManager didRetrieveData:(NSDictionary *)data success:(BOOL)success
-{
-    NSString *message;
-    if (success)
-    {
-        [self onRetrievedData:data];
-        message = [NSString stringWithFormat:@"Retrieved data"];
-        [[[[iToast makeText:message] setGravity:iToastGravityBottom] setDuration:iToastDurationNormal] show];
-    }
-    else
-    {
-        //message = [NSString stringWithFormat:@"Retrieve failed"];
-        dispatch_async(dispatch_get_main_queue(), ^() {
-            [self showLastCalData:nil];
-        });
-    }
-    
-}
-
-#pragma mark - status utilities
-- (void)didStartLogin
-{
-    [self.indicator startAnimating];
-    [self.labelStatus setText:@"Logging in..."];
-}
-
-- (void)didAlreadyLoggedIn
-{
-    [self.indicator stopAnimating];
-    [self.labelStatus setText:@"Logged in"];
-}
-
-- (void)didStartFetching
-{
-    [self.indicator startAnimating];
-    [self.labelStatus setText:@"Retrieving expiration date..."];
+    self.labelLastCalCheck.text = [calCheck.date toStringWithFormat:kDateFormat];
+    self.labelLastRH.text = [NSString stringWithFormat:@"%.1f", [calCheck.rh floatValue]];
+    self.labelLastTemp.text = [NSString stringWithFormat:@"%.1f", [calCheck.temp floatValue]];
+    //self.labelLastSaltSolution.text = saltSoltion.name;
+    self.labelLastSaltSolution.text = saltSoltion.solution;
 }
 
 - (void)setProgress:(CGFloat)percentage
@@ -776,7 +666,7 @@ static OSViewController *_sharedOSViewController = nil;
 #endif
 }
 
-
+// user tap a salt solution
 - (void)didCellTap:(OSSaltsCell *)cell
 {
     [self.btnSalts setTitle:cell.saltSolution.name forState:UIControlStateNormal];
@@ -793,8 +683,14 @@ static OSViewController *_sharedOSViewController = nil;
 {
     if (self.currSensor == nil || self.currSensor.length == 0)
         return;
-    OSSaltSolution *saltSolution = [self.dicCurrentSalt objectForKey:self.currSensor];
+    
+    OSSaltSolution *saltSolution = self.currSalt;
     if (saltSolution == nil)
+        return;
+    
+    // check certification
+    BOOL storable = [self setLabelWarningCalibrationChecking:YES];
+    if (!storable)
         return;
     
     NSDictionary *sensorData = [self.dicSensorData objectForKey:self.currSensor];
@@ -813,10 +709,17 @@ static OSViewController *_sharedOSViewController = nil;
     [data setObject:saltSolution.solution forKey:kDataSaltSolutionKey];
     [data setObject:[[NSDate date] toStringWithFormat:kUploadDataDateFormat] forKey:kDataDateKey];
     
-    // save to temp, and show it when stored successfully
-    self.dicStoringData = [data mutableCopy];
-    
-    [self.serverManager storeData:data];
+    [self.serverManager storeCalCheck:data];
+}
+
+- (void)showMessageForRecertification
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil
+                                                    message:[OSCertificationManager messageForRecertification]
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    [alert show];
 }
 
 #pragma mark - tap gesture
@@ -927,10 +830,84 @@ CGFloat firstX = 0, firstY = 0;
 - (IBAction)onSwipeLeft:(id)sender
 {
     // show table view
+#if 0
     OSSensorInventoryTableViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"OSSensorInventoryTableViewController"];
     vc.transitioningDelegate = [UIManager pushTransitioingDelegate];
     [self presentViewController:vc animated:YES completion:nil];
+#else
+    UIViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"navSensorInventory"];
+    vc.transitioningDelegate = [UIManager pushTransitioingDelegate];
+    [self presentViewController:vc animated:YES completion:nil];
+#endif
+    
 }
 
+
+#pragma mark - Server delegate
+- (void)didLogin:(BOOL)success
+{
+    if (success)
+    {
+        [self showToastMessage:@"Logged in"];
+    }
+    else
+    {
+        [self showToastMessage:@"Login failed"];
+    }
+}
+
+- (void)didRetrieveCalibrationDate:(NSString *)ssn success:(BOOL)success
+{
+    if (success)
+    {
+        [self showToastMessage:@"Retrieved calibration date"];
+    }
+    else
+    {
+        [self showToastMessage:@"Retrieve calibration date failed"];
+    }
+}
+
+- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success oldest:(BOOL)oldest
+{
+    if (success)
+    {
+        [self showToastMessage:@"Retrieved cal check"];
+    }
+    else
+    {
+        [self showToastMessage:@"Retrieve cal check failed"];
+    }
+}
+
+- (void)didStoreCalCheck:(NSString *)ssn success:(BOOL)success
+{
+    if (success)
+    {
+        [self showToastMessage:@"Stored successfully"];
+    }
+    else
+    {
+        [self showToastMessage:@"Store failed"];
+    }
+}
+
+- (void)showToastMessage:(NSString *)msg
+{
+    [[[[iToast makeText:msg] setGravity:iToastGravityBottom] setDuration:iToastDurationNormal] show];
+}
+
+#pragma mark - timer proc
+- (void)onTimer:(id)sender
+{
+    NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+    if (now - prevLoginTryTime > 5)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^() {
+            prevLoginTryTime = 5;
+            [self.serverManager loginWithUserName:kGlobalUserName password:kGlobalUserPass];
+        });
+    }
+}
 
 @end

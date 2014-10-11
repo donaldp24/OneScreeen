@@ -24,6 +24,7 @@ typedef enum {
 -(void)serverGatewayDidExtractAccessToken:(NSString *)accessToken;
 -(void)serverGatewayDidFailExtractAccessToken:(NSString *)accessToken;
 
-- (void)serverGatewayDidStore:(NSDictionary *)data;
-- (void)serverGatewayDidRetrieve:(NSDictionary *)data;
+- (void)serverGatewayDidStore:(NSDictionary *)data withResponse:(NSDictionary *)response;
+- (void)serverGatewayDidRetrieve:(NSString *)ssn data:(NSDictionary *)data;
+- (void)serverGatewayDidRetrieveOldest:(NSString *)ssn data:(NSDictionary *)data;
 @end

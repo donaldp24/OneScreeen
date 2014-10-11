@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3396" systemVersion="12F45" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
-    <entity name="Reading" representedClassName="Reading" syncable="YES">
-        <attribute name="ambientRh" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="ambientTemp" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="battery" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
-        <attribute name="calibrationDate" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="expirationDate" optional="YES" attributeType="Date" syncable="YES"/>
+    <entity name="CDCalCheck" representedClassName="CDCalCheck" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="rh" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="sensorSerial" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="salt_name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="ssn" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="temp" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="time" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="uid" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+    </entity>
+    <entity name="CDCalibrationDate" representedClassName="CDCalibrationDate" syncable="YES">
+        <attribute name="calibrationDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="ssn" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Reading" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="CDCalCheck" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="CDCalibrationDate" positionX="0" positionY="0" width="0" height="0"/>
     </elements>
 </model>

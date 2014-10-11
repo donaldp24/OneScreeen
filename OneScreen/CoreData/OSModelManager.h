@@ -7,7 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Reading.h"
+#import <CoreData/CoreData.h>
+#import "CDCalCheck.h"
+#import "CDCalibrationDate.h"
 
 @interface OSModelManager : NSObject
 
@@ -26,7 +28,17 @@
 - (void)saveContext;
 
 
-- (NSMutableArray *)retrieveReadings;
+- (NSMutableArray *)retrieveCalCheckForSensor:(NSString *)ssn;
+- (CDCalibrationDate *)getCalibrationDateForSensor:(NSString *)ssn;
+- (CDCalCheck *)getOldestCalCheckForSensor:(NSString *)ssn;
+- (CDCalCheck *)getLatestCalCheckForSensor:(NSString *)ssn;
+- (NSMutableArray *)retrieveSensors;
+
+- (CDCalCheck *)getCalCheckForSensor:(NSString *)ssn date:(NSDate *)date;
+
+
+- (void)setCalibrationDate:(NSDate *)date sensorSerial:(NSString *)ssn;
+- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name oldest:(BOOL)oldest;
 
 
 @end

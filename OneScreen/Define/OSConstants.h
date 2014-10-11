@@ -14,6 +14,7 @@
 #define kDateFormat                             @"MM-dd-yyyy"
 #define kUploadDataDateFormat                   @"yyyy-MM-dd"
 #define KJSONDateTimeFormat                     @"yyyy-MM-dd'T'HH:mm:ss.SSSz"
+#define kShortDateFormat                        @"yy-M-d"
 
 #define kGlobalUserName                         @"donald"
 #define kGlobalUserPass                         @"donald"
@@ -27,5 +28,10 @@
 #define kDataRhKey                              @"rh"
 #define kDataTempKey                            @"temp"
 #define kDataDateKey                            @"date"
+
+// notifications
+#define kCalibrationDateChanged                 @"calibration date changed"
+#define kLastCalCheckChanged                        @"calcheck data changed"
+#define kOldestCalCheckChanged                      @"oldest calcheck data changed"
 
 #endif

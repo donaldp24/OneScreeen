@@ -22,8 +22,6 @@ static NSString * const kOAuthClientAuthURL = @"http://auth-finished.invalid/";
 
 static NSString * const kServiceNameForKeychain = @"DMIOS";
 
-static ServerManager *_sharedServerManager = nil;
-
 @interface ServerManager ()<LROAuth2ClientDelegate>
 
 @property (nonatomic, retain) NSString *accessToken;
@@ -33,13 +31,6 @@ static ServerManager *_sharedServerManager = nil;
 @end
 
 @implementation ServerManager
-
-+ (ServerManager *)sharedInstance
-{
-    if (_sharedServerManager == nil)
-        _sharedServerManager = [[ServerManager alloc] init];
-    return _sharedServerManager;
-}
 
 -(void)oauthClientDidRefreshAccessToken:(LROAuth2Client *)client {}
 -(void)oauthClientDidReceiveAccessToken:(LROAuth2Client *)client {}
@@ -159,7 +150,12 @@ static ServerManager *_sharedServerManager = nil;
 
 - (void)retrieveData:(NSString *)ssn
 {
-    [self.serverGateway retrieveData:ssn accessToken:[self accessToken]];
+    [self.serverGateway retrieveData:ssn oldest:NO accessToken:[self accessToken]];
+}
+
+- (void)retrieveOldestData:(NSString *)ssn
+{
+    [self.serverGateway retrieveData:ssn oldest:YES accessToken:[self accessToken]];
 }
 
 #pragma mark LROAuth2ClientDelegate methods
@@ -258,31 +254,45 @@ static ServerManager *_sharedServerManager = nil;
     [self.delegate serverManagerDidFailLogin];
 }
 
-- (void)serverGatewayDidStore:(NSDictionary *)data
+- (void)serverGatewayDidStore:(NSDictionary *)data withResponse:(NSDictionary *)response
 {
-    if (data == nil)
-        [self.delegate serverManager:self didStoreData:NO];
+    if (response == nil)
+        [self.delegate serverManager:self didStoreData:data success:NO];
     else
     {
-        NSNumber *success = data[kDataSuccessKey];
+        NSNumber *success = response[kDataSuccessKey];
         if ([success boolValue])
-            [self.delegate serverManager:self didStoreData:YES];
+            [self.delegate serverManager:self didStoreData:data success:YES];
         else
-            [self.delegate serverManager:self didStoreData:NO];
+            [self.delegate serverManager:self didStoreData:data success:NO];
     }
 }
 
-- (void)serverGatewayDidRetrieve:(NSDictionary *)data
+- (void)serverGatewayDidRetrieve:(NSString *)ssn data:(NSDictionary *)data
 {
     if (data == nil)
-        [self.delegate serverManager:self didRetrieveData:nil success:NO];
+        [self.delegate serverManager:self didRetrieveData:ssn data:nil success:NO];
     else
     {
         NSNumber *success = data[kDataSuccessKey];
         if ([success boolValue])
-            [self.delegate serverManager:self didRetrieveData:data success:YES];
+            [self.delegate serverManager:self didRetrieveData:ssn data:data success:YES];
         else
-            [self.delegate serverManager:self didRetrieveData:data success:NO];
+            [self.delegate serverManager:self didRetrieveData:ssn data:data success:NO];
+    }
+}
+
+- (void)serverGatewayDidRetrieveOldest:(NSString *)ssn data:(NSDictionary *)data
+{
+    if (data == nil)
+        [self.delegate serverManager:self didRetrieveOldestData:ssn data:nil success:NO];
+    else
+    {
+        NSNumber *success = data[kDataSuccessKey];
+        if ([success boolValue])
+            [self.delegate serverManager:self didRetrieveOldestData:ssn data:data success:YES];
+        else
+            [self.delegate serverManager:self didRetrieveOldestData:ssn data:data success:NO];
     }
 }
 @end
