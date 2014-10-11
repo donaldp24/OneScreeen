@@ -22,9 +22,6 @@
 
 const int scanDelay = 5;
 
-#define kFontBebasNeue(fSize)           [UIFont fontWithName:@"BebasNeue" size:fSize]
-#define kFontMyriadProRegular(fSize)    [UIFont fontWithName:@"MyriadPro-Regular" size:fSize]
-
 #define kRhFontSize             60
 #define kTempFontSize           42
 #define kAmbientRhFontSize      20
@@ -115,8 +112,6 @@ static OSViewController *_sharedOSViewController = nil;
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    
-    self.navigationItem.title = @"SCAN";
     
     self.currSensor = @"";
     
@@ -460,19 +455,9 @@ static OSViewController *_sharedOSViewController = nil;
 {
     self.currSensor = newSensorSerial;
     
-    // show calibration date
-    CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:newSensorSerial];
-    if (cdCalibrationDate != nil)
-    {
-        self.labelCalibrationDate.text = [cdCalibrationDate.calibrationDate toStringWithFormat:kDateFormat];
-        self.labelExpireDate.text = [[self expireDateWithCalibrationDate:cdCalibrationDate.calibrationDate] toStringWithFormat:kDateFormat];
-    }
-    else
-    {
-        self.labelCalibrationDate.text = @"";
-        self.labelExpireDate.text = @"";
-    }
-
+    // calibration and cal check due
+    [self showCalibrationAndCalDue];
+    
     // show last data locally
     [self showLastCalData:self.currSensor];
     
@@ -572,24 +557,53 @@ static OSViewController *_sharedOSViewController = nil;
 {
     dispatch_async(dispatch_get_main_queue(), ^() {
         // show calibration/expiration date
-        CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:self.currSensor];
+        [self showCalibrationAndCalDue];
         
-        if (cdCalibrationDate == nil)
-            return;
-        
-        if (cdCalibrationDate.calibrationDate)
-        {
-            self.labelCalibrationDate.text = [cdCalibrationDate.calibrationDate toStringWithFormat:kDateFormat];
-            self.labelExpireDate.text = [[self expireDateWithCalibrationDate:cdCalibrationDate.calibrationDate] toStringWithFormat:kDateFormat];
-        }
-        else
-        {
-            self.labelCalibrationDate.text = @"";
-            self.labelExpireDate.text = @"";
-        }
-        
+        // check calibration due
         [self setLabelWarningCalibrationChecking:NO];
     });
+}
+
+- (void)showCalibrationAndCalDue
+{
+    // show calibration date
+    CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:self.currSensor];
+    CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:self.currSensor];
+    
+    NSDate *calibrationDate = nil;
+    if (cdCalibrationDate != nil)
+        calibrationDate = cdCalibrationDate.calibrationDate;
+    
+    NSDate *firstCalCheckDate = nil;
+    if (firstCalCheck != nil)
+        firstCalCheckDate = firstCalCheck.date;
+    
+    if (calibrationDate != nil)
+    {
+        self.labelCalibrationDate.text = [calibrationDate toStringWithFormat:kDateFormat];
+    }
+    else
+    {
+        self.labelCalibrationDate.text = @"";
+    }
+    
+    // cal cert due
+    NSDate *caldue = [OSCertificationManager earlierRecertificationDate:calibrationDate firstCalCheckDate:firstCalCheckDate];
+    if (caldue)
+        self.labelExpireDate.text = [caldue toStringWithFormat:kDateFormat];
+    else
+        self.labelExpireDate.text = @"";
+    
+    if ([OSCertificationManager shouldRecertificationWithCalibrationDate:calibrationDate firstCalCheckDate:firstCalCheckDate])
+    {
+        self.labelExpireDate.textColor = kDuedDueDateColor;
+    }
+    else if ([OSCertificationManager isInWarningPeriodWithCalibrationDate:calibrationDate firstCalCheckDate:firstCalCheckDate])
+    {
+        self.labelExpireDate.textColor = kBeforeDueDateColor;
+    }
+    else
+        self.labelExpireDate.textColor = kDefaultDueDateColor;
 }
 
 - (void)showLastCalData:(NSString *)sensorSerial
@@ -829,17 +843,13 @@ CGFloat firstX = 0, firstY = 0;
 #pragma mark - swipe left
 - (IBAction)onSwipeLeft:(id)sender
 {
+    [self onInventory:sender];
+}
+
+- (IBAction)onInventory:(id)sender
+{
     // show table view
-#if 0
-    OSSensorInventoryTableViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"OSSensorInventoryTableViewController"];
-    vc.transitioningDelegate = [UIManager pushTransitioingDelegate];
-    [self presentViewController:vc animated:YES completion:nil];
-#else
-    UIViewController *vc = [self.storyboard instantiateViewControllerWithIdentifier:@"navSensorInventory"];
-    vc.transitioningDelegate = [UIManager pushTransitioingDelegate];
-    [self presentViewController:vc animated:YES completion:nil];
-#endif
-    
+    [self performSegueWithIdentifier:@"gotoInventory" sender:self];
 }
 
 

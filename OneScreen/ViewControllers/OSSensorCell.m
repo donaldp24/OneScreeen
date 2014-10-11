@@ -14,10 +14,6 @@
 #define kDefaultBackgroundColor     [UIColor colorWithRed:0 green:0 blue:0 alpha:0.0]
 #define kReadingBackgroundColor     [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3]
 
-#define kDefaultDueDateColor        [UIColor colorWithRed:0 green:255 blue:0 alpha:0.8]
-#define kBeforeDueDateColor         [UIColor colorWithRed:1 green:1 blue:0 alpha:0.8]
-#define kDuedDueDateColor           [UIColor colorWithRed:1 green:0 blue:0 alpha:0.8]
-
 
 @interface OSSensorCell ()
 
@@ -62,6 +58,13 @@
     self.labelLastCalDate.text = @"";
     self.labelCalCertDue.text = @"";
     self.labelSaltName.text = @"";
+    
+    [self.labelSsn setFont:kFontBebasNeue(14)];
+    [self.labelLastCalDate setFont:kFontMyriadProRegular(14)];
+    [self.labelCalCertDue setFont:kFontMyriadProRegular(14)];
+    [self.labelRh setFont:kFontMyriadProRegular(14)];
+    [self.labelTemp setFont:kFontMyriadProRegular(14)];
+    [self.labelSaltName setFont:kFontMyriadProRegular(14)];
     
     CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
     CDCalCheck *oldestCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:ssn];

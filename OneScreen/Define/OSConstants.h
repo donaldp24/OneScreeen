@@ -34,4 +34,13 @@
 #define kLastCalCheckChanged                        @"calcheck data changed"
 #define kOldestCalCheckChanged                      @"oldest calcheck data changed"
 
+// colors for cal check due
+#define kDefaultDueDateColor        [UIColor colorWithRed:0 green:255 blue:0 alpha:0.8]
+#define kBeforeDueDateColor         [UIColor colorWithRed:1 green:1 blue:0 alpha:0.8]
+#define kDuedDueDateColor           [UIColor colorWithRed:1 green:0 blue:0 alpha:0.8]
+
+// custom fonts
+#define kFontBebasNeue(fSize)           [UIFont fontWithName:@"BebasNeue" size:fSize]
+#define kFontMyriadProRegular(fSize)    [UIFont fontWithName:@"MyriadPro-Regular" size:fSize]
+
 #endif
