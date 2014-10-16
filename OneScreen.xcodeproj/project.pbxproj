@@ -60,6 +60,7 @@
 		D02CB33019F01061003A23B8 /* ThumbsMainToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30919F01061003A23B8 /* ThumbsMainToolbar.m */; };
 		D02CB33119F01061003A23B8 /* ThumbsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30B19F01061003A23B8 /* ThumbsViewController.m */; };
 		D02CB33219F01061003A23B8 /* UIXToolbarView.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30D19F01061003A23B8 /* UIXToolbarView.m */; };
+		D02CB33519F08986003A23B8 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D02CB33419F08986003A23B8 /* Crashlytics.framework */; };
 		D02EE1AD19EDFA7200DF7F5F /* CDSensor.m in Sources */ = {isa = PBXBuildFile; fileRef = D02EE1AC19EDFA7200DF7F5F /* CDSensor.m */; };
 		D05CCF8B19ECCAFE00747064 /* OSRotateNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */; };
 		D05CCF8E19ECD88100747064 /* OSDummyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8D19ECD88100747064 /* OSDummyViewController.m */; };
@@ -211,6 +212,7 @@
 		D02CB30B19F01061003A23B8 /* ThumbsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThumbsViewController.m; sourceTree = "<group>"; };
 		D02CB30C19F01061003A23B8 /* UIXToolbarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIXToolbarView.h; sourceTree = "<group>"; };
 		D02CB30D19F01061003A23B8 /* UIXToolbarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIXToolbarView.m; sourceTree = "<group>"; };
+		D02CB33419F08986003A23B8 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		D02EE1AB19EDFA7200DF7F5F /* CDSensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDSensor.h; sourceTree = "<group>"; };
 		D02EE1AC19EDFA7200DF7F5F /* CDSensor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDSensor.m; sourceTree = "<group>"; };
 		D05CCF8919ECCAFE00747064 /* OSRotateNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSRotateNavigationController.h; sourceTree = "<group>"; };
@@ -311,6 +313,7 @@
 				D0BEAAEA19D3B9CB00514B19 /* CoreGraphics.framework in Frameworks */,
 				D0BEAAEC19D3B9CB00514B19 /* UIKit.framework in Frameworks */,
 				D0BEAAE819D3B9CB00514B19 /* Foundation.framework in Frameworks */,
+				D02CB33519F08986003A23B8 /* Crashlytics.framework in Frameworks */,
 				D0D5D30419E3761C005FF944 /* libTestFlight.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -524,6 +527,7 @@
 		D0BEAAE619D3B9CB00514B19 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D02CB33419F08986003A23B8 /* Crashlytics.framework */,
 				D0D5D30519E37708005FF944 /* libz.dylib */,
 				D0BEAAE719D3B9CB00514B19 /* Foundation.framework */,
 				D0BEAAE919D3B9CB00514B19 /* CoreGraphics.framework */,
@@ -762,6 +766,7 @@
 				D0BEAAE019D3B9CB00514B19 /* Sources */,
 				D0BEAAE119D3B9CB00514B19 /* Frameworks */,
 				D0BEAAE219D3B9CB00514B19 /* Resources */,
+				D02CB33319F0889D003A23B8 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -874,6 +879,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D02CB33319F0889D003A23B8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "./Crashlytics.framework/run 02eaa877844435ac8f0e7707e5087c6a937afdd5 7154887d77c7e9ff6f5f80e4466cc32d7744dd485e921ad9be41a9f8dbc1b875";
+			shellScript = "";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D0BEAAE019D3B9CB00514B19 /* Sources */ = {
@@ -1080,6 +1101,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Volumes/Macintosh\\ 2/work/xxh/OneScreen",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OneScreen/OneScreen-Prefix.pch";
 				INFOPLIST_FILE = "OneScreen/OneScreen-Info.plist";
@@ -1102,6 +1127,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"/Volumes/Macintosh\\ 2/work/xxh/OneScreen",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OneScreen/OneScreen-Prefix.pch";
 				INFOPLIST_FILE = "OneScreen/OneScreen-Info.plist";

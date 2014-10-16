@@ -32,6 +32,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnDelete;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *leftConstraintOfBtnDelete;
 @property (weak, nonatomic) IBOutlet UIView *viewMain;
+@property (weak, nonatomic) IBOutlet UIButton *btnSelect;
 
 @property (retain, nonatomic) IBOutlet UISwipeGestureRecognizer *rightGesture;
 @property (retain, nonatomic) IBOutlet UISwipeGestureRecognizer *leftGesture;
@@ -89,7 +90,7 @@
     // Configure the view for the selected state
 }
 
-- (void)bind:(NSString *)ssn isShownName:(BOOL)isShownName
+- (void)bind:(NSString *)ssn isShownName:(BOOL)isShownName isSelected:(BOOL)isSelected
 {
     _ssn = ssn;
     
@@ -204,6 +205,9 @@
     // hide delete button
     self.leftConstraintOfBtnDelete.constant = -self.btnDelete.bounds.size.width;
     
+    // select
+    self.btnSelect.selected = isSelected;
+    
     [self layoutIfNeeded];
 }
 
@@ -310,6 +314,13 @@
 {
     if (self.delegate)
         [self.delegate didDeleteCell:self];
+}
+
+- (IBAction)onTapCheck:(id)sender
+{
+    self.btnSelect.selected = !self.btnSelect.selected;
+    if (self.delegate)
+        [self.delegate didSelectCell:self isSelected:self.btnSelect.selected];
 }
 
 

@@ -8,6 +8,7 @@
 
 #import "OSAppDelegate.h"
 #import "OSServerManager.h"
+#import <Crashlytics/Crashlytics.h>
 
 @implementation OSAppDelegate
 
@@ -16,6 +17,9 @@
     // Override point for customization after application launch.
     
     [TestFlight takeOff:@"dfba855e-fe1a-4a76-97bc-ef5306809bb3"];
+    
+    // crashlytics
+    [Crashlytics startWithAPIKey:@"02eaa877844435ac8f0e7707e5087c6a937afdd5"];
     
     //Customize Of Navigation Controller for All page
     [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"NavigationBar_BgImage"] forBarMetrics:UIBarMetricsDefault];

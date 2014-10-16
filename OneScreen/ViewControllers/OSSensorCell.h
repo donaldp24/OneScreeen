@@ -19,6 +19,7 @@
 - (void)didShownName:(OSSensorCell *)cell;
 - (void)didShownSerial:(OSSensorCell *)cell;
 - (void)didDeleteCell:(OSSensorCell *)cell;
+- (void)didSelectCell:(OSSensorCell *)cell isSelected:(BOOL)isSelected;
 
 @end
 
@@ -27,7 +28,7 @@
 @property (nonatomic, retain) NSString *ssn;
 @property (nonatomic, retain) id<OSSensorCellDelegate> delegate;
 
-- (void)bind:(NSString *)ssn isShownName:(BOOL)isShownName;
+- (void)bind:(NSString *)ssn isShownName:(BOOL)isShownName isSelected:(BOOL)isSelected;
 
 - (void)showName;
 - (void)showSensorSerial;

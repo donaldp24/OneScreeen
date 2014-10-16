@@ -31,6 +31,7 @@
 @property (nonatomic) BOOL retrievedOldestCalCheck;
 @property (nonatomic) BOOL retrievedCalibrationDate;
 @property (nonatomic) BOOL isShownName;
+@property (nonatomic) BOOL isSelected;
 
 @end
 
@@ -52,12 +53,13 @@
 }
 @end
 
-@interface OSSensorInventoryTableViewController () <UIGestureRecognizerDelegate, OSServerManagerDelegate, OSSensorCellDelegate, UITextFieldDelegate, ReaderViewControllerDelegate>
+@interface OSSensorInventoryTableViewController () <UIGestureRecognizerDelegate, OSServerManagerDelegate, OSSensorCellDelegate, UITextFieldDelegate, ReaderViewControllerDelegate, UIAlertViewDelegate>
 {
     NSTimer *timer;
     BOOL orientationToLandscape; //should set to NO by default
     UIResponder *currentResponder;
     OSSensorCell *editingCell;
+    UIButton *btnDelete;
 }
 
 @property (nonatomic, retain) UISwipeGestureRecognizer *rightGesture;
@@ -245,6 +247,12 @@
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     UITableViewCell *sectionHeader = [self.tableView dequeueReusableCellWithIdentifier:@"sectionheader"];
+    btnDelete = (UIButton *)[sectionHeader viewWithTag:100];
+    [btnDelete removeTarget:self action:@selector(onDeleteSelectedCells:) forControlEvents:UIControlEventTouchUpInside];
+    [btnDelete addTarget:self action:@selector(onDeleteSelectedCells:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self refreshDeleteButton];
+    
     return sectionHeader;
 }
 
@@ -279,7 +287,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
     // Configure the cell...
     OSProcessingSensor *sensor = [self.arrayProcessingSensors objectAtIndex:indexPath.row];
     cell.delegate = self;
-    [cell bind:sensor.ssn isShownName:sensor.isShownName];
+    [cell bind:sensor.ssn isShownName:sensor.isShownName isSelected:sensor.isSelected];
     
     return cell;
 }
@@ -520,6 +528,88 @@ static OSSensorCell *_prototypeSensorCell = nil;
         if (indexPath)
             [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         [self.tableView endUpdates];
+    }
+}
+
+- (void)didSelectCell:(OSSensorCell *)cell isSelected:(BOOL)isSelected
+{
+    OSProcessingSensor *sensor = [self findProcessingSensor:cell.ssn];
+    if (sensor) {
+        // change selected
+        sensor.isSelected = isSelected;
+    }
+    
+    [self refreshDeleteButton];
+}
+
+- (void)refreshDeleteButton
+{
+    int count = 0;
+    for (OSProcessingSensor *s in self.arrayProcessingSensors) {
+        if (s.isSelected)
+            count++;
+    }
+    
+    if (btnDelete == nil)
+        return;
+    
+    if (count > 0)
+        btnDelete.enabled = YES;
+    else
+        btnDelete.enabled = NO;
+}
+
+- (IBAction)onDeleteSelectedCells:(id)sender
+{
+    int nSelected = 0;
+    for (int i = 0; i < self.arrayProcessingSensors.count; i++) {
+        OSProcessingSensor *sensor = [self.arrayProcessingSensors objectAtIndex:i];
+        if (!sensor.isSelected)
+            continue;
+        
+        nSelected++;
+    }
+    
+    if (nSelected > 0)
+    {
+        NSString *msg;
+        if (nSelected == 1)
+            msg = [NSString stringWithFormat:@"Selected %d sensor! \nPlease confirm to delete.", nSelected];
+        else
+            msg = [NSString stringWithFormat:@"Selected %d sensors! \nPlease confirm to delete.", nSelected];
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Confirm" message:msg delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
+        [alertView show];
+    }
+
+}
+
+#pragma mark - uialertview delegate
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) //yes
+    {
+        NSMutableArray *indexPathArray = [[NSMutableArray alloc] init];
+        NSMutableArray *removeSensors = [[NSMutableArray alloc] init];
+        for (int i = 0; i < self.arrayProcessingSensors.count; i++) {
+            OSProcessingSensor *sensor = [self.arrayProcessingSensors objectAtIndex:i];
+            if (!sensor.isSelected)
+                continue;
+            
+            NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
+            [indexPathArray addObject:indexPath];
+            [removeSensors addObject:sensor];
+        }
+        
+        if (indexPathArray.count > 0)
+        {
+            for (OSProcessingSensor *sensor in removeSensors) {
+                [self.arrayProcessingSensors removeObject:sensor];
+            }
+            
+            [self.tableView beginUpdates];
+            [self.tableView deleteRowsAtIndexPaths:indexPathArray withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self.tableView endUpdates];
+        }
     }
 }
 
