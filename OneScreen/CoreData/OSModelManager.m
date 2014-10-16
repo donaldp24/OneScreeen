@@ -161,7 +161,7 @@
     return ret;
 }
 
-- (NSMutableArray *)retrieveSensors
+- (NSMutableArray *)retrieveSensorSerials
 {
     NSMutableArray *sensors = [[NSMutableArray alloc] init];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -213,6 +213,34 @@
 
 }
 
+- (NSMutableArray *)retrieveSensorNames
+{
+    NSMutableArray *sensors = [[NSMutableArray alloc] init];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDSensor"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"name"
+                                 ascending:YES];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    [fetchRequest setEntity:entity];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    
+    for (id obj in fetchedObjects) {
+        [sensors addObject:obj];
+    }
+    
+    return sensors;
+}
+
 - (CDCalCheck *)getCalCheckForSensor:(NSString *)ssn date:(NSDate *)date
 {
     if (ssn == nil || ssn.length == 0)
@@ -255,10 +283,50 @@
     return ret;
 }
 
+- (CDSensor *)getSensorForSerial:(NSString *)ssn
+{
+    if (ssn == nil || ssn.length == 0)
+        return nil;
+    
+    CDSensor *ret = nil;
+    
+    // search equal calcheck
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDSensor"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ssn == %@", ssn];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"name"
+                                 ascending:YES];
+    
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        if (fetchedObjects.count > 0)
+            ret = [fetchedObjects objectAtIndex:0];
+    }
+    
+    return ret;
+}
+
+#pragma mark - save sensor
+
 - (void)setCalibrationDate:(NSDate *)date sensorSerial:(NSString *)ssn
 {
     if (ssn == nil || ssn.length == 0)
         return;
+    
+    [self setSensor:ssn];
     
     CDCalibrationDate *cdCalibrationDate = [self getCalibrationDateForSensor:ssn];
     if (cdCalibrationDate == nil)
@@ -275,6 +343,8 @@
 {
     if (ssn == nil || ssn.length == 0)
         return;
+    
+    [self setSensor:ssn];
     
     if (!oldest)
     {
@@ -346,6 +416,31 @@
         [self saveContext];
 
     }
+}
+
+- (void)setSensor:(NSString *)ssn
+{
+    CDSensor *sensor = [self getSensorForSerial:ssn];
+    if (sensor)
+        return;
+    sensor = [NSEntityDescription
+              insertNewObjectForEntityForName:@"CDSensor"
+              inManagedObjectContext:self.managedObjectContext];
+    sensor.ssn = ssn;
+    sensor.name = @"";
+}
+
+- (void)setSensor:(CDSensor *)sensor name:(NSString *)name
+{
+    if (sensor == nil)
+        return;
+    
+    if (name != nil)
+        sensor.name = name;
+    else
+        sensor.name = @"";
+    
+    [self saveContext];
 }
 
 #pragma mark - CoreData stack

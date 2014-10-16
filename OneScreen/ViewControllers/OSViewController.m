@@ -189,6 +189,7 @@ static OSViewController *_sharedOSViewController = nil;
     
     // left gesture
     [self.view addGestureRecognizer:self.leftGesture];
+    self.leftGesture.enabled = NO;
     
     // warning label
     self.labelWarning.alpha = 0;
@@ -918,6 +919,22 @@ CGFloat firstX = 0, firstY = 0;
             [self.serverManager loginWithUserName:kGlobalUserName password:kGlobalUserPass];
         });
     }
+}
+
+#pragma mark - interface orientation
+- (BOOL)shouldAutorotate
+{
+    return NO;
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
+{
+    return UIInterfaceOrientationPortrait;
 }
 
 @end

@@ -11,10 +11,11 @@
 
 #define kDateTimeFormatWithTimezone             @"yyyy-MM-dd HH:mm:ss ZZZ"
 #define kDateTimeFormat                         @"yyyy-MM-dd HH:mm:ss"
-#define kDateFormat                             @"MM-dd-yyyy"
+#define kDateFormat                             @"MMM dd, yyyy"
 #define kUploadDataDateFormat                   @"yyyy-MM-dd"
 #define KJSONDateTimeFormat                     @"yyyy-MM-dd'T'HH:mm:ss.SSSz"
-#define kShortDateFormat                        @"yy-M-d"
+//#define kShortDateFormat                        @"yy-M-d"
+#define kShortDateFormat                        @"MMM dd, yyyy"
 
 #define kGlobalUserName                         @"donald"
 #define kGlobalUserPass                         @"donald"

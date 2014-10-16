@@ -14,6 +14,11 @@
 @protocol OSSensorCellDelegate <NSObject>
 
 - (BOOL)retrievedData:(OSSensorCell *)cell;
+- (void)didBeginEditingCell:(OSSensorCell *)cell;
+- (void)didEndEditingCell:(OSSensorCell *)cell;
+- (void)didShownName:(OSSensorCell *)cell;
+- (void)didShownSerial:(OSSensorCell *)cell;
+- (void)didDeleteCell:(OSSensorCell *)cell;
 
 @end
 
@@ -21,5 +26,11 @@
 
 @property (nonatomic, retain) NSString *ssn;
 @property (nonatomic, retain) id<OSSensorCellDelegate> delegate;
+
+- (void)bind:(NSString *)ssn isShownName:(BOOL)isShownName;
+
+- (void)showName;
+- (void)showSensorSerial;
+- (void)endEditing;
 
 @end

@@ -15,7 +15,7 @@
 {
     // Override point for customization after application launch.
     
-    [TestFlight takeOff:@"6157733d-7939-490c-a235-356c766ce804"];
+    [TestFlight takeOff:@"dfba855e-fe1a-4a76-97bc-ef5306809bb3"];
     
     //Customize Of Navigation Controller for All page
     [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"NavigationBar_BgImage"] forBarMetrics:UIBarMetricsDefault];
@@ -25,6 +25,9 @@
                                                             NSForegroundColorAttributeName: [UIColor colorWithRed:248/255.0 green:248/255.0 blue:248/255.0 alpha:1.0],
                                                             NSFontAttributeName: [UIFont fontWithName:@"HelveticaNeue-Light" size:17.0f]
                                                             }];
+    
+    // orientation is portrate first
+    self.allowRotateToLandscape = NO;
     
     return YES;
 }
@@ -58,5 +61,14 @@
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
+#pragma mark - orientation
+//- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window
+//{
+//    if (self.allowRotateToLandscape)
+//        return UIInterfaceOrientationMaskLandscape;
+//    else
+//        return UIInterfaceOrientationMaskPortrait;
+//}
 
 @end
