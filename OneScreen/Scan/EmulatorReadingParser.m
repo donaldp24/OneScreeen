@@ -9,14 +9,6 @@
 #import "EmulatorReadingParser.h"
 #import "SensorReadingParser.h"
 
-//NSString * const kSensorDataBatteryKey = @"battery";
-//NSString * const kSensorDataRHKey = @"rh";
-//NSString * const kSensorDataRHAmbientKey = @"rhAmbient";
-//NSString * const kSensorDataTemperatureKey = @"temp";
-//NSString * const kSensorDataTemperatureAmbientKey = @"tempAmbient";
-//NSString * const kSensorDataReadingTimestampKey = @"readingTimestamp";
-//NSString * const kSensorDataSerialNumberKey = @"serial";
-
 static int const kRHValueOffset = 4;
 static int const kTempValueOffset = 6;
 static int const kRHAmbientValueOffset = 8;

@@ -11,6 +11,8 @@
 #import "CDCalCheck.h"
 #import "CDCalibrationDate.h"
 #import "CDSensor.h"
+#import "CDJob.h"
+#import "CDReading.h"
 
 @interface OSModelManager : NSObject
 
@@ -27,25 +29,43 @@
 
 // Save context
 - (void)saveContext;
+- (void)deleteObject:(id)object;
 
 
-- (NSMutableArray *)retrieveCalCheckForSensor:(NSString *)ssn;
-- (CDCalibrationDate *)getCalibrationDateForSensor:(NSString *)ssn;
-- (CDCalCheck *)getOldestCalCheckForSensor:(NSString *)ssn;
-- (CDCalCheck *)getLatestCalCheckForSensor:(NSString *)ssn;
-- (NSMutableArray *)retrieveSensorSerials;
-- (NSMutableArray *)retrieveSensorNames;
-
-
-- (CDCalCheck *)getCalCheckForSensor:(NSString *)ssn date:(NSDate *)date;
-
+#pragma mark - sensor
+- (NSMutableArray *)retrieveSensors;
 - (CDSensor *)getSensorForSerial:(NSString *)ssn;
-
-
-- (void)setCalibrationDate:(NSDate *)date sensorSerial:(NSString *)ssn;
-- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name oldest:(BOOL)oldest;
 - (void)setSensor:(NSString *)ssn;
 - (void)setSensor:(CDSensor *)sensor name:(NSString *)name;
+- (void)removeSensorFromInventory:(CDSensor *)sensor;
+- (void)removeSensorFromJob:(CDJob *)job sensor:(CDSensor *)sensor;
 
+
+#pragma mark - calcheck
+- (NSMutableArray *)retrieveCalCheckForSensor:(NSString *)ssn;
+- (CDCalCheck *)getOldestCalCheckForSensor:(NSString *)ssn;
+- (CDCalCheck *)getLatestCalCheckForSensor:(NSString *)ssn;
+- (CDCalCheck *)getCalCheckForSensor:(NSString *)ssn date:(NSDate *)date;
+- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name oldest:(BOOL)oldest;
+
+
+#pragma mark - calibration date
+- (CDCalibrationDate *)getCalibrationDateForSensor:(NSString *)ssn;
+- (void)setCalibrationDate:(NSDate *)date sensorSerial:(NSString *)ssn;
+
+
+// job
+- (CDJob *)getJobWithUid:(NSString *)uid;
+- (CDJob *)createNewJob:(NSString *)jobName;
+- (void)setNameForJob:(CDJob *)job jobName:(NSString *)jobName;
+- (NSMutableArray *)retrieveJobs;
+- (void)startJob:(CDJob *)job;
+- (void)endJob:(CDJob *)job;
+- (void)removeJob:(CDJob *)job;
+
+// reading
+- (CDReading *)getLastReadingForSensor:(NSString *)ssn ofJob:(NSString *)jobUuid;
+- (NSMutableArray *)getSensorSerialsForJob:(NSString *)jobUid;
+- (void)saveReadingForJob:(NSString *)jobUid sensorData:(NSDictionary *)dicInfo;
 
 @end

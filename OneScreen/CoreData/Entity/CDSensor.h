@@ -2,7 +2,7 @@
 //  CDSensor.h
 //  OneScreen
 //
-//  Created by Xiaoxue Han on 10/15/14.
+//  Created by Xiaoxue Han on 10/21/14.
 //  Copyright (c) 2014 wagnermeter. All rights reserved.
 //
 
@@ -14,5 +14,6 @@
 
 @property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSString * ssn;
+@property (nonatomic, retain) NSNumber * deletedInv;
 
 @end

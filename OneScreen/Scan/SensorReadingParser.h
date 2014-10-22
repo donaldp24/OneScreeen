@@ -8,14 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString * const kSensorDataBatteryKey;
-extern NSString * const kSensorDataRHKey;
-extern NSString * const kSensorDataRHAmbientKey;
-extern NSString * const kSensorDataTemperatureKey;
-extern NSString * const kSensorDataTemperatureAmbientKey;
-extern NSString * const kSensorDataReadingTimestampKey;
-extern NSString * const kSensorDataSerialNumberKey;
-
 @interface SensorReadingParser : NSObject
 
 - (NSDictionary*)parseData:(NSData*)manufactureData withOffset:(NSInteger)offset;

@@ -11,13 +11,7 @@
 #import "NSDate+String.h"
 #import "OSCertificationManager.h"
 
-#define kDefaultBackgroundColor     [UIColor colorWithRed:0 green:0 blue:0 alpha:0.0]
-#define kReadingBackgroundColor     [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3]
 
-#define kNameTextColor              [UIColor colorWithRed:243/255.0 green:143/255.0 blue:29/255.0 alpha:1.0]
-#define kSerialTextColor            [UIColor colorWithRed:255/255.0 green:255/255.0 blue:255/255.0 alpha:1.0]
-
-#define kSwipeAnimateDuration (0.25)
 
 @interface OSSensorCell () <UIGestureRecognizerDelegate>
 
@@ -106,7 +100,7 @@
     [self.labelLastCalDate setFont:kFontMyriadProRegular(17)];
     [self.labelCalCertDue setFont:kFontMyriadProRegular(17)];
     [self.labelRh setFont:kFontMyriadProRegular(17)];
-    [self.labelTemp setFont:kFontMyriadProRegular(16)];
+    [self.labelTemp setFont:kFontMyriadProRegular(17)];
     [self.labelSaltName setFont:kFontMyriadProRegular(17)];
     
     CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];

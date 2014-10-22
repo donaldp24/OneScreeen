@@ -8,6 +8,7 @@
 
 #import "OSModelManager.h"
 #import "NSDate+convenience.h"
+#import "NSDate+String.h"
 
 @implementation OSModelManager
 
@@ -27,6 +28,109 @@
     return (OSModelManager*)sharedInstance;
 }
 
+#pragma mark - CoreData stack
+
+- (void)saveContext
+{
+    NSError *error = nil;
+    NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
+    if (managedObjectContext != nil) {
+        if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error]) {
+            // Replace this implementation with code to handle the error appropriately.
+            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+            abort();
+        }
+    }
+}
+
+- (void)deleteObject:(id)object
+{
+    [self.managedObjectContext deleteObject:object];
+}
+
+- (void)_mocDidSaveNotification:(NSNotification *)notification
+{
+    NSManagedObjectContext *savedContext = [notification object];
+    
+    // ignore change notifications for the main MOC
+    if (_managedObjectContext == savedContext)
+    {
+        return;
+    }
+    
+    if (_managedObjectContext.persistentStoreCoordinator != savedContext.persistentStoreCoordinator)
+    {
+        // that's another database
+        return;
+    }
+    
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        
+        [_managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+    });
+}
+// Returns the managed object context for the application.
+// If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
+- (NSManagedObjectContext *)managedObjectContext
+{
+    if (_managedObjectContext != nil) {
+        return _managedObjectContext;
+    }
+    
+    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    if (coordinator != nil) {
+        _managedObjectContext = [[NSManagedObjectContext alloc] init];
+        [_managedObjectContext setUndoManager:nil];
+        [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+        // subscribe to change notifications
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_mocDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:nil];
+        
+    }
+    
+    
+    return _managedObjectContext;
+}
+
+// Returns the managed object model for the application.
+// If the model doesn't already exist, it is created from the application's model.
+- (NSManagedObjectModel *)managedObjectModel
+{
+    if (_managedObjectModel != nil) {
+        return _managedObjectModel;
+    }
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
+    _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    return _managedObjectModel;
+}
+
+// Returns the persistent store coordinator for the application.
+// If the coordinator doesn't already exist, it is created and the application's store added to it.
+- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
+{
+    if (_persistentStoreCoordinator != nil) {
+        return _persistentStoreCoordinator;
+    }
+    
+    NSURL *storeURL = [DOCUMENTS_DIR URLByAppendingPathComponent:kSqliteName];
+    //add lightweight migration
+    NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
+                             [NSNumber numberWithBool:YES],
+                             NSMigratePersistentStoresAutomaticallyOption,
+                             [NSNumber numberWithBool:YES],
+                             NSInferMappingModelAutomaticallyOption,nil];
+    NSError *error = nil;
+    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
+    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+    
+    
+    return _persistentStoreCoordinator;
+}
+
+#pragma mark - calcheck
 - (NSMutableArray *)retrieveCalCheckForSensor:(NSString *)ssn
 {
     NSMutableArray * allRecords = [NSMutableArray arrayWithCapacity:0];
@@ -161,59 +265,7 @@
     return ret;
 }
 
-- (NSMutableArray *)retrieveSensorSerials
-{
-    NSMutableArray *sensors = [[NSMutableArray alloc] init];
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    NSEntityDescription *entity = [NSEntityDescription
-                                   entityForName:@"CDCalCheck"
-                                   inManagedObjectContext:self.managedObjectContext];
-    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
-                                 initWithKey:@"date"
-                                 ascending:NO];
-    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
-    
-    [fetchRequest setEntity:entity];
-   
-    NSError *error = nil;
-    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-    if (error != nil)
-    {
-        NSLog(@"error in fetching : %@", error);
-    }
-    else
-    {
-        for (CDCalCheck *calCheck in fetchedObjects) {
-            if (![sensors containsObject:calCheck.ssn])
-                [sensors addObject:[NSString stringWithFormat:@"%@", calCheck.ssn]];
-        }
-    }
-    
-    fetchRequest = [[NSFetchRequest alloc] init];
-    entity = [NSEntityDescription
-              entityForName:@"CDCalibrationDate"
-              inManagedObjectContext:self.managedObjectContext];
-    
-    [fetchRequest setEntity:entity];
-    
-    error = nil;
-    fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
-    if (error != nil)
-    {
-        NSLog(@"error in fetching : %@", error);
-    }
-    else
-    {
-        for (CDCalibrationDate *cdCalibrationDate in fetchedObjects) {
-            if (![sensors containsObject:cdCalibrationDate.ssn])
-                [sensors addObject:[NSString stringWithFormat:@"%@", cdCalibrationDate.ssn]];
-        }
-    }
-    return sensors;
-
-}
-
-- (NSMutableArray *)retrieveSensorNames
+- (NSMutableArray *)retrieveSensors
 {
     NSMutableArray *sensors = [[NSMutableArray alloc] init];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -443,105 +495,300 @@
     [self saveContext];
 }
 
-#pragma mark - CoreData stack
-
-- (void)saveContext
+- (void)removeSensorFromInventory:(CDSensor *)sensor
 {
+    sensor.deletedInv = @(YES);
+    [self saveContext];
+}
+
+- (void)removeSensorFromJob:(CDJob *)job sensor:(CDSensor *)sensor
+{
+    if (job == nil)
+        return;
+    
+    if (sensor == nil)
+        return;
+    
+    // search equal calcheck
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDReading"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(jobUid == %@) AND (ssn == %@)", job.uid, sensor.ssn];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"timestamp"
+                                 ascending:NO];
+    
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
     NSError *error = nil;
-    NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
-    if (managedObjectContext != nil) {
-        if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error]) {
-            // Replace this implementation with code to handle the error appropriately.
-            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-            abort();
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        for (CDReading *reading in fetchedObjects) {
+            [self deleteObject:reading];
+        }
+        
+        [self saveContext];
+    }
+}
+
+#pragma mark - job
+- (CDJob *)getJobWithUid:(NSString *)uid
+{
+    if (uid == nil || uid.length == 0)
+        return nil;
+    
+    CDJob *ret = nil;
+    
+    // search equal calcheck
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDJob"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"uid == %@", uid];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"name"
+                                 ascending:YES];
+    
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        if (fetchedObjects.count > 0)
+            ret = [fetchedObjects objectAtIndex:0];
+    }
+    
+    return ret;
+}
+
+- (CDJob *)createNewJob:(NSString *)jobName
+{
+    NSDate *date = [NSDate date];
+    NSString *strDate = [date toStringWithFormat:kDateTimeFormat];
+    NSTimeInterval interval = [date timeIntervalSince1970];
+    NSString *uid = [NSString stringWithFormat:@"%@_%.2f", strDate, interval];
+    
+    CDJob *newJob = [NSEntityDescription
+                     insertNewObjectForEntityForName:@"CDJob"
+                     inManagedObjectContext:self.managedObjectContext];
+    newJob.deleted = @(NO);
+    newJob.uid = uid;
+    newJob.name = jobName;
+    newJob.createtime = [NSDate date];
+    
+    [self saveContext];
+    
+    return newJob;
+}
+
+- (void)setNameForJob:(CDJob *)job jobName:(NSString *)jobName
+{
+    if (job == nil)
+        return;
+    
+    job.name = jobName;
+    [self saveContext];
+}
+
+- (void)startJob:(CDJob *)job
+{
+    if (job == nil)
+        return;
+    
+    job.endtime = nil;
+    
+    if (job.starttime != nil)
+        return;
+    
+    job.starttime = [NSDate date];
+    
+    
+    [self saveContext];
+}
+
+- (void)endJob:(CDJob *)job
+{
+    if (job == nil)
+        return;
+    
+    job.endtime = [NSDate date];
+    [self saveContext];
+}
+
+- (void)removeJob:(CDJob *)job
+{
+    if (job == nil)
+        return;
+    
+    job.deleted = @(YES);
+    [self saveContext];
+}
+
+- (NSMutableArray *)retrieveJobs
+{
+    NSMutableArray *arrayJobs = [[NSMutableArray alloc] init];
+    
+    // search equal
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDJob"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"deleted == %@", @(NO)];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"createtime"
+                                 ascending:NO];
+    
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        for (id obj in fetchedObjects) {
+            [arrayJobs addObject:obj];
         }
     }
+    
+    return arrayJobs;
+
 }
 
-- (void)_mocDidSaveNotification:(NSNotification *)notification
+#pragma mark - reading
+- (CDReading *)getLastReadingForSensor:(NSString *)ssn ofJob:(NSString *)jobUid
 {
-    NSManagedObjectContext *savedContext = [notification object];
+    if (jobUid == nil || jobUid.length == 0)
+        return nil;
     
-    // ignore change notifications for the main MOC
-    if (_managedObjectContext == savedContext)
-    {
-        return;
-    }
+    if (ssn == nil || ssn.length == 0)
+        return nil;
     
-    if (_managedObjectContext.persistentStoreCoordinator != savedContext.persistentStoreCoordinator)
-    {
-        // that's another database
-        return;
-    }
+    CDReading *ret = nil;
     
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        
-        [_managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
-    });
-}
-// Returns the managed object context for the application.
-// If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
-- (NSManagedObjectContext *)managedObjectContext
-{
-    if (_managedObjectContext != nil) {
-        return _managedObjectContext;
-    }
+    // search equal calcheck
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDReading"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(jobUid == %@) AND (ssn == %@)", jobUid, ssn];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"timestamp"
+                                 ascending:NO];
     
-    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
-    if (coordinator != nil) {
-        _managedObjectContext = [[NSManagedObjectContext alloc] init];
-        [_managedObjectContext setUndoManager:nil];
-        [_managedObjectContext setPersistentStoreCoordinator:coordinator];
-        // subscribe to change notifications
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_mocDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:nil];
-        
-    }
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
     
-    
-    return _managedObjectContext;
-}
-
-// Returns the managed object model for the application.
-// If the model doesn't already exist, it is created from the application's model.
-- (NSManagedObjectModel *)managedObjectModel
-{
-    if (_managedObjectModel != nil) {
-        return _managedObjectModel;
-    }
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
-    _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
-    return _managedObjectModel;
-}
-
-// Returns the persistent store coordinator for the application.
-// If the coordinator doesn't already exist, it is created and the application's store added to it.
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
-{
-    if (_persistentStoreCoordinator != nil) {
-        return _persistentStoreCoordinator;
-    }
-    
-    NSURL *storeURL = [DOCUMENTS_DIR URLByAppendingPathComponent:kSqliteName];
-    //add lightweight migration
-    NSDictionary* options = [NSDictionary dictionaryWithObjectsAndKeys:
-                             [NSNumber numberWithBool:YES],
-                             NSMigratePersistentStoresAutomaticallyOption,
-                             [NSNumber numberWithBool:YES],
-                             NSInferMappingModelAutomaticallyOption,nil];
     NSError *error = nil;
-    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error]) {
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        if (fetchedObjects.count > 0)
+            ret = [fetchedObjects objectAtIndex:0];
     }
     
-    
-    return _persistentStoreCoordinator;
+    return ret;
 }
 
-- (void) deleteObject:(id)sender{
-    [self.managedObjectContext deleteObject:sender];
+- (NSMutableArray *)getSensorSerialsForJob:(NSString *)jobUid
+{
+    NSMutableArray *arraySensorSerials = [[NSMutableArray alloc] init];
+    if (jobUid == nil || jobUid.length == 0)
+        return arraySensorSerials;
+    
+    // search equal
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDReading"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(jobUid == %@)", jobUid];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"timestamp"
+                                 ascending:NO];
+    
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        for (CDReading *reading in fetchedObjects) {
+            if (![arraySensorSerials containsObject:reading.ssn])
+                [arraySensorSerials addObject:reading.ssn];
+        }
+    }
+    
+    return arraySensorSerials;
+}
+
+- (void)saveReadingForJob:(NSString *)jobUid sensorData:(NSDictionary *)dicInfo
+{
+    if (dicInfo == nil || ![dicInfo isKindOfClass:[NSDictionary class]])
+        return;
+    /*
+    NSString * const kSensorDataBatteryKey = @"battery";
+    NSString * const kSensorDataRHKey = @"rh";
+    NSString * const kSensorDataRHAmbientKey = @"rhAmbient";
+    NSString * const kSensorDataTemperatureKey = @"temp";
+    NSString * const kSensorDataTemperatureAmbientKey = @"tempAmbient";
+    NSString * const kSensorDataReadingTimestampKey = @"readingTimestamp";
+    NSString * const kSensorDataSerialNumberKey = @"serial";
+     */
+    CGFloat rh = [[dicInfo objectForKey:kSensorDataRHKey] floatValue];
+    CGFloat temp = [[dicInfo objectForKey:kSensorDataTemperatureKey] floatValue];
+    CGFloat ambRh = [[dicInfo objectForKey:kSensorDataRHAmbientKey] floatValue];
+    CGFloat ambTemp = [[dicInfo objectForKey:kSensorDataTemperatureAmbientKey] floatValue];
+    int battery = [[dicInfo objectForKey:kSensorDataBatteryKey] intValue];
+    
+    NSString *ssn = [dicInfo objectForKey:kSensorDataSerialNumberKey];
+    
+    if (ssn == nil || ssn.length == 0)
+        return;
+    
+    CDReading *reading = [NSEntityDescription
+                          insertNewObjectForEntityForName:@"CDReading"
+                          inManagedObjectContext:self.managedObjectContext];
+    reading.rh = @(rh);
+    reading.temp = @(temp);
+    reading.ambRh = @(ambRh);
+    reading.ambTemp = @(ambTemp);
+    reading.ssn = ssn;
+    reading.battery = @(battery);
+    reading.timestamp = [NSDate date];
+    reading.jobUid = jobUid;
+    
+    [self saveContext];
+    return;
 }
 
 @end

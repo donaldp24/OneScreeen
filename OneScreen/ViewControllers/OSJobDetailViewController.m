@@ -1,58 +1,48 @@
 //
-//  OSSensorInventoryTableViewController.m
+//  OSJobDetailViewController.m
 //  OneScreen
 //
-//  Created by Xiaoxue Han on 10/8/14.
+//  Created by Xiaoxue Han on 10/19/14.
 //  Copyright (c) 2014 wagnermeter. All rights reserved.
 //
 
-#import "OSSensorInventoryTableViewController.h"
-#import "OSServerManager.h"
-#import "OSModelManager.h"
-#import "OSSensorCell.h"
+#import "OSJobDetailViewController.h"
+#import "OSReadingCell.h"
 #import "OSAppDelegate.h"
+#import "OSModelManager.h"
+#import "ReaderViewController.h"
 #import "OSDummyViewController.h"
 #import "OSReportManager.h"
-#import "ReaderViewController.h"
-#import "ForceLandscape.h"
-
-#define USE_SEARCHBAR       0
 
 #define kHeightForSection       48.0
 
 
-@interface OSProcessingSensor : NSObject
+@interface OSProcessingReading : NSObject
 
 @property (nonatomic, retain) NSString *ssn;
-@property (nonatomic) BOOL retrievedLatestCalCheck;
-@property (nonatomic) BOOL retrievedOldestCalCheck;
-@property (nonatomic) BOOL retrievedCalibrationDate;
+@property (nonatomic, retain) CDReading *reading;
 @property (nonatomic) BOOL isShownName;
 @property (nonatomic) BOOL isSelected;
 
 @end
 
-@implementation OSProcessingSensor
+@implementation OSProcessingReading
 @end
 
-
-@interface OSSensorInventoryTableViewController () <UIGestureRecognizerDelegate, OSServerManagerDelegate, OSSensorCellDelegate, UITextFieldDelegate, ReaderViewControllerDelegate, UIAlertViewDelegate>
+@interface OSJobDetailViewController () <UIAlertViewDelegate, OSReadingCellDelegate, UIGestureRecognizerDelegate, ReaderViewControllerDelegate>
 {
     NSTimer *timer;
     BOOL orientationToLandscape; //should set to NO by default
     UIResponder *currentResponder;
-    OSSensorCell *editingCell;
     UIButton *btnDelete;
 }
 
 @property (nonatomic, retain) UISwipeGestureRecognizer *rightGesture;
-@property (nonatomic, retain) NSMutableArray *arrayProcessingSensors;
-
-@property (nonatomic, retain) NSMutableArray *arrayFilteredSensors;
+@property (nonatomic, retain) NSMutableArray *arrayProcessingReadings;
 
 @end
 
-@implementation OSSensorInventoryTableViewController
+@implementation OSJobDetailViewController
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -73,19 +63,10 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
-    // right gesture
-    /*
-    self.rightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(onSwipeRight:)];
-    self.rightGesture.delegate = self;
-    [self.view addGestureRecognizer:self.rightGesture];
-     */
-    
     // set background view
     UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Background"]];
     [imageView setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     self.tableView.backgroundView = imageView;
-    
-    [OSServerManager sharedInstance].delegate = self;
     
     [self loadData];
     
@@ -103,68 +84,29 @@
     OSAppDelegate *appDelegate = (OSAppDelegate *)([UIApplication sharedApplication].delegate);
     appDelegate.allowRotateToLandscape = YES;
     
-    orientationToLandscape = NO;
-    [self changeOrientationToLandscape];
+    //orientationToLandscape = NO;
+    //[self changeOrientationToLandscape];
     
-#if USE_SEARCHBAR
-    [self initSearchBar];
-#endif
     
     // gesture
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(backgroundTap:)];
     tap.delegate = self;
     [self.view addGestureRecognizer:tap];
     
-    // editing
-    editingCell = nil;
 }
 
-- (void)initSearchBar
-{
-    // search bar
-    [self.searchDisplayController.searchResultsTableView registerClass:[OSSensorCell class] forCellReuseIdentifier:@"sensorcell"];
-    self.arrayFilteredSensors = [[NSMutableArray alloc] init];
-    // search table background
-    UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Background"]];
-    [imageView setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-    self.searchDisplayController.searchResultsTableView.backgroundView = imageView;
-    
-    // search bar background
-    //[self.searchDisplayController.searchBar setBackgroundColor:[UIColor colorWithRed:240/255.0 green:240/255.0 blue:240/255.0 alpha:0.8]];
-    [self.searchDisplayController.searchBar setBackgroundImage:[UIImage imageNamed:@"Background"]];
-    [self.searchDisplayController.searchBar setTintColor:[UIColor whiteColor]];
-    
-    // search bar text color
-    [[UITextField appearanceWhenContainedIn:[UISearchBar class], nil] setTextColor:[UIColor colorWithRed:151/255.0 green:151/255.0 blue:151/255.0 alpha:1.0]];
-    
-    [self.searchDisplayController.searchBar setAutocapitalizationType:UITextAutocapitalizationTypeNone];
-}
 
 - (void)loadData
 {
     // load array
-    self.arrayProcessingSensors = [[NSMutableArray alloc] init];
-    NSMutableArray *arraySensors = [[OSModelManager sharedInstance] retrieveSensors];
-    for (CDSensor *s in arraySensors) {
-        if ([s.deletedInv boolValue])
-            continue;
-        OSProcessingSensor *sensor = [[OSProcessingSensor alloc] init];
-        sensor.ssn = s.ssn;
-        sensor.retrievedCalibrationDate = NO;
-        sensor.retrievedLatestCalCheck = NO;
-        sensor.retrievedOldestCalCheck = NO;
-        sensor.isShownName = YES;
-        
-        [self.arrayProcessingSensors addObject:sensor];
-    }
-    
-    for (OSProcessingSensor *sensor in self.arrayProcessingSensors) {
-        NSString *ssn = sensor.ssn;
-        
-        // retrieve data
-        [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:NO];
-        [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:YES];
-        [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:ssn];
+    self.arrayProcessingReadings = [[NSMutableArray alloc] init];
+    NSMutableArray *arraySensors = [[OSModelManager sharedInstance] getSensorSerialsForJob:self.job.uid];
+    for (NSString *ssn in arraySensors) {
+        OSProcessingReading *reading = [[OSProcessingReading alloc] init];
+        reading .ssn = ssn;
+        reading.reading = [[OSModelManager sharedInstance] getLastReadingForSensor:ssn ofJob:self.job.uid];
+        reading.isShownName = YES;
+        [self.arrayProcessingReadings addObject:reading];
     }
 }
 
@@ -173,6 +115,7 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 - (void)viewWillDisappear:(BOOL)animated
 {
@@ -216,6 +159,7 @@
     self.tableView.contentOffset = CGPointMake(0, 0);
 }
 
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -241,38 +185,36 @@
     return sectionHeader;
 }
 
-static OSSensorCell *_prototypeSensorCell = nil;
-- (OSSensorCell *)prototypeSensorCell
+static OSReadingCell *_prototypeReadingCell = nil;
+- (OSReadingCell *)prototypeReadingCell
 {
-    if (_prototypeSensorCell == nil)
-        _prototypeSensorCell = [self.tableView dequeueReusableCellWithIdentifier:@"sensorcell"];
-    return _prototypeSensorCell;
+    if (_prototypeReadingCell == nil)
+        _prototypeReadingCell = [self.tableView dequeueReusableCellWithIdentifier:@"readingcell"];
+    return _prototypeReadingCell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return [self prototypeSensorCell].bounds.size.height;
+    return [self prototypeReadingCell].bounds.size.height;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
     if (tableView == self.tableView)
-        return self.arrayProcessingSensors.count;
-    else if (tableView == self.searchDisplayController.searchResultsTableView)
-        return self.arrayFilteredSensors.count;
+        return self.arrayProcessingReadings.count;
     return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"sensorcell";
-    OSSensorCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
+    static NSString *CellIdentifier = @"readingcell";
+    OSReadingCell *cell = [self.tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
     
     // Configure the cell...
-    OSProcessingSensor *sensor = [self.arrayProcessingSensors objectAtIndex:indexPath.row];
+    OSProcessingReading *processingReading = [self.arrayProcessingReadings objectAtIndex:indexPath.row];
     cell.delegate = self;
-    [cell bind:sensor.ssn isShownName:sensor.isShownName isSelected:sensor.isSelected];
+    [cell bind:processingReading.reading isShownName:processingReading.isShownName isSelected:processingReading.isSelected];
     
     return cell;
 }
@@ -328,6 +270,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
 
  */
 
+
 #pragma mark - gesture recognizer delegate
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
 {
@@ -345,29 +288,21 @@ static OSSensorCell *_prototypeSensorCell = nil;
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+
 - (IBAction)onReport:(id)sender
 {
-    if (self.arrayProcessingSensors.count == 0)
+    if (self.arrayProcessingReadings.count == 0)
     {
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Warning" message:@"There is no sensors for report" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Warning" message:@"There is no data for report" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alertView show];
         return;
     }
-    
+
     // report
-    NSMutableArray *arraySsn = [[NSMutableArray alloc] init];
-    for (OSProcessingSensor *sensor in self.arrayProcessingSensors) {
-        [arraySsn addObject:sensor.ssn];
-    }
-    NSString *pdfFullPath = [[OSReportManager sharedInstance] createPdfForSensors:arraySsn];
+    NSString *pdfFullPath = [[OSReportManager sharedInstance] createPdfForJob:self.job.uid];
     
     if (pdfFullPath == nil)
-    {
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Warning" message:@"Creating pdf file failed" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alertView show];
-
         return;
-    }
     
     if([[NSFileManager defaultManager] fileExistsAtPath:pdfFullPath]) {
         ReaderDocument *document = [ReaderDocument withDocumentFilePath:pdfFullPath password:nil];
@@ -382,142 +317,43 @@ static OSSensorCell *_prototypeSensorCell = nil;
     }
 }
 
-- (void)checkEndRefresh
-{
-    BOOL bEnd = YES;
-    for (OSProcessingSensor *s in self.arrayProcessingSensors) {
-        if (s.retrievedCalibrationDate && s.retrievedLatestCalCheck && s.retrievedOldestCalCheck)
-        {
-            //
-        }
-        else
-        {
-            bEnd = NO;
-            break;
-        }
-    }
-    
-    if (bEnd)
-        [self endRefresh];
-}
-
 #pragma mark - ServerManagerDelegate
-- (OSProcessingSensor *)findProcessingSensor:(NSString *)ssn
+- (OSProcessingReading *)findProcessingReading:(NSString *)ssn
 {
-    OSProcessingSensor *sensor = nil;
-    for (OSProcessingSensor *s in self.arrayProcessingSensors) {
+    OSProcessingReading *reading = nil;
+    for (OSProcessingReading *s in self.arrayProcessingReadings) {
         if ([s.ssn isEqualToString:ssn])
         {
-            sensor = s;
+            reading = s;
             break;
         }
     }
-    return sensor;
-}
-
-- (void)didRetrieveCalibrationDate:(NSString *)ssn success:(BOOL)success
-{
-    dispatch_async(dispatch_get_main_queue(), ^() {
-        OSProcessingSensor *sensor = nil;
-        for (OSProcessingSensor *s in self.arrayProcessingSensors) {
-            if ([s.ssn isEqualToString:ssn])
-            {
-                sensor = s;
-                break;
-            }
-        }
-        
-        if (sensor)
-            sensor.retrievedCalibrationDate = YES;
-        
-        [self checkEndRefresh];
-        
-        [self.tableView reloadData];
-    });
-}
-
-- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success oldest:(BOOL)oldest
-{
-    dispatch_async(dispatch_get_main_queue(), ^() {
-        OSProcessingSensor *sensor = nil;
-        for (OSProcessingSensor *s in self.arrayProcessingSensors) {
-            if ([s.ssn isEqualToString:ssn])
-            {
-                sensor = s;
-                break;
-            }
-        }
-        
-        if (sensor)
-        {
-            if (oldest)
-                sensor.retrievedOldestCalCheck = YES;
-            else
-                sensor.retrievedLatestCalCheck = YES;
-        }
-        
-        [self checkEndRefresh];
-        
-        [self.tableView reloadData];
-    });
+    return reading;
 }
 
 #pragma mark - cell delegate
-- (BOOL)retrievedData:(OSSensorCell *)cell
-{
-    OSProcessingSensor *sensor = nil;
-    for (OSProcessingSensor *s in self.arrayProcessingSensors) {
-        if ([s.ssn isEqualToString:cell.ssn])
-        {
-            sensor = s;
-            break;
-        }
-    }
-    
-    if (!sensor)
-        return YES;
-    
-    if (sensor.retrievedCalibrationDate && sensor.retrievedLatestCalCheck && sensor.retrievedOldestCalCheck)
-        return YES;
-    return NO;
-}
 
-- (void)didBeginEditingCell:(OSSensorCell *)cell
+- (void)didShownName:(OSReadingCell *)cell
 {
-    editingCell = cell;
-}
-
-- (void)didEndEditingCell:(OSSensorCell *)cell
-{
-    editingCell = nil;
-}
-
-- (void)didShownName:(OSSensorCell *)cell
-{
-    OSProcessingSensor *sensor = [self findProcessingSensor:cell.ssn];
+    OSProcessingReading *sensor = [self findProcessingReading:cell.reading.ssn];
     if (sensor)
         sensor.isShownName = YES;
 }
 
-- (void)didShownSerial:(OSSensorCell *)cell
+- (void)didShownSerial:(OSReadingCell *)cell
 {
-    OSProcessingSensor *sensor = [self findProcessingSensor:cell.ssn];
-    if (sensor)
-        sensor.isShownName = NO;
+    OSProcessingReading *reading = [self findProcessingReading:cell.reading.ssn];
+    if (reading)
+        reading.isShownName = NO;
 }
 
-- (void)didDeleteCell:(OSSensorCell *)cell
+- (void)didDeleteCell:(OSReadingCell *)cell
 {
-    OSProcessingSensor *sensor = [self findProcessingSensor:cell.ssn];
-    if (sensor) {
-        // remove sensor from array
-        [self.arrayProcessingSensors removeObject:sensor];
+    OSProcessingReading *processingReading = [self findProcessingReading:cell.reading.ssn];
+    if (processingReading) {
+        // remove sensor
+        [self.arrayProcessingReadings removeObject:processingReading];
         
-        // remove sensor on db
-        CDSensor *s = [[OSModelManager sharedInstance] getSensorForSerial:sensor.ssn];
-        [[OSModelManager sharedInstance] removeSensorFromInventory:s];
-        
-        // update table
         [self.tableView beginUpdates];
         NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
         if (indexPath)
@@ -526,12 +362,12 @@ static OSSensorCell *_prototypeSensorCell = nil;
     }
 }
 
-- (void)didSelectCell:(OSSensorCell *)cell isSelected:(BOOL)isSelected
+- (void)didSelectCell:(OSReadingCell *)cell isSelected:(BOOL)isSelected
 {
-    OSProcessingSensor *sensor = [self findProcessingSensor:cell.ssn];
-    if (sensor) {
+    OSProcessingReading *processingReading = [self findProcessingReading:cell.reading.ssn];
+    if (processingReading) {
         // change selected
-        sensor.isSelected = isSelected;
+        processingReading.isSelected = isSelected;
     }
     
     [self refreshDeleteButton];
@@ -540,7 +376,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
 - (void)refreshDeleteButton
 {
     int count = 0;
-    for (OSProcessingSensor *s in self.arrayProcessingSensors) {
+    for (OSProcessingReading *s in self.arrayProcessingReadings) {
         if (s.isSelected)
             count++;
     }
@@ -557,9 +393,9 @@ static OSSensorCell *_prototypeSensorCell = nil;
 - (IBAction)onDeleteSelectedCells:(id)sender
 {
     int nSelected = 0;
-    for (int i = 0; i < self.arrayProcessingSensors.count; i++) {
-        OSProcessingSensor *sensor = [self.arrayProcessingSensors objectAtIndex:i];
-        if (!sensor.isSelected)
+    for (int i = 0; i < self.arrayProcessingReadings.count; i++) {
+        OSProcessingReading *processingReading = [self.arrayProcessingReadings objectAtIndex:i];
+        if (!processingReading.isSelected)
             continue;
         
         nSelected++;
@@ -575,7 +411,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Confirm" message:msg delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
         [alertView show];
     }
-
+    
 }
 
 #pragma mark - uialertview delegate
@@ -585,26 +421,27 @@ static OSSensorCell *_prototypeSensorCell = nil;
     {
         NSMutableArray *indexPathArray = [[NSMutableArray alloc] init];
         NSMutableArray *removeSensors = [[NSMutableArray alloc] init];
-        for (int i = 0; i < self.arrayProcessingSensors.count; i++) {
-            OSProcessingSensor *sensor = [self.arrayProcessingSensors objectAtIndex:i];
-            if (!sensor.isSelected)
+        for (int i = 0; i < self.arrayProcessingReadings.count; i++) {
+            OSProcessingReading *processingReading = [self.arrayProcessingReadings objectAtIndex:i];
+            if (!processingReading.isSelected)
                 continue;
             
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
             [indexPathArray addObject:indexPath];
-            [removeSensors addObject:sensor];
+            [removeSensors addObject:processingReading];
         }
         
         if (indexPathArray.count > 0)
         {
-            // delete sensors from array / db
-            for (OSProcessingSensor *sensor in removeSensors) {
-                [self.arrayProcessingSensors removeObject:sensor];
-                CDSensor *s = [[OSModelManager sharedInstance] getSensorForSerial:sensor.ssn];
-                [[OSModelManager sharedInstance] removeSensorFromInventory:s];
+            for (OSProcessingReading *processingReading in removeSensors) {
+                [self.arrayProcessingReadings removeObject:processingReading];
+                
+                CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:processingReading.ssn];
+                
+                if (sensor)
+                    [[OSModelManager sharedInstance] removeSensorFromJob:self.job sensor:sensor];
             }
             
-            // delete a cell for sensor
             [self.tableView beginUpdates];
             [self.tableView deleteRowsAtIndexPaths:indexPathArray withRowAnimation:UITableViewRowAnimationAutomatic];
             [self.tableView endUpdates];
@@ -621,15 +458,15 @@ static OSSensorCell *_prototypeSensorCell = nil;
     [self loadData];
     [self.tableView reloadData];
     
-    [self checkEndRefresh];
+    [self endRefresh];
     
-    timer = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(onTimer:) userInfo:Nil repeats:NO];
+    //timer = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(onTimer:) userInfo:Nil repeats:NO];
 }
 
 - (void)onTimer:(id)sender
 {
-    timer = nil;
-    [self endRefresh];
+    //timer = nil;
+    //[self endRefresh];
 }
 
 - (void)endRefresh
@@ -705,9 +542,6 @@ static OSSensorCell *_prototypeSensorCell = nil;
 - (void)keyboardHiding:(NSNotification *)note
 {
     //[keyboardStrategy doKeyboardWillBeHidden:note];
-    
-    if (editingCell != nil)
-        [editingCell endEditing];
 }
 
 #pragma mark -
@@ -740,5 +574,4 @@ static OSSensorCell *_prototypeSensorCell = nil;
         [viewController dismissViewControllerAnimated:YES completion:nil];
     }
 }
-
 @end

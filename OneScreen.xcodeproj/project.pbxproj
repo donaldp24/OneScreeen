@@ -16,7 +16,14 @@
 		D00A8FAD19E4A64C00A4A95C /* PushAnimatedTransitioning.m in Sources */ = {isa = PBXBuildFile; fileRef = D00A8FAA19E4A64C00A4A95C /* PushAnimatedTransitioning.m */; };
 		D00A8FAE19E4A64C00A4A95C /* PushTransitioningDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D00A8FAC19E4A64C00A4A95C /* PushTransitioningDelegate.m */; };
 		D00A8FB119E4A66C00A4A95C /* UIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D00A8FB019E4A66C00A4A95C /* UIManager.m */; };
+		D00C2F3E19F11BD20041EB09 /* OSAppContext.m in Sources */ = {isa = PBXBuildFile; fileRef = D00C2F3D19F11BD20041EB09 /* OSAppContext.m */; };
 		D00DB25419D50CC500C62136 /* OSTemperatureHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = D00DB25319D50CC500C62136 /* OSTemperatureHelper.m */; };
+		D01756AF19F2C5F00044F573 /* OSReadingCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D01756AE19F2C5F00044F573 /* OSReadingCell.m */; };
+		D01756B519F2D6D40044F573 /* ForceLandscape.m in Sources */ = {isa = PBXBuildFile; fileRef = D01756B419F2D6D40044F573 /* ForceLandscape.m */; };
+		D01756B819F2DCC00044F573 /* OSJobCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D01756B719F2DCC00044F573 /* OSJobCell.m */; };
+		D01756BB19F2DE040044F573 /* CDJob.m in Sources */ = {isa = PBXBuildFile; fileRef = D01756BA19F2DE040044F573 /* CDJob.m */; };
+		D01756BE19F2E17C0044F573 /* OSJobsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D01756BD19F2E17C0044F573 /* OSJobsTableViewController.m */; };
+		D01756C119F2EA240044F573 /* OSJobDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D01756C019F2EA240044F573 /* OSJobDetailViewController.m */; };
 		D01A314319DD3D49008C924F /* OSSaltSolutionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D01A314219DD3D49008C924F /* OSSaltSolutionManager.m */; };
 		D01A314619DD479C008C924F /* OSSaltSolution.m in Sources */ = {isa = PBXBuildFile; fileRef = D01A314519DD479C008C924F /* OSSaltSolution.m */; };
 		D01D6E6919DCC34300EF4B37 /* NSString+UrlEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = D01D6E6819DCC34300EF4B37 /* NSString+UrlEncoding.m */; };
@@ -61,7 +68,8 @@
 		D02CB33119F01061003A23B8 /* ThumbsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30B19F01061003A23B8 /* ThumbsViewController.m */; };
 		D02CB33219F01061003A23B8 /* UIXToolbarView.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30D19F01061003A23B8 /* UIXToolbarView.m */; };
 		D02CB33519F08986003A23B8 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D02CB33419F08986003A23B8 /* Crashlytics.framework */; };
-		D02EE1AD19EDFA7200DF7F5F /* CDSensor.m in Sources */ = {isa = PBXBuildFile; fileRef = D02EE1AC19EDFA7200DF7F5F /* CDSensor.m */; };
+		D0375C4419F4A9D600F64359 /* CDReading.m in Sources */ = {isa = PBXBuildFile; fileRef = D0375C4319F4A9D600F64359 /* CDReading.m */; };
+		D0375C4A19F5CDE800F64359 /* CDSensor.m in Sources */ = {isa = PBXBuildFile; fileRef = D0375C4919F5CDE800F64359 /* CDSensor.m */; };
 		D05CCF8B19ECCAFE00747064 /* OSRotateNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */; };
 		D05CCF8E19ECD88100747064 /* OSDummyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8D19ECD88100747064 /* OSDummyViewController.m */; };
 		D08964C319E67F2D00FFF5CE /* CDCalCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = D08964C219E67F2D00FFF5CE /* CDCalCheck.m */; };
@@ -141,9 +149,23 @@
 		D00A8FAC19E4A64C00A4A95C /* PushTransitioningDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PushTransitioningDelegate.m; sourceTree = "<group>"; };
 		D00A8FAF19E4A66C00A4A95C /* UIManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIManager.h; sourceTree = "<group>"; };
 		D00A8FB019E4A66C00A4A95C /* UIManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIManager.m; sourceTree = "<group>"; };
+		D00C2F3C19F11BD20041EB09 /* OSAppContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSAppContext.h; sourceTree = "<group>"; };
+		D00C2F3D19F11BD20041EB09 /* OSAppContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSAppContext.m; sourceTree = "<group>"; };
 		D00DB25019D50C6700C62136 /* OSDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSDefine.h; sourceTree = "<group>"; };
 		D00DB25219D50CC500C62136 /* OSTemperatureHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSTemperatureHelper.h; sourceTree = "<group>"; };
 		D00DB25319D50CC500C62136 /* OSTemperatureHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSTemperatureHelper.m; sourceTree = "<group>"; };
+		D01756AD19F2C5F00044F573 /* OSReadingCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSReadingCell.h; sourceTree = "<group>"; };
+		D01756AE19F2C5F00044F573 /* OSReadingCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSReadingCell.m; sourceTree = "<group>"; };
+		D01756B319F2D6D40044F573 /* ForceLandscape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ForceLandscape.h; sourceTree = "<group>"; };
+		D01756B419F2D6D40044F573 /* ForceLandscape.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ForceLandscape.m; sourceTree = "<group>"; };
+		D01756B619F2DCC00044F573 /* OSJobCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSJobCell.h; sourceTree = "<group>"; };
+		D01756B719F2DCC00044F573 /* OSJobCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSJobCell.m; sourceTree = "<group>"; };
+		D01756B919F2DE040044F573 /* CDJob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDJob.h; sourceTree = "<group>"; };
+		D01756BA19F2DE040044F573 /* CDJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDJob.m; sourceTree = "<group>"; };
+		D01756BC19F2E17C0044F573 /* OSJobsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSJobsTableViewController.h; sourceTree = "<group>"; };
+		D01756BD19F2E17C0044F573 /* OSJobsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSJobsTableViewController.m; sourceTree = "<group>"; };
+		D01756BF19F2EA240044F573 /* OSJobDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSJobDetailViewController.h; sourceTree = "<group>"; };
+		D01756C019F2EA240044F573 /* OSJobDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSJobDetailViewController.m; sourceTree = "<group>"; };
 		D01A314119DD3D49008C924F /* OSSaltSolutionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSSaltSolutionManager.h; sourceTree = "<group>"; };
 		D01A314219DD3D49008C924F /* OSSaltSolutionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSSaltSolutionManager.m; sourceTree = "<group>"; };
 		D01A314419DD479C008C924F /* OSSaltSolution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSSaltSolution.h; sourceTree = "<group>"; };
@@ -213,8 +235,10 @@
 		D02CB30C19F01061003A23B8 /* UIXToolbarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIXToolbarView.h; sourceTree = "<group>"; };
 		D02CB30D19F01061003A23B8 /* UIXToolbarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIXToolbarView.m; sourceTree = "<group>"; };
 		D02CB33419F08986003A23B8 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
-		D02EE1AB19EDFA7200DF7F5F /* CDSensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDSensor.h; sourceTree = "<group>"; };
-		D02EE1AC19EDFA7200DF7F5F /* CDSensor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDSensor.m; sourceTree = "<group>"; };
+		D0375C4219F4A9D600F64359 /* CDReading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDReading.h; sourceTree = "<group>"; };
+		D0375C4319F4A9D600F64359 /* CDReading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDReading.m; sourceTree = "<group>"; };
+		D0375C4819F5CDE800F64359 /* CDSensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDSensor.h; sourceTree = "<group>"; };
+		D0375C4919F5CDE800F64359 /* CDSensor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDSensor.m; sourceTree = "<group>"; };
 		D05CCF8919ECCAFE00747064 /* OSRotateNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSRotateNavigationController.h; sourceTree = "<group>"; };
 		D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSRotateNavigationController.m; sourceTree = "<group>"; };
 		D05CCF8C19ECD88100747064 /* OSDummyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSDummyViewController.h; sourceTree = "<group>"; };
@@ -345,12 +369,20 @@
 			children = (
 				D0E505A419E88F0600B2E45C /* OSSensorCell.h */,
 				D0E505A519E88F0600B2E45C /* OSSensorCell.m */,
+				D01756AD19F2C5F00044F573 /* OSReadingCell.h */,
+				D01756AE19F2C5F00044F573 /* OSReadingCell.m */,
+				D01756B619F2DCC00044F573 /* OSJobCell.h */,
+				D01756B719F2DCC00044F573 /* OSJobCell.m */,
 				D005B7A519E5E8670073336A /* OSSaltsCell.h */,
 				D005B7A619E5E8670073336A /* OSSaltsCell.m */,
 				D005B7A919E5E8670073336A /* OSViewController.h */,
 				D005B7AA19E5E8670073336A /* OSViewController.m */,
 				D005B7A719E5E8670073336A /* OSSensorInventoryTableViewController.h */,
 				D005B7A819E5E8670073336A /* OSSensorInventoryTableViewController.m */,
+				D01756BC19F2E17C0044F573 /* OSJobsTableViewController.h */,
+				D01756BD19F2E17C0044F573 /* OSJobsTableViewController.m */,
+				D01756BF19F2EA240044F573 /* OSJobDetailViewController.h */,
+				D01756C019F2EA240044F573 /* OSJobDetailViewController.m */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -362,6 +394,15 @@
 				D005B7B619E5EB5E0073336A /* OSExpirationManager.m */,
 			);
 			path = Expiration;
+			sourceTree = "<group>";
+		};
+		D00C2F3B19F11BC40041EB09 /* AppContext */ = {
+			isa = PBXGroup;
+			children = (
+				D00C2F3C19F11BD20041EB09 /* OSAppContext.h */,
+				D00C2F3D19F11BD20041EB09 /* OSAppContext.m */,
+			);
+			path = AppContext;
 			sourceTree = "<group>";
 		};
 		D00DB25119D50CB400C62136 /* Helper */ = {
@@ -379,6 +420,8 @@
 				D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */,
 				D05CCF8C19ECD88100747064 /* OSDummyViewController.h */,
 				D05CCF8D19ECD88100747064 /* OSDummyViewController.m */,
+				D01756B319F2D6D40044F573 /* ForceLandscape.h */,
+				D01756B419F2D6D40044F573 /* ForceLandscape.m */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
@@ -498,8 +541,12 @@
 				D08964C819E67F2E00FFF5CE /* CDCalibrationDate.m */,
 				D08964C119E67F2D00FFF5CE /* CDCalCheck.h */,
 				D08964C219E67F2D00FFF5CE /* CDCalCheck.m */,
-				D02EE1AB19EDFA7200DF7F5F /* CDSensor.h */,
-				D02EE1AC19EDFA7200DF7F5F /* CDSensor.m */,
+				D01756B919F2DE040044F573 /* CDJob.h */,
+				D01756BA19F2DE040044F573 /* CDJob.m */,
+				D0375C4219F4A9D600F64359 /* CDReading.h */,
+				D0375C4319F4A9D600F64359 /* CDReading.m */,
+				D0375C4819F5CDE800F64359 /* CDSensor.h */,
+				D0375C4919F5CDE800F64359 /* CDSensor.m */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -540,6 +587,7 @@
 		D0BEAAED19D3B9CB00514B19 /* OneScreen */ = {
 			isa = PBXGroup;
 			children = (
+				D00C2F3B19F11BC40041EB09 /* AppContext */,
 				D02A36B619EED4E300322C00 /* Report */,
 				D005B7B419E5EB4C0073336A /* Expiration */,
 				D005B7A319E5E8670073336A /* Certification */,
@@ -891,8 +939,8 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "./Crashlytics.framework/run 02eaa877844435ac8f0e7707e5087c6a937afdd5 7154887d77c7e9ff6f5f80e4466cc32d7744dd485e921ad9be41a9f8dbc1b875";
-			shellScript = "";
+			shellPath = /bin/sh;
+			shellScript = "./Crashlytics.framework/run 02eaa877844435ac8f0e7707e5087c6a937afdd5 7154887d77c7e9ff6f5f80e4466cc32d7744dd485e921ad9be41a9f8dbc1b875";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -915,12 +963,15 @@
 				D00DB25419D50CC500C62136 /* OSTemperatureHelper.m in Sources */,
 				D02CB32319F01061003A23B8 /* ReaderContentTile.m in Sources */,
 				D00A8FAE19E4A64C00A4A95C /* PushTransitioningDelegate.m in Sources */,
+				D01756B519F2D6D40044F573 /* ForceLandscape.m in Sources */,
+				D0375C4419F4A9D600F64359 /* CDReading.m in Sources */,
 				D005B7B319E5EA6A0073336A /* NSDate+convenience.m in Sources */,
 				D02CB33219F01061003A23B8 /* UIXToolbarView.m in Sources */,
 				D01D6E6919DCC34300EF4B37 /* NSString+UrlEncoding.m in Sources */,
 				D0BEAB4619D3BA7500514B19 /* NSDictionary+QueryString.m in Sources */,
 				D02A36B919EED4F500322C00 /* OSReportManager.m in Sources */,
 				D02CB32B19F01061003A23B8 /* ReaderThumbRender.m in Sources */,
+				D01756C119F2EA240044F573 /* OSJobDetailViewController.m in Sources */,
 				D022423A19DB373E002B0E6D /* iToast.m in Sources */,
 				D02CB33119F01061003A23B8 /* ThumbsViewController.m in Sources */,
 				D02CB32619F01061003A23B8 /* ReaderMainPagebar.m in Sources */,
@@ -928,12 +979,14 @@
 				D02CB32519F01061003A23B8 /* ReaderDocument.m in Sources */,
 				D02CB32919F01061003A23B8 /* ReaderThumbFetch.m in Sources */,
 				D0E505A619E88F0600B2E45C /* OSSensorCell.m in Sources */,
+				D01756BB19F2DE040044F573 /* CDJob.m in Sources */,
 				D0BEAB5319D3BB4400514B19 /* SensorReadingParser.m in Sources */,
 				D0BEAAF819D3B9CB00514B19 /* OSAppDelegate.m in Sources */,
 				D0BEAB4019D3BA7500514B19 /* SBJsonBase.m in Sources */,
 				D02CB32E19F01061003A23B8 /* ReaderThumbView.m in Sources */,
-				D02EE1AD19EDFA7200DF7F5F /* CDSensor.m in Sources */,
+				D01756B819F2DCC00044F573 /* OSJobCell.m in Sources */,
 				D005B7AD19E5E8670073336A /* OSViewController.m in Sources */,
+				D01756BE19F2E17C0044F573 /* OSJobsTableViewController.m in Sources */,
 				D05CCF8E19ECD88100747064 /* OSDummyViewController.m in Sources */,
 				D02CB32C19F01061003A23B8 /* ReaderThumbRequest.m in Sources */,
 				D005B7AC19E5E8670073336A /* OSSensorInventoryTableViewController.m in Sources */,
@@ -942,10 +995,12 @@
 				D02CB32219F01061003A23B8 /* ReaderContentPage.m in Sources */,
 				D02CB32D19F01061003A23B8 /* ReaderThumbsView.m in Sources */,
 				D00A8FAD19E4A64C00A4A95C /* PushAnimatedTransitioning.m in Sources */,
+				D0375C4A19F5CDE800F64359 /* CDSensor.m in Sources */,
 				D0BEAB4519D3BA7500514B19 /* LRURLRequestOperation.m in Sources */,
 				D02CB32019F01061003A23B8 /* CGPDFDocument.m in Sources */,
 				D0BEAB6C19D3CD0200514B19 /* SFHFKeychainUtils.m in Sources */,
 				D01A314319DD3D49008C924F /* OSSaltSolutionManager.m in Sources */,
+				D00C2F3E19F11BD20041EB09 /* OSAppContext.m in Sources */,
 				D02CB32A19F01061003A23B8 /* ReaderThumbQueue.m in Sources */,
 				D0BEAAF419D3B9CB00514B19 /* main.m in Sources */,
 				D0BEAB4119D3BA7500514B19 /* SBJsonParser.m in Sources */,
@@ -964,6 +1019,7 @@
 				D08964C919E67F2E00FFF5CE /* CDCalibrationDate.m in Sources */,
 				D0F9850219D8AA74003B2E74 /* OSModelManager.m in Sources */,
 				D0BEAB4319D3BA7500514B19 /* LROAuth2AccessToken.m in Sources */,
+				D01756AF19F2C5F00044F573 /* OSReadingCell.m in Sources */,
 				D01A314619DD479C008C924F /* OSSaltSolution.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1114,7 +1170,7 @@
 					"$(PROJECT_DIR)/Library/TestFlight",
 				);
 				PRODUCT_NAME = CalMaster;
-				PROVISIONING_PROFILE = "7bddce0d-9996-4f7a-973f-bd1f512f7406";
+				PROVISIONING_PROFILE = "14e69ccd-8800-4442-b154-f7f7b0b4911b";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1140,7 +1196,7 @@
 					"$(PROJECT_DIR)/Library/TestFlight",
 				);
 				PRODUCT_NAME = CalMaster;
-				PROVISIONING_PROFILE = "88c25dab-206a-42db-abba-bf8fd516c2cf";
+				PROVISIONING_PROFILE = "913b38a7-c326-4146-b4cd-b66036f38357";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};

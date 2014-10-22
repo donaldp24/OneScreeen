@@ -44,4 +44,37 @@
 #define kFontBebasNeue(fSize)           [UIFont fontWithName:@"BebasNeue" size:fSize]
 #define kFontMyriadProRegular(fSize)    [UIFont fontWithName:@"MyriadPro-Regular" size:fSize]
 
+
+// constants for table view cell
+#define kDefaultBackgroundColor     [UIColor colorWithRed:0 green:0 blue:0 alpha:0.0]
+#define kReadingBackgroundColor     [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3]
+
+#define kNameTextColor              [UIColor colorWithRed:243/255.0 green:143/255.0 blue:29/255.0 alpha:1.0]
+#define kSerialTextColor            [UIColor colorWithRed:255/255.0 green:255/255.0 blue:255/255.0 alpha:1.0]
+
+#define kSwipeAnimateDuration (0.25)
+
+
+// format constant
+#define kFormatForRh        @"%.1f"
+#define kFormatForTemp      @"%.1f"
+#define kFormatForAmbRh     @"%.1f"
+#define kFormatForAmbTemp   @"%.1f"
+
+
+// refresh
+#define kRefreshHintText        @"Pull to refresh"
+#define kRefreshTintColor       [UIColor colorWithWhite:1 alpha:1]
+#define kRefreshProcessingText  @"Updating..."
+
+// parse
+#define kSensorDataBatteryKey  @"battery"
+#define kSensorDataRHKey  @"rh"
+#define kSensorDataRHAmbientKey  @"rhAmbient"
+#define kSensorDataTemperatureKey  @"temp"
+#define kSensorDataTemperatureAmbientKey  @"tempAmbient"
+#define kSensorDataReadingTimestampKey  @"readingTimestamp"
+#define kSensorDataSerialNumberKey  @"serial"
+
+
 #endif

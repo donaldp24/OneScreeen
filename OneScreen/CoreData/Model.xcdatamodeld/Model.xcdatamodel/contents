@@ -11,13 +11,34 @@
         <attribute name="calibrationDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="ssn" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
+    <entity name="CDJob" representedClassName="CDJob" syncable="YES">
+        <attribute name="createtime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="deleted" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="endtime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="starttime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="CDReading" representedClassName="CDReading" syncable="YES">
+        <attribute name="ambRh" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="ambTemp" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="battery" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="jobUid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="rh" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="ssn" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="temp" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="timestamp" optional="YES" attributeType="Date" syncable="YES"/>
+    </entity>
     <entity name="CDSensor" representedClassName="CDSensor" syncable="YES">
+        <attribute name="deletedInv" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="ssn" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
         <element name="CDCalCheck" positionX="0" positionY="0" width="0" height="0"/>
         <element name="CDCalibrationDate" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="CDJob" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="CDReading" positionX="0" positionY="0" width="0" height="0"/>
         <element name="CDSensor" positionX="0" positionY="0" width="0" height="0"/>
     </elements>
 </model>

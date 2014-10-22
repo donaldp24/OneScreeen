@@ -8,14 +8,6 @@
 
 #import "SensorReadingParser.h"
 
-NSString * const kSensorDataBatteryKey = @"battery";
-NSString * const kSensorDataRHKey = @"rh";
-NSString * const kSensorDataRHAmbientKey = @"rhAmbient";
-NSString * const kSensorDataTemperatureKey = @"temp";
-NSString * const kSensorDataTemperatureAmbientKey = @"tempAmbient";
-NSString * const kSensorDataReadingTimestampKey = @"readingTimestamp";
-NSString * const kSensorDataSerialNumberKey = @"serial";
-
 static int const kRHValueOffset = 8;
 static int const kTempValueOffset = 10;
 static int const kRHAmbientValueOffset = 4;

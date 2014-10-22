@@ -22,5 +22,6 @@
 + (OSReportManager *)sharedInstance;
 
 - (NSString *)createPdfForSensors:(NSArray *)arraySsn;
+- (NSString *)createPdfForJob:(NSString *)jobUid;
 
 @end

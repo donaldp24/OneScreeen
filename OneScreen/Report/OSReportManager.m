@@ -11,6 +11,8 @@
 #import "OSModelManager.h"
 #import "OSCertificationManager.h"
 
+#define STR(string) (string) ? (string) : @""
+
 #define A4PAPER_WIDTH_IN_PORTRATE  1240.0f
 #define A4PAPER_HEIGHT_IN_PORTRATE   1753.0f
 
@@ -18,6 +20,11 @@
 #define kBorderWidth            1.0
 #define kMarginInset            10.0
 #define kLineWidth              1.0
+
+static NSString * const kLabelKey = @"label";
+static NSString * const kDescriptionKey = @"description";
+static NSString * const kNewLineKey = @"newLineSeparator";
+static NSString * const kFontSizeKey = @"fontSize";
 
 static CGFloat const kHeaderHeight = 110.f;
 static CGFloat const kSubtitleHeight = 120.f;
@@ -34,6 +41,9 @@ static CGFloat const kGap = 10.f;
 #define kReportDataRhKey            @"RH (%)"
 #define kReportDataTempKey          @"Temp (F)"
 #define kReportDataCalCertDueKey    @"Cal Cert Due"
+
+#define kReportDataAmbRhKey         @"Amb RH (%)"
+#define kReportDataAmbTempKey       @"Amb Temp (F)"
 
 
 static OSReportManager *_sharedReportManager = nil;
@@ -60,10 +70,11 @@ static OSReportManager *_sharedReportManager = nil;
     return documentsDirectory;
 }
 
+#pragma mark - report for sensor inventory
 - (NSString *)createPdfForSensors:(NSArray *)arraySsn
 {
     NSDate * aDate = [NSDate date];
-    NSString *fileName = [NSString stringWithFormat:@"%@_%@.pdf", @"Report", [aDate toStringWithFormat:@"MM_dd_HH_mm_ss"]];
+    NSString *fileName = [NSString stringWithFormat:@"%@_%@.pdf", @"Report(SensorInventory)", [aDate toStringWithFormat:@"MM_dd_HH_mm_ss"]];
     NSString * fullPDFPath = [[OSReportManager getDocumentDirectory] stringByAppendingPathComponent:fileName];
     
     NSString *dateStr = [NSString stringWithFormat:@"%@",[aDate toStringWithFormat:kDateFormat]];
@@ -79,7 +90,7 @@ static OSReportManager *_sharedReportManager = nil;
     CGFloat yPos = 0.0;
     
     // render first page
-    [self renderFirstPage:dateStr];
+    [self renderFirstPageForSensors:dateStr];
     [self drawPageNumber:currentPage++ + 1];
     
     // render contents page
@@ -125,7 +136,7 @@ static OSReportManager *_sharedReportManager = nil;
             if (remainRows > count - m)
                 remainRows = count - m;
             
-            [self renderRows:yPos data:arrayReportData startIndex:m count:remainRows];
+            [self renderRowsForSensors:yPos data:arrayReportData startIndex:m count:remainRows];
             yPos += (remainRows + 1) * kRowHeight;
             m += remainRows;
         }
@@ -145,6 +156,7 @@ static OSReportManager *_sharedReportManager = nil;
     
     return fullPDFPath;
 }
+
 
 - (NSArray *)reportDataWithSensors:(NSArray *)arraySensors
 {
@@ -216,25 +228,25 @@ static OSReportManager *_sharedReportManager = nil;
     return arrayReportData;
 }
 
-- (void)renderFirstPage:(NSString *)dateStr {
+- (void)renderFirstPageForSensors:(NSString *)dateStr {
     
     UIGraphicsBeginPDFPageWithInfo(CGRectMake(0, 0, pageSize.width, pageSize.height), nil);
     //[self drawImage];
     /*
-    CGRect previousRect = {{kBorderInset + kMarginInset+50, kBorderInset + kMarginInset + 150.0}, {0, 0}};
-    
-    NSArray *strings = @[
-                         @{kLabelKey: @"Job Name:",                   kDescriptionKey: STR(self.job.jobName),                               kFontSizeKey: @24.f},
-                         @{kLabelKey: @"Date:",              kDescriptionKey: STR(dateStr),                                 kFontSizeKey: @24.f}
-                         ];
-    
-    for (NSDictionary *row in strings) {
-        previousRect =[self drawLabel:row[kLabelKey]
-                              details:row[kDescriptionKey]
-                               origin:CGPointMake(previousRect.origin.x, previousRect.size.height + previousRect.origin.y + 10)
-                             fontSize:[row[kFontSizeKey] floatValue]
-                     newLineSeparator:[row[kNewLineKey] boolValue]];
-    }
+     CGRect previousRect = {{kBorderInset + kMarginInset+50, kBorderInset + kMarginInset + 150.0}, {0, 0}};
+     
+     NSArray *strings = @[
+     @{kLabelKey: @"Job Name:",                   kDescriptionKey: STR(self.job.jobName),                               kFontSizeKey: @24.f},
+     @{kLabelKey: @"Date:",              kDescriptionKey: STR(dateStr),                                 kFontSizeKey: @24.f}
+     ];
+     
+     for (NSDictionary *row in strings) {
+     previousRect =[self drawLabel:row[kLabelKey]
+     details:row[kDescriptionKey]
+     origin:CGPointMake(previousRect.origin.x, previousRect.size.height + previousRect.origin.y + 10)
+     fontSize:[row[kFontSizeKey] floatValue]
+     newLineSeparator:[row[kNewLineKey] boolValue]];
+     }
      */
     
     if (YES) {
@@ -246,6 +258,393 @@ static OSReportManager *_sharedReportManager = nil;
          */
     }
 }
+
+
+- (void) renderRowsForSensors:(CGFloat)ypos data:(NSArray *)data startIndex:(long)startIndex count:(long)count {
+    
+    CGFloat xOrigin = 100;
+    CGFloat yOrigin = ypos;
+    CGFloat columnWidth = 160;
+    int numberOfColumns = 6;
+    
+    // table header
+    [self drawTableAt:CGPointMake(xOrigin, yOrigin)
+        withRowHeight:kRowHeight
+       andColumnWidth:columnWidth
+          andRowCount:1
+       andColumnCount:numberOfColumns];
+    
+    NSArray *labels = @[kReportDataSensorKey,
+                        kReportDataLastCalDateKey,
+                        kReportDataSaltKey,
+                        kReportDataRhKey,
+                        kReportDataTempKey,
+                        kReportDataCalCertDueKey
+                        ];
+    
+    for (int i = 0; i < [labels count]; i++) {
+        [self drawText:labels[i]
+             withFrame:CGRectMake(xOrigin + 20 + columnWidth * i,
+                                  yOrigin + 10,
+                                  columnWidth - 40,
+                                  80)
+              withFont:[UIFont boldSystemFontOfSize:18.0f]];
+    }
+    
+    yOrigin += kRowHeight;
+    
+    
+    [self drawTableAt:CGPointMake(xOrigin, yOrigin)
+        withRowHeight:kRowHeight
+       andColumnWidth:columnWidth
+          andRowCount:(int)count
+       andColumnCount:numberOfColumns];
+    
+    for (int i = (int)startIndex; i < (int)startIndex + count; i++) {
+        UIFont *textFont = [UIFont systemFontOfSize:14.0f];
+        
+        NSDictionary *reportData = [data objectAtIndex:i];
+        
+        // sensor
+        int column = 0;
+        [self drawText:reportData[kReportDataSensorKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // last cal date
+        column++;
+        [self drawText:reportData[kReportDataLastCalDateKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // salt
+        column++;
+        [self drawText:reportData[kReportDataSaltKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // rh
+        column++;
+        [self drawText:reportData[kReportDataRhKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // temp
+        column++;
+        [self drawText:reportData[kReportDataTempKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // cal cert due
+        column++;
+        [self drawText:reportData[kReportDataCalCertDueKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+    }
+}
+
+#pragma mark - report for job
+- (NSString *)createPdfForJob:(NSString *)jobUid
+{
+    CDJob *job = [[OSModelManager sharedInstance] getJobWithUid:jobUid];
+    if (job == nil)
+        return nil;
+    
+    NSDate * aDate = [NSDate date];
+    NSString *fileName = [NSString stringWithFormat:@"%@_%@.pdf", @"Report(Job)", [aDate toStringWithFormat:@"MM_dd_HH_mm_ss"]];
+    NSString * fullPDFPath = [[OSReportManager getDocumentDirectory] stringByAppendingPathComponent:fileName];
+    
+    NSString *dateStr = [NSString stringWithFormat:@"%@",[aDate toStringWithFormat:kDateFormat]];
+    
+    NSArray *arrayReportData = [self reportDataWithJob:jobUid];
+    
+    // Opent the PDF context
+    pageSize = CGSizeMake(A4PAPER_WIDTH_IN_PORTRATE, A4PAPER_HEIGHT_IN_PORTRATE);
+    UIGraphicsBeginPDFContextToFile(fullPDFPath, CGRectZero, nil);
+    
+    NSInteger currentPage = 0;
+    
+    CGFloat yPos = 0.0;
+    
+    // render first page
+    [self renderFirstPageForJob:job dateStr:dateStr];
+    [self drawPageNumber:currentPage++ + 1];
+    
+    // render contents page
+    BOOL isStart = YES;
+    
+    //    for (int i = 0; i < [arrayReportData count]; i++) {
+    //
+    if (isStart == YES) {
+        
+        // draw header.
+        [self renderHeader];
+        isStart = NO;
+        yPos = kHeaderHeight;
+    }
+    
+    int m = 0;
+    int count = (int)[arrayReportData count];
+    isStart = NO;
+    //isStart = YES;
+    while (m < count) {
+        
+        if (isStart == YES)
+        {
+            [self drawPageNumber:currentPage++ + 1];
+            
+            [self renderHeader];
+            yPos = kHeaderHeight;
+            
+            isStart = NO;
+        }
+        
+        CGFloat remains = [self heightRemains:yPos];
+        int remainRows = remains / kRowHeight - 1;
+        
+        
+        if (remainRows <= count - m) {
+            isStart = YES;
+        }
+        
+        if (remainRows <= 0)
+            continue;
+        
+        if (remainRows > count - m)
+            remainRows = count - m;
+        
+        [self renderRowsForJob:yPos data:arrayReportData startIndex:m count:remainRows];
+        yPos += (remainRows + 1) * kRowHeight;
+        m += remainRows;
+    }
+    
+    //    }
+    
+    if (yPos > kHeaderHeight)
+        [self drawPageNumber:currentPage++ + 1];
+    
+    // Close the PDF context and write the contents out.
+    UIGraphicsEndPDFContext();
+    
+    //NSNumber *fileSize = [self getFileSizeWithFilePath:fullPDFPath];
+    
+    if (self.delegate)
+        [[self delegate] didFinishGeneratingReport];
+    
+    return fullPDFPath;
+}
+
+- (NSArray *)reportDataWithJob:(NSString *)jobUid
+{
+    NSMutableArray *arrayReportData = [[NSMutableArray alloc] init];
+    
+    NSMutableArray *arraySensors = [[OSModelManager sharedInstance] getSensorSerialsForJob:jobUid];
+    for (NSString *ssn in arraySensors) {
+        CDReading *reading = [[OSModelManager sharedInstance] getLastReadingForSensor:ssn ofJob:jobUid];
+        CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:reading.ssn];
+        
+        NSMutableDictionary *dicReport = [[NSMutableDictionary alloc] init];
+        
+        // sensor
+        [dicReport setObject:reading.ssn forKey:kReportDataSensorKey];
+        
+        // last cal check
+        NSString *strLastCalCheck = @"";
+        if (calCheck != nil && calCheck.date != nil)
+            strLastCalCheck = [calCheck.date toStringWithFormat:kShortDateFormat];
+        [dicReport setObject:strLastCalCheck forKey:kReportDataLastCalDateKey];
+        
+        // rh
+        NSString *strRh = [NSString stringWithFormat:kFormatForRh, [reading.rh floatValue]];
+        [dicReport setObject:strRh forKey:kReportDataRhKey];
+        
+        // temp
+        NSString *strTemp = [NSString stringWithFormat:kFormatForTemp, [reading.temp floatValue]];
+        [dicReport setObject:strTemp forKey:kReportDataTempKey];
+        
+        // amb rh
+        NSString *strAmbRh = [NSString stringWithFormat:kFormatForAmbRh, [reading.ambRh floatValue]];
+        [dicReport setObject:strAmbRh forKey:kReportDataAmbRhKey];
+        
+        // amb temp
+        NSString *strAmbTemp = [NSString stringWithFormat:kFormatForAmbTemp, [reading.ambTemp floatValue]];
+        [dicReport setObject:strAmbTemp forKey:kReportDataAmbTempKey];
+        
+        [arrayReportData addObject:dicReport];
+    }
+
+    return arrayReportData;
+}
+
+- (void)renderFirstPageForJob:(CDJob *)job dateStr:(NSString *)dateStr {
+    
+    UIGraphicsBeginPDFPageWithInfo(CGRectMake(0, 0, pageSize.width, pageSize.height), nil);
+    //[self drawImage];
+    
+     CGRect previousRect = {{kBorderInset + kMarginInset+50, kBorderInset + kMarginInset + 150.0}, {0, 0}};
+     
+     NSArray *strings = @[
+     @{kLabelKey: @"Job Name:",
+       kDescriptionKey: STR(job.name),
+       kFontSizeKey: @24.f},
+     @{kLabelKey: @"Date:",
+       kDescriptionKey: STR(dateStr),
+       kFontSizeKey: @24.f}
+     ];
+     
+     for (NSDictionary *row in strings) {
+         previousRect =[self drawLabel:row[kLabelKey]
+                               details:row[kDescriptionKey]
+                                origin:CGPointMake(previousRect.origin.x, previousRect.size.height + previousRect.origin.y + 10)
+                              fontSize:[row[kFontSizeKey] floatValue]
+                      newLineSeparator:[row[kNewLineKey] boolValue]];
+     }
+    
+    
+    if (YES) {
+        //[self drawLogoImage];
+        /*
+         [self drawTextWithLeftAllignment:@"Certified By Wagner Meters"
+         withFrame:CGRectMake(kBorderInset + kMarginInset+150, kBorderInset + kMarginInset + 850.0,400 , 80)
+         withFont:[UIFont systemFontOfSize:24.0f]];
+         */
+    }
+}
+
+
+- (void) renderRowsForJob:(CGFloat)ypos data:(NSArray *)data startIndex:(long)startIndex count:(long)count {
+    
+    CGFloat xOrigin = 100;
+    CGFloat yOrigin = ypos;
+    CGFloat columnWidth = 160;
+    int numberOfColumns = 6;
+    
+    // table header
+    [self drawTableAt:CGPointMake(xOrigin, yOrigin)
+        withRowHeight:kRowHeight
+       andColumnWidth:columnWidth
+          andRowCount:1
+       andColumnCount:numberOfColumns];
+    
+    NSArray *labels = @[kReportDataSensorKey,
+                        kReportDataLastCalDateKey,
+                        kReportDataRhKey,
+                        kReportDataTempKey,
+                        kReportDataAmbRhKey,
+                        kReportDataAmbTempKey
+                        ];
+    
+    for (int i = 0; i < [labels count]; i++) {
+        [self drawText:labels[i]
+             withFrame:CGRectMake(xOrigin + 20 + columnWidth * i,
+                                  yOrigin + 10,
+                                  columnWidth - 40,
+                                  80)
+              withFont:[UIFont boldSystemFontOfSize:18.0f]];
+    }
+    
+    yOrigin += kRowHeight;
+    
+    
+    [self drawTableAt:CGPointMake(xOrigin, yOrigin)
+        withRowHeight:kRowHeight
+       andColumnWidth:columnWidth
+          andRowCount:(int)count
+       andColumnCount:numberOfColumns];
+    
+    for (int i = (int)startIndex; i < (int)startIndex + count; i++) {
+        UIFont *textFont = [UIFont systemFontOfSize:14.0f];
+        
+        NSDictionary *reportData = [data objectAtIndex:i];
+        
+        // sensor
+        int column = 0;
+        [self drawText:reportData[kReportDataSensorKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // last cal date
+        column++;
+        [self drawText:reportData[kReportDataLastCalDateKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // salt
+        column++;
+        [self drawText:reportData[kReportDataRhKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // rh
+        column++;
+        [self drawText:reportData[kReportDataTempKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // temp
+        column++;
+        [self drawText:reportData[kReportDataAmbRhKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        
+        // cal cert due
+        column++;
+        [self drawText:reportData[kReportDataAmbTempKey]
+             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  columnWidth - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+    }
+}
+
+
+#pragma mark - utilities
 
 - (CGRect)drawLabel:(NSString*)label
             details:(NSString*)details
@@ -422,113 +821,6 @@ static OSReportManager *_sharedReportManager = nil;
     CGColorSpaceRelease(colorspace);
     CGColorRelease(color);
     
-}
-
-- (void) renderRows:(CGFloat)ypos data:(NSArray *)data startIndex:(long)startIndex count:(long)count {
-    
-    CGFloat xOrigin = 100;
-    CGFloat yOrigin = ypos;
-    CGFloat columnWidth = 160;
-    int numberOfColumns = 6;
-    
-    // table header
-    [self drawTableAt:CGPointMake(xOrigin, yOrigin)
-        withRowHeight:kRowHeight
-       andColumnWidth:columnWidth
-          andRowCount:1
-       andColumnCount:numberOfColumns];
-    
-    NSArray *labels = @[kReportDataSensorKey,
-                        kReportDataLastCalDateKey,
-                        kReportDataSaltKey,
-                        kReportDataRhKey,
-                        kReportDataTempKey,
-                        kReportDataCalCertDueKey
-                        ];
-    
-    for (int i = 0; i < [labels count]; i++) {
-        [self drawText:labels[i]
-             withFrame:CGRectMake(xOrigin + 20 + columnWidth * i,
-                                  yOrigin + 10,
-                                  columnWidth - 40,
-                                  80)
-              withFont:[UIFont boldSystemFontOfSize:18.0f]];
-    }
-    
-    yOrigin += kRowHeight;
-    
-    
-    [self drawTableAt:CGPointMake(xOrigin, yOrigin)
-        withRowHeight:kRowHeight
-       andColumnWidth:columnWidth
-          andRowCount:(int)count
-       andColumnCount:numberOfColumns];
-    
-    for (int i = (int)startIndex; i < (int)startIndex + count; i++) {
-        UIFont *textFont = [UIFont systemFontOfSize:14.0f];
-        
-        NSDictionary *reportData = [data objectAtIndex:i];
-        
-        // sensor
-        int column = 0;
-        [self drawText:reportData[kReportDataSensorKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
-                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
-                                  30)
-              withFont:textFont
-           placeholder:@""];
-        
-        // last cal date
-        column++;
-        [self drawText:reportData[kReportDataLastCalDateKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
-                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
-                                  30)
-              withFont:textFont
-           placeholder:@""];
-        
-        // salt
-        column++;
-        [self drawText:reportData[kReportDataSaltKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
-                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
-                                  30)
-              withFont:textFont
-           placeholder:@""];
-        
-        // rh
-        column++;
-        [self drawText:reportData[kReportDataRhKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
-                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
-                                  30)
-              withFont:textFont
-           placeholder:@""];
-        
-        // temp
-        column++;
-        [self drawText:reportData[kReportDataTempKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
-                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
-                                  30)
-              withFont:textFont
-           placeholder:@""];
-        
-        // cal cert due
-        column++;
-        [self drawText:reportData[kReportDataCalCertDueKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
-                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
-                                  30)
-              withFont:textFont
-           placeholder:@""];
-    }
 }
 
 -(void)drawTableAt:(CGPoint)origin
