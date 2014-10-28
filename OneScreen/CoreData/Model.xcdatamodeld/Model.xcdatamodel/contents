@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3396" systemVersion="12F45" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6252" systemVersion="13F34" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="CDCalCheck" representedClassName="CDCalCheck" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="rh" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
@@ -13,8 +13,8 @@
     </entity>
     <entity name="CDJob" representedClassName="CDJob" syncable="YES">
         <attribute name="createtime" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="deleted" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="endtime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="isdeleted" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="starttime" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
@@ -35,10 +35,10 @@
         <attribute name="ssn" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="CDCalCheck" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="CDCalibrationDate" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="CDJob" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="CDReading" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="CDSensor" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="CDCalCheck" positionX="0" positionY="0" width="128" height="120"/>
+        <element name="CDCalibrationDate" positionX="0" positionY="0" width="128" height="75"/>
+        <element name="CDJob" positionX="0" positionY="0" width="128" height="135"/>
+        <element name="CDReading" positionX="0" positionY="0" width="128" height="165"/>
+        <element name="CDSensor" positionX="0" positionY="0" width="128" height="90"/>
     </elements>
 </model>

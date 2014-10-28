@@ -27,13 +27,8 @@ static NSString * const kNewLineKey = @"newLineSeparator";
 static NSString * const kFontSizeKey = @"fontSize";
 
 static CGFloat const kHeaderHeight = 110.f;
-static CGFloat const kSubtitleHeight = 120.f;
-static CGFloat const kDateHeight = 50.f;
 static CGFloat const kRowHeight = 40.0f;
-static CGFloat const kStatisticHeight = 40.f;
-static CGFloat const kStatisticTableHeight = 100.f;
-static CGFloat const kLastReadingTableHeight = 100.f;
-static CGFloat const kGap = 10.f;
+
 
 #define kReportDataSensorKey        @"Sensor"
 #define kReportDataLastCalDateKey   @"Last Cal Date"
@@ -98,18 +93,17 @@ static OSReportManager *_sharedReportManager = nil;
     
 //    for (int i = 0; i < [arrayReportData count]; i++) {
 //        
-        if (isStart == YES) {
+        //if (isStart == YES) {
             
             // draw header.
             [self renderHeader];
-            isStart = NO;
+            //isStart = NO;
             yPos = kHeaderHeight;
-        }
+        //}
     
         int m = 0;
         int count = (int)[arrayReportData count];
-        isStart = NO;
-        //isStart = YES;
+        //isStart = NO;
         while (m < count) {
             
             if (isStart == YES)
@@ -399,18 +393,17 @@ static OSReportManager *_sharedReportManager = nil;
     
     //    for (int i = 0; i < [arrayReportData count]; i++) {
     //
-    if (isStart == YES) {
+    //if (isStart == YES) {
         
         // draw header.
         [self renderHeader];
-        isStart = NO;
+        //isStart = NO;
         yPos = kHeaderHeight;
-    }
+    //}
     
     int m = 0;
     int count = (int)[arrayReportData count];
-    isStart = NO;
-    //isStart = YES;
+    //isStart = NO;
     while (m < count) {
         
         if (isStart == YES)

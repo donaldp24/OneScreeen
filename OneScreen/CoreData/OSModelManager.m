@@ -586,7 +586,7 @@
     CDJob *newJob = [NSEntityDescription
                      insertNewObjectForEntityForName:@"CDJob"
                      inManagedObjectContext:self.managedObjectContext];
-    newJob.deleted = @(NO);
+    newJob.isdeleted = @(NO);
     newJob.uid = uid;
     newJob.name = jobName;
     newJob.createtime = [NSDate date];
@@ -635,7 +635,7 @@
     if (job == nil)
         return;
     
-    job.deleted = @(YES);
+    job.isdeleted = @(YES);
     [self saveContext];
 }
 
@@ -648,7 +648,7 @@
     NSEntityDescription *entity = [NSEntityDescription
                                    entityForName:@"CDJob"
                                    inManagedObjectContext:self.managedObjectContext];
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"deleted == %@", @(NO)];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"isdeleted == %@", @(NO)];
     NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
                                  initWithKey:@"createtime"
                                  ascending:NO];

@@ -2,7 +2,7 @@
 //  CDJob.h
 //  OneScreen
 //
-//  Created by Xiaoxue Han on 10/19/14.
+//  Created by Xiaoxue Han on 29/10/14.
 //  Copyright (c) 2014 wagnermeter. All rights reserved.
 //
 
@@ -12,11 +12,11 @@
 
 @interface CDJob : NSManagedObject
 
-@property (nonatomic, retain) NSNumber * deleted;
-@property (nonatomic, retain) NSString * name;
-@property (nonatomic, retain) NSString * uid;
 @property (nonatomic, retain) NSDate * createtime;
-@property (nonatomic, retain) NSDate * starttime;
+@property (nonatomic, retain) NSNumber * isdeleted;
 @property (nonatomic, retain) NSDate * endtime;
+@property (nonatomic, retain) NSString * name;
+@property (nonatomic, retain) NSDate * starttime;
+@property (nonatomic, retain) NSString * uid;
 
 @end

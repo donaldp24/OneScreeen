@@ -345,6 +345,10 @@ static OSJobCell *_prototypeJobCell = nil;
 {
     OSProcessingJob *processingJob = [self findProcessingJob:cell.job];
     if (processingJob) {
+        
+        if (processingJob.job == [OSAppContext sharedInstance].currentJob && [OSAppContext sharedInstance].isJobStarted)
+            return;
+        
         // remove job from array
         [self.arrayProcessingJobs removeObject:processingJob];
         

@@ -104,6 +104,7 @@
     appDelegate.allowRotateToLandscape = YES;
     
     orientationToLandscape = NO;
+    //[self performSelector:@selector(changeOrientationToLandscape) withObject:nil afterDelay:0];
     [self changeOrientationToLandscape];
     
 #if USE_SEARCHBAR

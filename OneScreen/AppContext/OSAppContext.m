@@ -65,6 +65,9 @@ static OSAppContext *_sharedAppContext = nil;
     }
     
     _isJobStarted = [userDefaults boolForKey:@"isstarted"];
+    
+    if (_isJobStarted)
+        _currentJob.isdeleted = @(NO);
 }
 
 @end

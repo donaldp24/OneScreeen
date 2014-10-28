@@ -21,6 +21,8 @@
     // crashlytics
     [Crashlytics startWithAPIKey:@"02eaa877844435ac8f0e7707e5087c6a937afdd5"];
     
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    
     //Customize Of Navigation Controller for All page
     [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"NavigationBar_BgImage"] forBarMetrics:UIBarMetricsDefault];
     
