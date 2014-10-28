@@ -1170,7 +1170,7 @@
 					"$(PROJECT_DIR)/Library/TestFlight",
 				);
 				PRODUCT_NAME = CalMaster;
-				PROVISIONING_PROFILE = "14e69ccd-8800-4442-b154-f7f7b0b4911b";
+				PROVISIONING_PROFILE = "c7cb24d4-aa8e-412b-99de-17aae3e552be";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1196,7 +1196,7 @@
 					"$(PROJECT_DIR)/Library/TestFlight",
 				);
 				PRODUCT_NAME = CalMaster;
-				PROVISIONING_PROFILE = "913b38a7-c326-4146-b4cd-b66036f38357";
+				PROVISIONING_PROFILE = "3be9f809-5ff7-4d02-b065-67987a9a8495";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
