@@ -10,6 +10,9 @@
 #import "OSModelManager.h"
 #import "NSDate+String.h"
 
+#define kBackgroundColorForSelected     [UIColor colorWithRed:1 green:1 blue:1 alpha:0.1]
+#define kBackgroundColorForNonSelected  [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3]
+
 @interface OSReadingCell () <UIGestureRecognizerDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *labelSsn;
@@ -141,6 +144,10 @@
     
     // select
     self.btnSelect.selected = isSelected;
+    if (isSelected)
+        self.contentView.backgroundColor = kBackgroundColorForSelected;
+    else
+        self.contentView.backgroundColor = kBackgroundColorForNonSelected;
     
     [self layoutIfNeeded];
 
@@ -195,6 +202,10 @@
 - (IBAction)onTapCheck:(id)sender
 {
     self.btnSelect.selected = !self.btnSelect.selected;
+    if (self.btnSelect.selected)
+        self.contentView.backgroundColor = kBackgroundColorForSelected;
+    else
+        self.contentView.backgroundColor = kBackgroundColorForNonSelected;
     if (self.delegate)
         [self.delegate didSelectCell:self isSelected:self.btnSelect.selected];
 }

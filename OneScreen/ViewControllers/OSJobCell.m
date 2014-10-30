@@ -10,6 +10,9 @@
 #import "NSDate+String.h"
 #import "OSModelManager.h"
 
+#define kBackgroundColorForSelected     [UIColor colorWithRed:1 green:1 blue:1 alpha:0.1]
+#define kBackgroundColorForNonSelected  [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3]
+
 @interface OSJobCell ()
 
 @property (weak, nonatomic) IBOutlet UILabel *labelJobName;
@@ -81,6 +84,7 @@
     [self.labelStartDate setFont:kFontMyriadProRegular(17)];
     [self.labelEndDate setFont:kFontMyriadProRegular(17)];
     
+    
     // job name
     self.labelJobName.text = job.name;
     
@@ -110,6 +114,10 @@
     
     // select
     self.btnSelect.selected = isSelected;
+    if (isSelected)
+        self.contentView.backgroundColor = kBackgroundColorForSelected;
+    else
+        self.contentView.backgroundColor = kBackgroundColorForNonSelected;
     
     self.isNewOne = isNewOne;
     
@@ -218,6 +226,11 @@
 - (IBAction)onTapCheck:(id)sender
 {
     self.btnSelect.selected = !self.btnSelect.selected;
+    if (self.btnSelect.selected)
+        self.contentView.backgroundColor = kBackgroundColorForSelected;
+    else
+        self.contentView.backgroundColor = kBackgroundColorForNonSelected;
+    
     if (self.delegate)
         [self.delegate didSelectCell:self isSelected:self.btnSelect.selected];
 }

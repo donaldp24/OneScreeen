@@ -711,7 +711,7 @@ static OSReportManager *_sharedReportManager = nil;
 
 - (void)drawPageNumber:(NSInteger)pageNumber {
     
-    NSString* pageNumberString = [NSString stringWithFormat:@"Page %d", pageNumber];
+    NSString* pageNumberString = [NSString stringWithFormat:@"Page %d", (int)pageNumber];
     UIFont* theFont = [UIFont systemFontOfSize:16];
     
     NSDictionary *attributesDictionary = [NSDictionary dictionaryWithObjectsAndKeys:

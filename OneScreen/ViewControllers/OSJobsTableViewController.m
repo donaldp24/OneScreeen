@@ -394,19 +394,26 @@ static OSJobCell *_prototypeJobCell = nil;
 - (IBAction)onDeleteSelectedCells:(id)sender
 {
     int nSelected = 0;
+    OSProcessingJob *oneJob = nil;
     for (int i = 0; i < self.arrayProcessingJobs.count; i++) {
         OSProcessingJob *processingJob = [self.arrayProcessingJobs objectAtIndex:i];
         if (!processingJob.isSelected)
             continue;
         
         nSelected++;
+        oneJob = processingJob;
     }
     
     if (nSelected > 0)
     {
         NSString *msg;
         if (nSelected == 1)
-            msg = [NSString stringWithFormat:@"Selected %d job! \nPlease confirm to delete.", nSelected];
+        {
+            NSString *strJob = @"";
+            if (oneJob)
+                strJob = oneJob.job.name;
+            msg = [NSString stringWithFormat:@"Selected job \"%@\"\nPlease confirm to delete.", strJob];
+        }
         else
             msg = [NSString stringWithFormat:@"Selected %d jobs! \nPlease confirm to delete.", nSelected];
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Confirm" message:msg delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];

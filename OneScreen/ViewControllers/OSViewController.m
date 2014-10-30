@@ -403,56 +403,62 @@ typedef enum {
 // called when read data from sensor
 - (void)onReadSensorData:(NSDictionary*)sensorData {
     
-    if (self.dicSensorData == nil)
-        self.dicSensorData = [[NSMutableDictionary alloc] init];
-    
-    NSString *sensorSerial = [sensorData objectForKey:kSensorDataSerialNumberKey];
-    if (sensorSerial == nil)
-        return;
-    [self.dicSensorData setObject:sensorData forKey:sensorSerial];
-    
-    // change bluetooth icon
-    self.ivBluetoothIcon.image = imageBluetooth;
-    
-    ///since we recieved 3 2-bytes packages of serialNumber in little endian format we'll have to transform it so the string has appropriate look
-    [self setProgress:[[sensorData objectForKey:kSensorDataBatteryKey] floatValue]];
-    
-    CGFloat rh = [[sensorData objectForKey:kSensorDataRHKey] floatValue];
-    CGFloat temp_f = [[sensorData objectForKey:kSensorDataTemperatureKey] floatValue];
-    
-    self.labelRh.text = [NSString stringWithFormat:@"%3.1f", rh];
-    self.labelAmbientRh.text = [NSString stringWithFormat:@"%3.1f",[[sensorData objectForKey:kSensorDataRHAmbientKey] floatValue]];
-    self.labelTemp.text = [NSString stringWithFormat:@"%3.1f", temp_f];
-    self.labelAmbientTemp.text = [NSString stringWithFormat:@"%3.1f",[[sensorData objectForKey:kSensorDataTemperatureAmbientKey] floatValue]];
-    
-    // sensor serial
-    self.labelSensorSerial.text = sensorSerial;
-    
-    if ([self.currSensor isEqualToString:sensorSerial])
-    {
-        // same sensor
-    }
-    else
-    {
-        [self onSensorChanged:sensorSerial];
-    }
-    self.currSensor = sensorSerial;
-    
-    // calculate result
-    OSSaltSolution *saltSolution = self.currSalt;
-    if (saltSolution)
-    {
-        if (saltSolution.calculable)
+    dispatch_async(dispatch_get_main_queue(), ^() {
+        if (self.dicSensorData == nil)
+            self.dicSensorData = [[NSMutableDictionary alloc] init];
+        
+        NSString *sensorSerial = [sensorData objectForKey:kSensorDataSerialNumberKey];
+        if (sensorSerial == nil)
+            return;
+        [self.dicSensorData setObject:sensorData forKey:sensorSerial];
+        
+        // change bluetooth icon
+        self.ivBluetoothIcon.image = imageBluetooth;
+        
+        ///since we recieved 3 2-bytes packages of serialNumber in little endian format we'll have to transform it so the string has appropriate look
+        [self setProgress:[[sensorData objectForKey:kSensorDataBatteryKey] floatValue]];
+        
+        CGFloat rh = [[sensorData objectForKey:kSensorDataRHKey] floatValue];
+        CGFloat temp_f = [[sensorData objectForKey:kSensorDataTemperatureKey] floatValue];
+        
+        self.labelRh.text = [NSString stringWithFormat:@"%3.1f", rh];
+        self.labelAmbientRh.text = [NSString stringWithFormat:@"%3.1f",[[sensorData objectForKey:kSensorDataRHAmbientKey] floatValue]];
+        self.labelTemp.text = [NSString stringWithFormat:@"%3.1f", temp_f];
+        self.labelAmbientTemp.text = [NSString stringWithFormat:@"%3.1f",[[sensorData objectForKey:kSensorDataTemperatureAmbientKey] floatValue]];
+        
+        // sensor serial
+        self.labelSensorSerial.text = sensorSerial;
+        
+        if ([self.currSensor isEqualToString:sensorSerial])
         {
-            CalCheckResult result = [[OSSaltSolutionManager sharedInstance] calCheckWithRh:rh temp_f:temp_f saltSolution:saltSolution];
-            [self showResultForCalResult:result];
+            // same sensor
+        }
+        else
+        {
+            [self onSensorChanged:sensorSerial];
+        }
+        self.currSensor = sensorSerial;
+        CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:self.currSensor];
+        if (sensor) {
+            [[OSModelManager sharedInstance] setLastReadingTimeForSensor:sensor lastTime:[NSDate date]];
         }
         
-        if (saltSolution.storable)
-            self.btnStore.enabled = YES;
-        else
-            self.btnStore.enabled = NO;
-    }
+        // calculate result
+        OSSaltSolution *saltSolution = self.currSalt;
+        if (saltSolution)
+        {
+            if (saltSolution.calculable)
+            {
+                CalCheckResult result = [[OSSaltSolutionManager sharedInstance] calCheckWithRh:rh temp_f:temp_f saltSolution:saltSolution];
+                [self showResultForCalResult:result];
+            }
+            
+            if (saltSolution.storable)
+                self.btnStore.enabled = YES;
+            else
+                self.btnStore.enabled = NO;
+        }
+    });
 }
 
 - (NSString *)resultForCalcResult:(CalCheckResult)result
@@ -497,6 +503,9 @@ typedef enum {
     UIColor *labelColor = [self colorForCalcResult:result];
     self.labelResult.textColor = labelColor;
     self.labelResult.text = strResult;
+    
+    self.labelResult.hidden = NO;
+    self.labelForResult.hidden = NO;
 }
 
 // calculate expiration date from calibration date
@@ -539,6 +548,9 @@ typedef enum {
     self.btnStore.enabled = NO;
     self.labelResult.hidden = YES;
     self.labelForResult.hidden = YES;
+    
+    self.currSalt = saltSolution;
+    
     if (self.currSensor == nil || self.currSensor.length == 0)
         return;
     
@@ -549,9 +561,6 @@ typedef enum {
     self.btnStore.enabled = saltSolution.storable;
     self.labelForResult.hidden = !saltSolution.calculable;
     self.labelResult.hidden = !saltSolution.calculable;
-   
-    
-    self.currSalt = saltSolution;
     
     // re-calc result
     if (saltSolution.calculable)
@@ -570,7 +579,7 @@ typedef enum {
 - (void)onSensorChanged:(NSString *)newSensorSerial
 {
     self.currSensor = newSensorSerial;
-    
+
     // calibration and cal check due
     [self showCalibrationAndCalDue];
     

@@ -273,8 +273,8 @@
                                    entityForName:@"CDSensor"
                                    inManagedObjectContext:self.managedObjectContext];
     NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
-                                 initWithKey:@"name"
-                                 ascending:YES];
+                                 initWithKey:@"lastreadingtime"
+                                 ascending:NO];
     [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
     
     [fetchRequest setEntity:entity];
@@ -539,6 +539,18 @@
     }
 }
 
+- (void)setLastReadingTimeForSensor:(CDSensor *)sensor lastTime:(NSDate *)lastTime
+{
+    if (sensor == nil)
+        return;
+    if (lastTime == nil)
+        return;
+    
+    sensor.lastreadingtime = lastTime;
+    [self saveContext];
+    return;
+}
+
 #pragma mark - job
 - (CDJob *)getJobWithUid:(NSString *)uid
 {
@@ -650,7 +662,7 @@
                                    inManagedObjectContext:self.managedObjectContext];
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"isdeleted == %@", @(NO)];
     NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
-                                 initWithKey:@"createtime"
+                                 initWithKey:@"starttime"
                                  ascending:NO];
     
     [fetchRequest setEntity:entity];

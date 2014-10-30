@@ -67,32 +67,32 @@ static const int kPackageID = 0xDEB93390;
 
     switch ([central state]) {
         case CBCentralManagerStateResetting:
-            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStateResetting %d ", central.state];
+            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStateResetting %d ", (int)central.state];
             break;
         case CBCentralManagerStateUnsupported:
-            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStateUnsupported %d ", central.state];
+            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStateUnsupported %d ", (int)central.state];
             [self showAlertWithTitle:@"Error"
                          description:@"This device does not support Bluetooth low energy."];
             break;
         case CBCentralManagerStateUnauthorized:
-            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStateUnauthorized %d ", central.state];
+            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStateUnauthorized %d ", (int)central.state];
             [self showAlertWithTitle:@"Unauthorized!"
                          description:@"This app is not authorized to use Bluetooth low energy.\n\nAuthorize in Settings > Bluetooth."];
             break;
         case CBCentralManagerStatePoweredOff:
-            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStatePoweredOff %d ", central.state];
+            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStatePoweredOff %d ", (int)central.state];
             [self showAlertWithTitle:@"Powered Off"
                          description:@"Bluetooth is currently powered off.\n\nPower ON the bluetooth in Settings > Bluetooth."];
             break;
         case CBCentralManagerStatePoweredOn:
-            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStatePoweredOn %d ", central.state];
+            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStatePoweredOn %d ", (int)central.state];
             [self startScan];
             break;
         case CBCentralManagerStateUnknown:
-            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStateUnknown %d ", central.state];
+            stateDescription = [NSString stringWithFormat:@"CBCentralManagerStateUnknown %d ", (int)central.state];
             break;
         default:
-            stateDescription = [NSString stringWithFormat:@"CBCentralManager Undefined %d ", central.state];
+            stateDescription = [NSString stringWithFormat:@"CBCentralManager Undefined %d ", (int)central.state];
             break;
     }
 
@@ -202,7 +202,7 @@ static const int kPackageID = 0xDEB93390;
 #ifndef RELEASE
     NSString * outputString = @"";
     NSLog(@"%@",outputString);
-    for (int ix=offset; ix<dataToParse.length; ix++) {
+    for (int ix=(int)offset; ix<(int)dataToParse.length; ix++) {
         unsigned char c;
         [dataToParse getBytes:&c range:NSMakeRange(ix, 1)];
         outputString = [outputString stringByAppendingFormat:@"%02X ",c];

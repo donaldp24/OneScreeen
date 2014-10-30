@@ -39,6 +39,7 @@
 - (void)setSensor:(CDSensor *)sensor name:(NSString *)name;
 - (void)removeSensorFromInventory:(CDSensor *)sensor;
 - (void)removeSensorFromJob:(CDJob *)job sensor:(CDSensor *)sensor;
+- (void)setLastReadingTimeForSensor:(CDSensor *)sensor lastTime:(NSDate *)lastTime;
 
 
 #pragma mark - calcheck

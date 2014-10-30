@@ -2,7 +2,7 @@
 //  CDSensor.m
 //  OneScreen
 //
-//  Created by Xiaoxue Han on 10/21/14.
+//  Created by Xiaoxue Han on 30/10/14.
 //  Copyright (c) 2014 wagnermeter. All rights reserved.
 //
 
@@ -11,8 +11,9 @@
 
 @implementation CDSensor
 
+@dynamic deletedInv;
 @dynamic name;
 @dynamic ssn;
-@dynamic deletedInv;
+@dynamic lastreadingtime;
 
 @end

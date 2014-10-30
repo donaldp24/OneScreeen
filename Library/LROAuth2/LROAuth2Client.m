@@ -270,7 +270,7 @@
     NSString* str_token, *str_url;
     int index = 0, length, start_index = 0, end_index = 0;
     str_url = [url absoluteString];
-    length = [[url absoluteString] length];
+    length = (int)[[url absoluteString] length];
     //str_url = url get
     for(index = 0; index< length; index++)
     {

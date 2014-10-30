@@ -31,6 +31,7 @@
     </entity>
     <entity name="CDSensor" representedClassName="CDSensor" syncable="YES">
         <attribute name="deletedInv" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="lastreadingtime" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="ssn" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
@@ -39,6 +40,6 @@
         <element name="CDCalibrationDate" positionX="0" positionY="0" width="128" height="75"/>
         <element name="CDJob" positionX="0" positionY="0" width="128" height="135"/>
         <element name="CDReading" positionX="0" positionY="0" width="128" height="165"/>
-        <element name="CDSensor" positionX="0" positionY="0" width="128" height="90"/>
+        <element name="CDSensor" positionX="0" positionY="0" width="128" height="105"/>
     </elements>
 </model>

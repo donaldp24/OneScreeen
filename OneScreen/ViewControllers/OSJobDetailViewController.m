@@ -392,6 +392,7 @@ static OSReadingCell *_prototypeReadingCell = nil;
 
 - (IBAction)onDeleteSelectedCells:(id)sender
 {
+    OSProcessingReading *oneReading = nil;
     int nSelected = 0;
     for (int i = 0; i < self.arrayProcessingReadings.count; i++) {
         OSProcessingReading *processingReading = [self.arrayProcessingReadings objectAtIndex:i];
@@ -399,13 +400,25 @@ static OSReadingCell *_prototypeReadingCell = nil;
             continue;
         
         nSelected++;
+        oneReading = processingReading;
     }
     
     if (nSelected > 0)
     {
         NSString *msg;
         if (nSelected == 1)
-            msg = [NSString stringWithFormat:@"Selected %d sensor! \nPlease confirm to delete.", nSelected];
+        {
+            NSString *strSensor = @"";
+            if (oneReading)
+            {
+                CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:oneReading.ssn];
+                if (sensor.name != nil && sensor.name.length > 0)
+                    strSensor = sensor.name;
+                else
+                    strSensor = sensor.ssn;
+            }
+            msg = [NSString stringWithFormat:@"Selected sensor \"%@\"! \nPlease confirm to delete.", strSensor];
+        }
         else
             msg = [NSString stringWithFormat:@"Selected %d sensors! \nPlease confirm to delete.", nSelected];
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Confirm" message:msg delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];

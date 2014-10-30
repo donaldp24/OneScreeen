@@ -11,7 +11,8 @@
 #import "NSDate+String.h"
 #import "OSCertificationManager.h"
 
-
+#define kBackgroundColorForSelected     [UIColor colorWithRed:1 green:1 blue:1 alpha:0.1]
+#define kBackgroundColorForNonSelected  [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3]
 
 @interface OSSensorCell () <UIGestureRecognizerDelegate>
 
@@ -175,17 +176,31 @@
         {
             self.contentView.backgroundColor = kDefaultBackgroundColor;
             [self.indicator stopAnimating];
+            if (isSelected)
+                self.contentView.backgroundColor = kBackgroundColorForSelected;
+            else
+                self.contentView.backgroundColor = kBackgroundColorForNonSelected;
+            
+            self.btnSelect.hidden = NO;
         }
         else
         {
             self.contentView.backgroundColor = kReadingBackgroundColor;
             [self.indicator startAnimating];
+            
+            self.btnSelect.hidden = YES;
         }
     }
     else
     {
         self.contentView.backgroundColor = kDefaultBackgroundColor;
         [self.indicator stopAnimating];
+        if (isSelected)
+            self.contentView.backgroundColor = kBackgroundColorForSelected;
+        else
+            self.contentView.backgroundColor = kBackgroundColorForNonSelected;
+        
+        self.btnSelect.hidden = NO;
     }
     
     // hide editing
@@ -313,6 +328,13 @@
 - (IBAction)onTapCheck:(id)sender
 {
     self.btnSelect.selected = !self.btnSelect.selected;
+    if ([self.delegate retrievedData:self])
+    {
+        if (self.btnSelect.selected)
+            self.contentView.backgroundColor = kBackgroundColorForSelected;
+        else
+            self.contentView.backgroundColor = kBackgroundColorForNonSelected;
+    }
     if (self.delegate)
         [self.delegate didSelectCell:self isSelected:self.btnSelect.selected];
 }

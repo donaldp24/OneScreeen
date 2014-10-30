@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D0007C091A0232A500235E69 /* CDSensor.m in Sources */ = {isa = PBXBuildFile; fileRef = D0007C081A0232A500235E69 /* CDSensor.m */; };
+		D0007C0D1A02525D00235E69 /* iTunesArtwork@2x in Resources */ = {isa = PBXBuildFile; fileRef = D0007C0C1A02525D00235E69 /* iTunesArtwork@2x */; };
+		D0007C0F1A0252FF00235E69 /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = D0007C0E1A0252FF00235E69 /* iTunesArtwork */; };
 		D005B7AB19E5E8670073336A /* OSSaltsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D005B7A619E5E8670073336A /* OSSaltsCell.m */; };
 		D005B7AC19E5E8670073336A /* OSSensorInventoryTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D005B7A819E5E8670073336A /* OSSensorInventoryTableViewController.m */; };
 		D005B7AD19E5E8670073336A /* OSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D005B7AA19E5E8670073336A /* OSViewController.m */; };
@@ -68,7 +71,6 @@
 		D02CB33219F01061003A23B8 /* UIXToolbarView.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30D19F01061003A23B8 /* UIXToolbarView.m */; };
 		D02CB33519F08986003A23B8 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D02CB33419F08986003A23B8 /* Crashlytics.framework */; };
 		D0375C4419F4A9D600F64359 /* CDReading.m in Sources */ = {isa = PBXBuildFile; fileRef = D0375C4319F4A9D600F64359 /* CDReading.m */; };
-		D0375C4A19F5CDE800F64359 /* CDSensor.m in Sources */ = {isa = PBXBuildFile; fileRef = D0375C4919F5CDE800F64359 /* CDSensor.m */; };
 		D05CCF8B19ECCAFE00747064 /* OSRotateNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */; };
 		D05CCF8E19ECD88100747064 /* OSDummyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8D19ECD88100747064 /* OSDummyViewController.m */; };
 		D08964C319E67F2D00FFF5CE /* CDCalCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = D08964C219E67F2D00FFF5CE /* CDCalCheck.m */; };
@@ -131,6 +133,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D0007C071A0232A500235E69 /* CDSensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDSensor.h; sourceTree = "<group>"; };
+		D0007C081A0232A500235E69 /* CDSensor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDSensor.m; sourceTree = "<group>"; };
+		D0007C0C1A02525D00235E69 /* iTunesArtwork@2x */ = {isa = PBXFileReference; lastKnownFileType = file; path = "iTunesArtwork@2x"; sourceTree = "<group>"; };
+		D0007C0E1A0252FF00235E69 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; path = iTunesArtwork; sourceTree = "<group>"; };
 		D005B7A519E5E8670073336A /* OSSaltsCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSSaltsCell.h; sourceTree = "<group>"; };
 		D005B7A619E5E8670073336A /* OSSaltsCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSSaltsCell.m; sourceTree = "<group>"; };
 		D005B7A719E5E8670073336A /* OSSensorInventoryTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSSensorInventoryTableViewController.h; sourceTree = "<group>"; };
@@ -235,8 +241,6 @@
 		D02CB33419F08986003A23B8 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		D0375C4219F4A9D600F64359 /* CDReading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDReading.h; sourceTree = "<group>"; };
 		D0375C4319F4A9D600F64359 /* CDReading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDReading.m; sourceTree = "<group>"; };
-		D0375C4819F5CDE800F64359 /* CDSensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDSensor.h; sourceTree = "<group>"; };
-		D0375C4919F5CDE800F64359 /* CDSensor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDSensor.m; sourceTree = "<group>"; };
 		D05CCF8919ECCAFE00747064 /* OSRotateNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSRotateNavigationController.h; sourceTree = "<group>"; };
 		D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSRotateNavigationController.m; sourceTree = "<group>"; };
 		D05CCF8C19ECD88100747064 /* OSDummyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSDummyViewController.h; sourceTree = "<group>"; };
@@ -543,10 +547,10 @@
 				D08964C219E67F2D00FFF5CE /* CDCalCheck.m */,
 				D0375C4219F4A9D600F64359 /* CDReading.h */,
 				D0375C4319F4A9D600F64359 /* CDReading.m */,
-				D0375C4819F5CDE800F64359 /* CDSensor.h */,
-				D0375C4919F5CDE800F64359 /* CDSensor.m */,
 				D0BDE8221A0054D10033A553 /* CDJob.h */,
 				D0BDE8231A0054D10033A553 /* CDJob.m */,
+				D0007C071A0232A500235E69 /* CDSensor.h */,
+				D0007C081A0232A500235E69 /* CDSensor.m */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -587,6 +591,8 @@
 		D0BEAAED19D3B9CB00514B19 /* OneScreen */ = {
 			isa = PBXGroup;
 			children = (
+				D0007C0E1A0252FF00235E69 /* iTunesArtwork */,
+				D0007C0C1A02525D00235E69 /* iTunesArtwork@2x */,
 				D00C2F3B19F11BC40041EB09 /* AppContext */,
 				D02A36B619EED4E300322C00 /* Report */,
 				D005B7B419E5EB4C0073336A /* Expiration */,
@@ -887,6 +893,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0007C0D1A02525D00235E69 /* iTunesArtwork@2x in Resources */,
 				D0F984F519D8A358003B2E74 /* MyriadPro-Bold.ttf in Resources */,
 				D0F984F819D8A358003B2E74 /* MyriadPro-Regular.ttf in Resources */,
 				D02CB31A19F01061003A23B8 /* Reader-Mark-Y.png in Resources */,
@@ -899,6 +906,7 @@
 				D02CB31319F01061003A23B8 /* Reader-Button-H@2x.png in Resources */,
 				D0BEAB0319D3B9CB00514B19 /* Images.xcassets in Resources */,
 				D02CB31E19F01061003A23B8 /* Reader-Thumbs.png in Resources */,
+				D0007C0F1A0252FF00235E69 /* iTunesArtwork in Resources */,
 				D0BDE8211A0053610033A553 /* Main_iPhone.storyboard in Resources */,
 				D02CB31F19F01061003A23B8 /* Reader-Thumbs@2x.png in Resources */,
 				D0F984F619D8A358003B2E74 /* MyriadPro-BoldCond.ttf in Resources */,
@@ -995,7 +1003,7 @@
 				D02CB32219F01061003A23B8 /* ReaderContentPage.m in Sources */,
 				D02CB32D19F01061003A23B8 /* ReaderThumbsView.m in Sources */,
 				D00A8FAD19E4A64C00A4A95C /* PushAnimatedTransitioning.m in Sources */,
-				D0375C4A19F5CDE800F64359 /* CDSensor.m in Sources */,
+				D0007C091A0232A500235E69 /* CDSensor.m in Sources */,
 				D0BEAB4519D3BA7500514B19 /* LRURLRequestOperation.m in Sources */,
 				D02CB32019F01061003A23B8 /* CGPDFDocument.m in Sources */,
 				D0BEAB6C19D3CD0200514B19 /* SFHFKeychainUtils.m in Sources */,

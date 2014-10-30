@@ -28,15 +28,17 @@ static int const kSerialNumberValueOffset = 12;
 
 - (NSDictionary*)parseData:(NSData *)manufactureData withOffset:(NSInteger)offset {
 
-    int batteryLevelValueOffset = kBatteryLevelValueOffset + offset;
-    int rhValueOffset = kRHValueOffset + offset;
-    int rhAmbientValueOffset = kRHAmbientValueOffset + offset;
-    int tempValueOffset = kTempValueOffset + offset;
-    int tempAmbientValueOffset = kTempAmbientValueOffset + offset;
+    int batteryLevelValueOffset = kBatteryLevelValueOffset + (int)offset;
+    int rhValueOffset = kRHValueOffset + (int)offset;
+    int rhAmbientValueOffset = kRHAmbientValueOffset + (int)offset;
+    int tempValueOffset = kTempValueOffset + (int)offset;
+    int tempAmbientValueOffset = kTempAmbientValueOffset + (int)offset;
 
     NSMutableDictionary *sensorData = [NSMutableDictionary dictionary];
     
     NSString* serialNumberString = [self serialNumberFromData:manufactureData withOffset:offset];
+    //if (serialNumberString == nil || serialNumberString.length != 12)
+    //    return nil;
     
     UInt8 batteryLevel = *(UInt8*)[[manufactureData subdataWithRange:NSMakeRange(batteryLevelValueOffset, 1)] bytes];
     
@@ -90,7 +92,7 @@ static int const kSerialNumberValueOffset = 12;
 
     NSMutableString* serialNumberString = [NSMutableString string];
 
-    int serialNumberValueOffset = kSerialNumberValueOffset + offset;
+    int serialNumberValueOffset = kSerialNumberValueOffset + (int)offset;
 
     for(int i=0;i<3;++i)
     {
