@@ -169,7 +169,7 @@ static const int kPackageID = 0xDEB93390;
 
         UInt32 packageID = kPackageID;
         ///uuid comes right after flag, length and dataType bytes.
-        if(![[[uuid1 data] subdataWithRange:NSMakeRange(5, 4)] isEqualToData:
+        if(uuid1 == nil || [uuid1 data].length < 10 || ![[[uuid1 data] subdataWithRange:NSMakeRange(5, 4)] isEqualToData:
              [NSData dataWithBytes:&packageID length:4]])
         {
             //NSLog(@"Third party package was received.");

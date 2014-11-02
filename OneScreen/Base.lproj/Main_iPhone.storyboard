@@ -1351,7 +1351,7 @@
                                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
                                                     <connections>
-                                                        <action selector="onDelete:" destination="YSC-9H-xLM" eventType="touchUpInside" id="8wS-wu-ouS"/>
+                                                        <action selector="onTapSensor:" destination="YSC-9H-xLM" eventType="touchUpInside" id="pLT-Rm-JFf"/>
                                                     </connections>
                                                 </button>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AABBAABB1122" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fpZ-63-OAQ">
@@ -1452,6 +1452,9 @@
                                             <state key="normal" title="Delete">
                                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                             </state>
+                                            <connections>
+                                                <action selector="onDelete:" destination="YSC-9H-xLM" eventType="touchUpInside" id="Hmg-Iw-7hH"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.29999999999999999" colorSpace="calibratedRGB"/>

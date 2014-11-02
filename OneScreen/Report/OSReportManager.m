@@ -30,7 +30,8 @@ static CGFloat const kHeaderHeight = 110.f;
 static CGFloat const kRowHeight = 40.0f;
 
 
-#define kReportDataSensorKey        @"Sensor"
+#define kReportDataSensorKey        @"Serial Number"
+#define kreportDataSensorNameKey    @"Name/Location"
 #define kReportDataLastCalDateKey   @"Last Cal Date"
 #define kReportDataSaltKey          @"Salt"
 #define kReportDataRhKey            @"RH (%)"
@@ -97,7 +98,7 @@ static OSReportManager *_sharedReportManager = nil;
             
             // draw header.
             [self renderHeader];
-            //isStart = NO;
+            isStart = NO;
             yPos = kHeaderHeight;
         //}
     
@@ -163,21 +164,27 @@ static OSReportManager *_sharedReportManager = nil;
         
         NSMutableDictionary *reportData = [[NSMutableDictionary alloc] init];
         
-        // sensor
+        // serial number
+        [reportData setObject:sensor.ssn forKey:kReportDataSensorKey];
+        
+        // sensor name
         NSString *strSensor = @"";
         if (sensor != nil)
         {
             if (sensor.name != nil && sensor.name.length > 0)
                 strSensor = sensor.name;
-            else
-                strSensor = sensor.ssn;
         }
-        [reportData setObject:strSensor forKey:kReportDataSensorKey];
+        [reportData setObject:strSensor forKey:kreportDataSensorNameKey];
         
         // last cal date
         NSString *strLastCalCheck = @"";
         if (lastCalCheck != nil)
             strLastCalCheck = [lastCalCheck.date toStringWithFormat:kShortDateFormat];
+        else
+        {
+            if (cdCalibrationDate != nil && cdCalibrationDate.calibrationDate != nil)
+                strLastCalCheck = [cdCalibrationDate.calibrationDate toStringWithFormat:kShortDateFormat];
+        }
         [reportData setObject:strLastCalCheck forKey:kReportDataLastCalDateKey];
         
         // salt
@@ -258,31 +265,34 @@ static OSReportManager *_sharedReportManager = nil;
     
     CGFloat xOrigin = 100;
     CGFloat yOrigin = ypos;
-    CGFloat columnWidth = 160;
-    int numberOfColumns = 6;
+    CGFloat arrayColumnWidth[] = {160, 170, 160, 100, 100, 130, 160};
+    int numberOfColumns = 7;
     
     // table header
     [self drawTableAt:CGPointMake(xOrigin, yOrigin)
         withRowHeight:kRowHeight
-       andColumnWidth:columnWidth
+       andColumnWidth:arrayColumnWidth
           andRowCount:1
        andColumnCount:numberOfColumns];
     
     NSArray *labels = @[kReportDataSensorKey,
+                        kreportDataSensorNameKey,
                         kReportDataLastCalDateKey,
                         kReportDataSaltKey,
                         kReportDataRhKey,
                         kReportDataTempKey,
                         kReportDataCalCertDueKey
                         ];
-    
+
+    CGFloat fLeft = 0;
     for (int i = 0; i < [labels count]; i++) {
         [self drawText:labels[i]
-             withFrame:CGRectMake(xOrigin + 20 + columnWidth * i,
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10,
-                                  columnWidth - 40,
+                                  arrayColumnWidth[i] - 20,
                                   80)
               withFont:[UIFont boldSystemFontOfSize:18.0f]];
+        fLeft += arrayColumnWidth[i];
     }
     
     yOrigin += kRowHeight;
@@ -290,7 +300,7 @@ static OSReportManager *_sharedReportManager = nil;
     
     [self drawTableAt:CGPointMake(xOrigin, yOrigin)
         withRowHeight:kRowHeight
-       andColumnWidth:columnWidth
+       andColumnWidth:arrayColumnWidth
           andRowCount:(int)count
        andColumnCount:numberOfColumns];
     
@@ -301,63 +311,81 @@ static OSReportManager *_sharedReportManager = nil;
         
         // sensor
         int column = 0;
+        CGFloat fLeft = 0;
         [self drawText:reportData[kReportDataSensorKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
+        
+        // sensor name
+        column++;
+        [self drawText:reportData[kreportDataSensorNameKey]
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  arrayColumnWidth[column] - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // last cal date
         column++;
         [self drawText:reportData[kReportDataLastCalDateKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // salt
         column++;
         [self drawText:reportData[kReportDataSaltKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // rh
         column++;
         [self drawText:reportData[kReportDataRhKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // temp
         column++;
         [self drawText:reportData[kReportDataTempKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // cal cert due
         column++;
         [self drawText:reportData[kReportDataCalCertDueKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
     }
 }
 
@@ -397,7 +425,7 @@ static OSReportManager *_sharedReportManager = nil;
         
         // draw header.
         [self renderHeader];
-        //isStart = NO;
+        isStart = NO;
         yPos = kHeaderHeight;
     //}
     
@@ -459,16 +487,32 @@ static OSReportManager *_sharedReportManager = nil;
     for (NSString *ssn in arraySensors) {
         CDReading *reading = [[OSModelManager sharedInstance] getLastReadingForSensor:ssn ofJob:jobUid];
         CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:reading.ssn];
+        CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:reading.ssn];
+        CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:reading.ssn];
         
         NSMutableDictionary *dicReport = [[NSMutableDictionary alloc] init];
         
         // sensor
         [dicReport setObject:reading.ssn forKey:kReportDataSensorKey];
         
+        // sensor name
+        NSString *strSensor = @"";
+        if (sensor != nil)
+        {
+            if (sensor.name != nil && sensor.name.length > 0)
+                strSensor = sensor.name;
+        }
+        [dicReport setObject:strSensor forKey:kreportDataSensorNameKey];
+        
         // last cal check
         NSString *strLastCalCheck = @"";
         if (calCheck != nil && calCheck.date != nil)
             strLastCalCheck = [calCheck.date toStringWithFormat:kShortDateFormat];
+        else
+        {
+            if (cdCalibrationDate != nil && cdCalibrationDate.calibrationDate != nil)
+                strLastCalCheck = [cdCalibrationDate.calibrationDate toStringWithFormat:kShortDateFormat];
+        }
         [dicReport setObject:strLastCalCheck forKey:kReportDataLastCalDateKey];
         
         // rh
@@ -533,17 +577,18 @@ static OSReportManager *_sharedReportManager = nil;
     
     CGFloat xOrigin = 100;
     CGFloat yOrigin = ypos;
-    CGFloat columnWidth = 160;
-    int numberOfColumns = 6;
+    CGFloat arrayColumnWidth[] = {160, 160, 160, 100, 120, 150, 150};
+    int numberOfColumns = 7;
     
     // table header
     [self drawTableAt:CGPointMake(xOrigin, yOrigin)
         withRowHeight:kRowHeight
-       andColumnWidth:columnWidth
+       andColumnWidth:arrayColumnWidth
           andRowCount:1
        andColumnCount:numberOfColumns];
     
     NSArray *labels = @[kReportDataSensorKey,
+                        kreportDataSensorNameKey,
                         kReportDataLastCalDateKey,
                         kReportDataRhKey,
                         kReportDataTempKey,
@@ -551,13 +596,15 @@ static OSReportManager *_sharedReportManager = nil;
                         kReportDataAmbTempKey
                         ];
     
+    CGFloat fLeft = 0;
     for (int i = 0; i < [labels count]; i++) {
         [self drawText:labels[i]
-             withFrame:CGRectMake(xOrigin + 20 + columnWidth * i,
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10,
-                                  columnWidth - 40,
+                                  arrayColumnWidth[i] - 20,
                                   80)
               withFont:[UIFont boldSystemFontOfSize:18.0f]];
+        fLeft += arrayColumnWidth[i];
     }
     
     yOrigin += kRowHeight;
@@ -565,7 +612,7 @@ static OSReportManager *_sharedReportManager = nil;
     
     [self drawTableAt:CGPointMake(xOrigin, yOrigin)
         withRowHeight:kRowHeight
-       andColumnWidth:columnWidth
+       andColumnWidth:arrayColumnWidth
           andRowCount:(int)count
        andColumnCount:numberOfColumns];
     
@@ -576,63 +623,81 @@ static OSReportManager *_sharedReportManager = nil;
         
         // sensor
         int column = 0;
+        CGFloat fLeft = 0;
         [self drawText:reportData[kReportDataSensorKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
+        
+        // sensor name
+        column++;
+        [self drawText:reportData[kreportDataSensorNameKey]
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
+                                  yOrigin + 10 + (kRowHeight * (i - startIndex)),
+                                  arrayColumnWidth[column] - 20,
+                                  30)
+              withFont:textFont
+           placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // last cal date
         column++;
         [self drawText:reportData[kReportDataLastCalDateKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // salt
         column++;
         [self drawText:reportData[kReportDataRhKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // rh
         column++;
         [self drawText:reportData[kReportDataTempKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // temp
         column++;
         [self drawText:reportData[kReportDataAmbRhKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
         
         // cal cert due
         column++;
         [self drawText:reportData[kReportDataAmbTempKey]
-             withFrame:CGRectMake(xOrigin + 10 + (columnWidth * column),
+             withFrame:CGRectMake(xOrigin + 10 + fLeft,
                                   yOrigin + 10 + (kRowHeight * (i - startIndex)),
-                                  columnWidth - 20,
+                                  arrayColumnWidth[column] - 20,
                                   30)
               withFont:textFont
            placeholder:@""];
+        fLeft += arrayColumnWidth[column];
     }
 }
 
@@ -818,29 +883,38 @@ static OSReportManager *_sharedReportManager = nil;
 
 -(void)drawTableAt:(CGPoint)origin
      withRowHeight:(int)rowHeight
-    andColumnWidth:(int)columnWidth
+    andColumnWidth:(CGFloat*)arrayColumnWidth
        andRowCount:(int)numberOfRows
     andColumnCount:(int)numberOfColumns
 
 {
     for (int i = 0; i <= numberOfRows; i++) {
         
+        CGFloat width = 0;
+        for (int j = 0; j < numberOfColumns; j++) {
+            width += arrayColumnWidth[j];
+        }
+        
         int newOrigin = origin.y + (rowHeight*i);
         
         CGPoint from = CGPointMake(origin.x, newOrigin);
-        CGPoint to = CGPointMake(origin.x + (numberOfColumns*columnWidth), newOrigin);
+        CGPoint to = CGPointMake(origin.x + width, newOrigin);
         
         [self drawLineFromPoint:from toPoint:to];
     }
     
+    CGFloat fLeft = 0;
     for (int i = 0; i <= numberOfColumns; i++) {
         
-        int newOrigin = origin.x + (columnWidth*i);
+        int newOrigin = origin.x + fLeft;
         
         CGPoint from = CGPointMake(newOrigin, origin.y);
         CGPoint to = CGPointMake(newOrigin, origin.y +(numberOfRows*rowHeight));
         
         [self drawLineFromPoint:from toPoint:to];
+        
+        if (i < numberOfColumns)
+            fLeft += arrayColumnWidth[i];
     }
 }
 

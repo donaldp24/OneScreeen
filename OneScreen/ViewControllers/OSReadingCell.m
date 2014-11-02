@@ -113,6 +113,12 @@
     {
         self.labelLastCalDate.text = [calCheck.date toStringWithFormat:kShortDateFormat];
     }
+    else
+    {
+        // if there is no last cal date, show calibration date
+        if (cdCalibrationDate != nil && cdCalibrationDate.calibrationDate != nil)
+            self.labelLastCalDate.text = [cdCalibrationDate.calibrationDate toStringWithFormat:kShortDateFormat];
+    }
     
     // values
     self.labelRh.text = [NSString stringWithFormat:kFormatForRh, [self.reading.rh floatValue]];

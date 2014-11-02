@@ -87,7 +87,7 @@
     
     [OSServerManager sharedInstance].delegate = self;
     
-    [self loadData];
+    [self loadData:NO];
     
     // set refresh control
     UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
@@ -141,7 +141,7 @@
     [self.searchDisplayController.searchBar setAutocapitalizationType:UITextAutocapitalizationTypeNone];
 }
 
-- (void)loadData
+- (void)loadData:(BOOL)bRefreshData
 {
     // load array
     self.arrayProcessingSensors = [[NSMutableArray alloc] init];
@@ -163,9 +163,33 @@
         NSString *ssn = sensor.ssn;
         
         // retrieve data
-        [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:NO];
-        [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:YES];
-        [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:ssn];
+        if (bRefreshData)
+        {
+            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:NO];
+            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:YES];
+            [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:ssn];
+        }
+        else
+        {
+            // check is existing
+            CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:ssn];
+            if (!firstCalCheck)
+                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:YES];
+            else
+                sensor.retrievedOldestCalCheck = YES;
+            
+            CDCalCheck *lastCalCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
+            if (!lastCalCheck)
+                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:NO];
+            else
+                sensor.retrievedLatestCalCheck = YES;
+            
+            CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:ssn];
+            if (!cdCalibrationDate)
+                [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:ssn];
+            else
+                sensor.retrievedCalibrationDate = YES;
+        }
     }
 }
 
@@ -632,7 +656,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
 {
     refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:kRefreshProcessingText attributes:@{NSForegroundColorAttributeName:kRefreshTintColor}];
     
-    [self loadData];
+    [self loadData:YES];
     [self.tableView reloadData];
     
     [self checkEndRefresh];

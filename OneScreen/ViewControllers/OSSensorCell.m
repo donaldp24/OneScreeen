@@ -122,6 +122,12 @@
         self.labelLastCalDate.text = [calCheck.date toStringWithFormat:kShortDateFormat];
         self.labelSaltName.text = calCheck.salt_name;
     }
+    else
+    {
+        // if there is no last cal date, then show calibration date
+        if (cdCalibrationDate != nil && cdCalibrationDate.calibrationDate != nil)
+            self.labelLastCalDate.text = [cdCalibrationDate.calibrationDate toStringWithFormat:kShortDateFormat];
+    }
     
     // calculate due date
     NSDate *calibrationDate = nil;

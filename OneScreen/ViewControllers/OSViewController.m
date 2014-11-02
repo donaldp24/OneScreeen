@@ -386,7 +386,7 @@ typedef enum {
         [[OSModelManager sharedInstance] saveReadingForJob:nil sensorData:sensorData];
     }
     
-    
+    // Cancel deleting for sensor.
     CDSensor *cdsensor = [[OSModelManager sharedInstance] getSensorForSerial:sensorSerial];
     if (cdsensor)
     {
@@ -404,6 +404,18 @@ typedef enum {
 - (void)onReadSensorData:(NSDictionary*)sensorData {
     
     dispatch_async(dispatch_get_main_queue(), ^() {
+        
+        if (self.navigationController.viewControllers.count > 1)
+        {
+            if (self.navigationController.viewControllers.count == 2)
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            else
+            {
+                [self.navigationController popToViewController:[self.navigationController.viewControllers objectAtIndex:self.navigationController.viewControllers.count - 2] animated:NO];
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }
+        }
+        
         if (self.dicSensorData == nil)
             self.dicSensorData = [[NSMutableDictionary alloc] init];
         
@@ -593,7 +605,9 @@ typedef enum {
     [self retrieveDataForSensor:newSensorSerial];
     
     // fetching calibration date
-    [self.serverManager retrieveCalibrationDateForSensor:newSensorSerial];
+    CDCalibrationDate *cdCalibrationData = [[OSModelManager sharedInstance] getCalibrationDateForSensor:newSensorSerial];
+    if (!cdCalibrationData)
+        [self.serverManager retrieveCalibrationDateForSensor:newSensorSerial];
 }
 
 // check calibration due and will represent it on UIs
@@ -659,8 +673,13 @@ typedef enum {
 
 - (void)retrieveDataForSensor:(NSString *)sensorSerial
 {
-    [self.serverManager retrieveCalCheckForSensor:sensorSerial oldest:NO];
-    [self.serverManager retrieveCalCheckForSensor:sensorSerial oldest:YES];
+    CDCalCheck *oldestCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:sensorSerial];
+    if (!oldestCalCheck)
+        [self.serverManager retrieveCalCheckForSensor:sensorSerial oldest:NO];
+    
+    CDCalCheck *latestCalCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:sensorSerial];
+    if (!latestCalCheck)
+        [self.serverManager retrieveCalCheckForSensor:sensorSerial oldest:YES];
 }
 
 - (void)onRetrievedData:(NSNotification *)notification
