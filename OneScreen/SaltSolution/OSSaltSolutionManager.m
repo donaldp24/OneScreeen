@@ -190,7 +190,7 @@ static OSSaltSolutionManager *_sharedSaltSolutionManager = nil;
     
     
     // init inactivesolution
-    inactiveSolution = [[OSSaltSolution alloc] initWithDesc:kSaltSolutionNameKCl salt_name:kSaltSolutionKCl calculable:YES storable:YES];
+    inactiveSolution = [[OSSaltSolution alloc] initWithDesc:kSaltSolutionNameInactive salt_name:kSaltSolutionInactive calculable:YES storable:YES];
     
     return self;
 }

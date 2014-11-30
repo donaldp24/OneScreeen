@@ -485,6 +485,9 @@ static OSSensorCell *_prototypeSensorCell = nil;
                 
                 // check "inactive" salt solution
                 CDCalCheck *calCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:ssn];
+                
+                [[OSModelManager sharedInstance] printCalCheckForSensor:ssn];
+                
                 if (calCheck != nil) {
                     if ([[OSSaltSolutionManager sharedInstance] isInactiveSolution:calCheck.salt_name]) {
                         shouldBeRemoved = YES;
@@ -496,6 +499,9 @@ static OSSensorCell *_prototypeSensorCell = nil;
                 
                 // check "inactive" salt solution
                 CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
+                
+                [[OSModelManager sharedInstance] printCalCheckForSensor:ssn];
+                
                 if (calCheck != nil) {
                     if ([[OSSaltSolutionManager sharedInstance] isInactiveSolution:calCheck.salt_name]) {
                         shouldBeRemoved = YES;
@@ -505,7 +511,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
         }
         
         // when refreshing manually, check "inactive" and remove
-        if (refreshPressed) {
+        //if (refreshPressed) {
             
             if (shouldBeRemoved) {
                 // remove from db
@@ -515,7 +521,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
                 // remove from array
                 [self.arrayProcessingSensors removeObject:sensor];
             }
-        }
+        //}
         
         [self checkEndRefresh];
         

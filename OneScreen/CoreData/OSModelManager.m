@@ -231,6 +231,44 @@
     return ret;
 }
 
+- (void)printCalCheckForSensor:(NSString *)ssn
+{
+    if (ssn == nil || ssn.length == 0)
+        return;
+    
+    CDCalCheck *ret = nil;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription
+                                   entityForName:@"CDCalCheck"
+                                   inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(ssn == %@)", ssn];
+    NSSortDescriptor * sorter = [[NSSortDescriptor alloc]
+                                 initWithKey:@"date"
+                                 ascending:YES];
+    
+    [fetchRequest setEntity:entity];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObjects:sorter, nil]];
+    
+    NSError *error = nil;
+    NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    if (error != nil)
+    {
+        NSLog(@"error in fetching : %@", error);
+    }
+    else
+    {
+        if(fetchedObjects && fetchedObjects.count > 0) {
+            int i = 0;
+            for (CDCalCheck *calCheck in fetchedObjects) {
+                NSLog(@"calcheck %d : %@", i, calCheck);
+                i++;
+            }
+        }
+    }
+}
+
+
 - (CDCalCheck *)getLatestCalCheckForSensor:(NSString *)ssn
 {
     if (ssn == nil || ssn.length == 0)

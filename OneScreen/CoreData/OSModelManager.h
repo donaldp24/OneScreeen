@@ -47,6 +47,7 @@
 #pragma mark - calcheck
 - (NSMutableArray *)retrieveCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getFirstCalCheckForSensor:(NSString *)ssn;
+- (void)printCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getLatestCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getDummyCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getCalCheckForSensor:(NSString *)ssn date:(NSDate *)date;
