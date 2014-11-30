@@ -159,7 +159,7 @@ static OSReportManager *_sharedReportManager = nil;
     for (NSString *ssn in arraySensors) {
         CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:ssn];
         CDCalCheck *lastCalCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
-        CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:ssn];
+        CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:ssn];
         CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:ssn];
         
         NSMutableDictionary *reportData = [[NSMutableDictionary alloc] init];

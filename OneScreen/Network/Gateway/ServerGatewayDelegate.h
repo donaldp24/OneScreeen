@@ -26,5 +26,5 @@ typedef enum {
 
 - (void)serverGatewayDidStore:(NSDictionary *)data withResponse:(NSDictionary *)response;
 - (void)serverGatewayDidRetrieve:(NSString *)ssn data:(NSDictionary *)data;
-- (void)serverGatewayDidRetrieveOldest:(NSString *)ssn data:(NSDictionary *)data;
+- (void)serverGatewayDidRetrieveFirst:(NSString *)ssn data:(NSDictionary *)data;
 @end

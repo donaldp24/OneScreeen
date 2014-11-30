@@ -150,12 +150,12 @@ static NSString * const kServiceNameForKeychain = @"DMIOS";
 
 - (void)retrieveData:(NSString *)ssn
 {
-    [self.serverGateway retrieveData:ssn oldest:NO accessToken:[self accessToken]];
+    [self.serverGateway retrieveData:ssn first:NO accessToken:[self accessToken]];
 }
 
-- (void)retrieveOldestData:(NSString *)ssn
+- (void)retrieveFirstData:(NSString *)ssn
 {
-    [self.serverGateway retrieveData:ssn oldest:YES accessToken:[self accessToken]];
+    [self.serverGateway retrieveData:ssn first:YES accessToken:[self accessToken]];
 }
 
 #pragma mark LROAuth2ClientDelegate methods
@@ -282,17 +282,17 @@ static NSString * const kServiceNameForKeychain = @"DMIOS";
     }
 }
 
-- (void)serverGatewayDidRetrieveOldest:(NSString *)ssn data:(NSDictionary *)data
+- (void)serverGatewayDidRetrieveFirst:(NSString *)ssn data:(NSDictionary *)data
 {
     if (data == nil)
-        [self.delegate serverManager:self didRetrieveOldestData:ssn data:nil success:NO];
+        [self.delegate serverManager:self didRetrieveFirstData:ssn data:nil success:NO];
     else
     {
         NSNumber *success = data[kDataSuccessKey];
         if ([success boolValue])
-            [self.delegate serverManager:self didRetrieveOldestData:ssn data:data success:YES];
+            [self.delegate serverManager:self didRetrieveFirstData:ssn data:data success:YES];
         else
-            [self.delegate serverManager:self didRetrieveOldestData:ssn data:data success:NO];
+            [self.delegate serverManager:self didRetrieveFirstData:ssn data:data success:NO];
     }
 }
 @end

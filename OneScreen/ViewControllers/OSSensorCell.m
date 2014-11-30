@@ -33,7 +33,7 @@
 @property (retain, nonatomic) IBOutlet UISwipeGestureRecognizer *leftGesture;
 
 @property (retain, nonatomic) CDCalCheck *lastCalCheck;
-@property (retain, nonatomic) CDCalCheck *oldestCalCheck;
+@property (retain, nonatomic) CDCalCheck *firstCalCheck;
 @property (retain, nonatomic) CDCalibrationDate *cdCalibrationDate;
 @property (retain, nonatomic) CDSensor *sensor;
 
@@ -96,21 +96,24 @@
     self.labelCalCertDue.text = @"";
     self.labelSaltName.text = @"";
     
-    //[self.labelSsn setFont:kFontBebasNeue(17)];
-    [self.labelSsn setFont:kFontMyriadProRegular(17)];
-    [self.labelLastCalDate setFont:kFontMyriadProRegular(17)];
-    [self.labelCalCertDue setFont:kFontMyriadProRegular(17)];
-    [self.labelRh setFont:kFontMyriadProRegular(17)];
-    [self.labelTemp setFont:kFontMyriadProRegular(17)];
-    [self.labelSaltName setFont:kFontMyriadProRegular(17)];
+    CGFloat fontSize = 17;
+    if ([[UIScreen mainScreen] bounds].size.height == 480 || [[UIScreen mainScreen] bounds].size.width == 480)
+        fontSize = 14;
+
+    [self.labelSsn setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelLastCalDate setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelCalCertDue setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelRh setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelTemp setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelSaltName setFont:kFontMyriadProRegular(fontSize)];
     
     CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
-    CDCalCheck *oldestCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:ssn];
+    CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:ssn];
     CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:ssn];
     CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:ssn];
     
     self.lastCalCheck = calCheck;
-    self.oldestCalCheck = oldestCalCheck;
+    self.firstCalCheck = firstCalCheck;
     self.cdCalibrationDate = cdCalibrationDate;
     self.sensor = sensor;
     
@@ -134,8 +137,8 @@
     if (cdCalibrationDate)
         calibrationDate = cdCalibrationDate.calibrationDate;
     NSDate *firstCalCheckDate = nil;
-    if (oldestCalCheck)
-        firstCalCheckDate = oldestCalCheck.date;
+    if (firstCalCheck)
+        firstCalCheckDate = firstCalCheck.date;
     
     
     NSDate *dueDate = [OSCertificationManager earlierRecertificationDate:calibrationDate firstCalCheckDate:firstCalCheckDate];

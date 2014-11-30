@@ -21,6 +21,25 @@
     // crashlytics
     [Crashlytics startWithAPIKey:@"02eaa877844435ac8f0e7707e5087c6a937afdd5"];
     
+    NSString *storyboardName = @"Main_iPhone";
+    if ([[UIScreen mainScreen] bounds].size.height == 480 || [[UIScreen mainScreen] bounds].size.width == 480) {
+        storyboardName = @"Main_iPhone3.5";
+    }
+    
+    //[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait];
+#if 1
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle:nil];
+    UITabBarController *rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"rootNav"];
+    self.window.rootViewController = rootViewController;
+    [self.window makeKeyAndVisible];
+#else
+    // test Reset Password view
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:[KNStoryboardManager getMainStoryboardName] bundle:nil];
+    UIViewController *rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"passwordResetNavController"];
+    self.window.rootViewController = rootViewController;
+    [self.window makeKeyAndVisible];
+#endif
+
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
     //Customize Of Navigation Controller for All page
@@ -69,12 +88,12 @@
 }
 
 #pragma mark - orientation
-//- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window
-//{
-//    if (self.allowRotateToLandscape)
-//        return UIInterfaceOrientationMaskLandscape;
-//    else
-//        return UIInterfaceOrientationMaskPortrait;
-//}
+- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window
+{
+    if (self.allowRotateToLandscape)
+        return UIInterfaceOrientationMaskLandscape;
+    else
+        return UIInterfaceOrientationMaskPortrait;
+}
 
 @end

@@ -13,7 +13,7 @@
 @optional
 - (void)didLogin:(BOOL)success;
 - (void)didRetrieveCalibrationDate:(NSString *)ssn success:(BOOL)success;
-- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success oldest:(BOOL)oldest;
+- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success first:(BOOL)first;
 - (void)didStoreCalCheck:(NSString *)ssn success:(BOOL)success;
 
 @end
@@ -25,7 +25,7 @@
 + (OSServerManager *)sharedInstance;
 
 - (void)storeCalCheck:(NSDictionary *)calCheck;
-- (void)retrieveCalCheckForSensor:(NSString *)sensor oldest:(BOOL)oldest;
+- (void)retrieveCalCheckForSensor:(NSString *)sensor first:(BOOL)first;
 - (void)retrieveCalibrationDateForSensor:(NSString *)sensor;
 
 - (void)loginWithUserName:(NSString *)userName password:(NSString *)password;

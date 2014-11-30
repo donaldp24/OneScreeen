@@ -33,7 +33,7 @@
 // notifications
 #define kCalibrationDateChanged                 @"calibration date changed"
 #define kLastCalCheckChanged                        @"calcheck data changed"
-#define kOldestCalCheckChanged                      @"oldest calcheck data changed"
+#define kFirstCalCheckChanged                      @"first calcheck data changed"
 
 // colors for cal check due
 #define kDefaultDueDateColor        [UIColor colorWithRed:0 green:255 blue:0 alpha:0.8]
@@ -75,6 +75,11 @@
 #define kSensorDataTemperatureAmbientKey  @"tempAmbient"
 #define kSensorDataReadingTimestampKey  @"readingTimestamp"
 #define kSensorDataSerialNumberKey  @"serial"
+
+// configure
+
+// indicating to use job or nob 0 : not use, 1 : use
+#define kUseJobsFunction            0
 
 
 #endif

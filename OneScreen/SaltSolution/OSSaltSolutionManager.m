@@ -10,6 +10,12 @@
 
 static OSSaltSolutionManager *_sharedSaltSolutionManager = nil;
 
+@interface OSSaltSolutionManager () {
+    OSSaltSolution *inactiveSolution;
+}
+
+@end
+
 @implementation OSSaltSolutionManager
 
 // this function does linear interpolation between 2 known points
@@ -153,12 +159,14 @@ static OSSaltSolutionManager *_sharedSaltSolutionManager = nil;
 
 + (NSString *)nameForSaltSolution:(NSString *)saltSolution
 {
-    if ([saltSolution isEqualToString:kSaltSolutionNaBr])
+    if ([saltSolution caseInsensitiveCompare:kSaltSolutionNaBr] == NSOrderedSame)
         return kSaltSolutionNameNaBr;
-    else if ([saltSolution isEqualToString:kSaltSolutionNaCl])
+    else if ([saltSolution caseInsensitiveCompare:kSaltSolutionNaCl] == NSOrderedSame)
         return kSaltSolutionNameNaCl;
-    else if ([saltSolution isEqualToString:kSaltSolutionKCl])
+    else if ([saltSolution caseInsensitiveCompare:kSaltSolutionKCl] == NSOrderedSame)
         return kSaltSolutionNameKCl;
+    else if ([saltSolution caseInsensitiveCompare:kSaltSolutionInactive] == NSOrderedSame)
+        return kSaltSolutionInactive;
     return @"";
 }
 
@@ -175,30 +183,62 @@ static OSSaltSolutionManager *_sharedSaltSolutionManager = nil;
     
     // init saltsolutions
     self.arraySalts = [[NSMutableArray alloc] init];
-    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:kSaltSolutionNameDefault solution:kSaltSolutionNone calculable:NO storable:NO]];
-    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:kSaltSolutionNameNaCl solution:kSaltSolutionNaCl calculable:YES storable:YES]];
-    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:kSaltSolutionNameNaBr solution:kSaltSolutionNaBr calculable:YES storable:YES]];
-    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithName:kSaltSolutionNameKCl solution:kSaltSolutionKCl calculable:YES storable:YES]];
+    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithDesc:kSaltSolutionNameDefault salt_name:kSaltSolutionNone calculable:NO storable:NO]];
+    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithDesc:kSaltSolutionNameNaCl salt_name:kSaltSolutionNaCl calculable:YES storable:YES]];
+    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithDesc:kSaltSolutionNameNaBr salt_name:kSaltSolutionNaBr calculable:YES storable:YES]];
+    [self.arraySalts addObject:[[OSSaltSolution alloc] initWithDesc:kSaltSolutionNameKCl salt_name:kSaltSolutionKCl calculable:YES storable:YES]];
+    
+    
+    // init inactivesolution
+    inactiveSolution = [[OSSaltSolution alloc] initWithDesc:kSaltSolutionNameKCl salt_name:kSaltSolutionKCl calculable:YES storable:YES];
+    
     return self;
 }
 
 - (CalCheckResult)calCheckWithRh:(CGFloat)rh temp_f:(CGFloat)temp_f saltSolution:(OSSaltSolution *)saltSolution
 {
-    return [OSSaltSolutionManager CAL_CHECK_WITH_RH:rh TEMP_F:temp_f SALT:saltSolution.solution];
+    return [OSSaltSolutionManager CAL_CHECK_WITH_RH:rh TEMP_F:temp_f SALT:saltSolution.salt_name];
 }
 
 - (OSSaltSolution *)saltSolutionWithSolution:(NSString *)solution
 {
     for (OSSaltSolution *saltSolution in self.arraySalts) {
-        if ([saltSolution.solution isEqualToString:solution])
+        if ([saltSolution.salt_name caseInsensitiveCompare:solution] == NSOrderedSame)
             return saltSolution;
     }
-    return self.arraySalts[0];
+    if ([solution caseInsensitiveCompare:kSaltSolutionInactive] == NSOrderedSame)
+        return inactiveSolution;
+    return nil;
 }
 
 - (OSSaltSolution *)defaultSolution
 {
     return self.arraySalts[0];
+}
+
+- (OSSaltSolution *)inactiveSolution
+{
+    return inactiveSolution;
+}
+
+- (BOOL)isDefaultSolution:(NSString *)salt_name
+{
+    if (salt_name == nil)
+        return NO;
+    
+    if ([salt_name caseInsensitiveCompare:[self defaultSolution].salt_name] == NSOrderedSame)
+        return YES;
+    return NO;
+}
+
+- (BOOL)isInactiveSolution:(NSString *)salt_name
+{
+    if (salt_name == nil)
+        return NO;
+    
+    if ([salt_name caseInsensitiveCompare:[self inactiveSolution].salt_name] == NSOrderedSame)
+        return YES;
+    return NO;
 }
 
 @end

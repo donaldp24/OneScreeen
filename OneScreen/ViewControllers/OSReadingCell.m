@@ -31,7 +31,7 @@
 @property (retain, nonatomic) IBOutlet UISwipeGestureRecognizer *leftGesture;
 
 @property (retain, nonatomic) CDCalCheck *lastCalCheck;
-@property (retain, nonatomic) CDCalCheck *oldestCalCheck;
+@property (retain, nonatomic) CDCalCheck *firstCalCheck;
 @property (retain, nonatomic) CDCalibrationDate *cdCalibrationDate;
 @property (retain, nonatomic) CDSensor *sensor;
 
@@ -90,21 +90,23 @@
     self.labelAmbRh.text = @"";
     self.labelAmbTemp.text = @"";
     
-    //[self.labelSsn setFont:kFontBebasNeue(17)];
-    [self.labelSsn setFont:kFontMyriadProRegular(17)];
-    [self.labelLastCalDate setFont:kFontMyriadProRegular(17)];
-    [self.labelRh setFont:kFontMyriadProRegular(17)];
-    [self.labelTemp setFont:kFontMyriadProRegular(17)];
-    [self.labelAmbRh setFont:kFontMyriadProRegular(17)];
-    [self.labelAmbTemp setFont:kFontMyriadProRegular(17)];
+    CGFloat fontSize = 17;
+    if ([[UIScreen mainScreen] bounds].size.height == 480 || [[UIScreen mainScreen] bounds].size.width == 480)
+        fontSize = 14;
+    [self.labelSsn setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelLastCalDate setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelRh setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelTemp setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelAmbRh setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelAmbTemp setFont:kFontMyriadProRegular(fontSize)];
     
     CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:reading.ssn];
-    CDCalCheck *oldestCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:reading.ssn];
+    CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:reading.ssn];
     CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:reading.ssn];
     CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:reading.ssn];
     
     self.lastCalCheck = calCheck;
-    self.oldestCalCheck = oldestCalCheck;
+    self.firstCalCheck = firstCalCheck;
     self.cdCalibrationDate = cdCalibrationDate;
     self.sensor = sensor;
     

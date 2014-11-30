@@ -15,16 +15,16 @@
     if (![object isKindOfClass:[OSSaltSolution class]])
         return NO;
     OSSaltSolution *obj = (OSSaltSolution *)object;
-    if ([obj.solution isEqualToString:self.solution])
+    if ([obj.salt_name isEqualToString:self.salt_name])
         return YES;
     return NO;
 }
 
-- (id)initWithName:(NSString *)name solution:(NSString *)solution calculable:(BOOL)calculable storable:(BOOL)storable
+- (id)initWithDesc:(NSString *)desc salt_name:(NSString *)salt_name calculable:(BOOL)calculable storable:(BOOL)storable
 {
     self = [super init];
-    self.name = name;
-    self.solution = solution;
+    self.desc = desc;
+    self.salt_name = salt_name;
     self.calculable = calculable;
     self.storable = storable;
     return self;

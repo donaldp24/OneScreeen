@@ -33,6 +33,6 @@
 - (void)storeData:(NSDictionary *)data;
 - (void)retrieveData:(NSString *)ssn;
 
-- (void)retrieveOldestData:(NSString *)ssn;
+- (void)retrieveFirstData:(NSString *)ssn;
 
 @end

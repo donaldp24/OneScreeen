@@ -35,7 +35,7 @@
 - (void)bind:(OSSaltSolution *)saltSolution
 {
     self.saltSolution = saltSolution;
-    self.labelName.text = saltSolution.name;
+    self.labelName.text = saltSolution.desc;
     
     [self layoutIfNeeded];
 }

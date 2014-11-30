@@ -2,7 +2,7 @@
 //  CDCalCheck.m
 //  OneScreen
 //
-//  Created by Xiaoxue Han on 10/9/14.
+//  Created by Xiaoxue Han on 23/11/14.
 //  Copyright (c) 2014 wagnermeter. All rights reserved.
 //
 
@@ -11,10 +11,11 @@
 
 @implementation CDCalCheck
 
-@dynamic ssn;
-@dynamic rh;
-@dynamic temp;
-@dynamic salt_name;
 @dynamic date;
+@dynamic rh;
+@dynamic salt_name;
+@dynamic ssn;
+@dynamic temp;
+@dynamic isdummy;
 
 @end

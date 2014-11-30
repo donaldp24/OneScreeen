@@ -10,11 +10,11 @@
 
 @interface OSSaltSolution : NSObject
 
-@property (nonatomic, retain) NSString *name;
-@property (nonatomic, retain) NSString *solution;
+@property (nonatomic, retain) NSString *desc;
+@property (nonatomic, retain) NSString *salt_name;
 @property (nonatomic) BOOL calculable;
 @property (nonatomic) BOOL storable;
 
-- (id)initWithName:(NSString *)name solution:(NSString *)solution calculable:(BOOL)calculable storable:(BOOL)storable;
+- (id)initWithDesc:(NSString *)desc salt_name:(NSString *)salt_name calculable:(BOOL)calculable storable:(BOOL)storable;
 
 @end

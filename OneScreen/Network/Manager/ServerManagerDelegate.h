@@ -32,6 +32,6 @@
 
 - (void)serverManager:(ServerManager *)serverManager didStoreData:(NSDictionary *)data success:(BOOL)success;
 - (void)serverManager:(ServerManager *)serverManager didRetrieveData:(NSString *)ssn data:(NSDictionary *)data success:(BOOL)success;
-- (void)serverManager:(ServerManager *)serverManager didRetrieveOldestData:(NSString *)ssn data:(NSDictionary *)data success:(BOOL)success;
+- (void)serverManager:(ServerManager *)serverManager didRetrieveFirstData:(NSString *)ssn data:(NSDictionary *)data success:(BOOL)success;
 
 @end

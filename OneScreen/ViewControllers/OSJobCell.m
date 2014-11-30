@@ -80,9 +80,12 @@
 {
     _job = job;
     
-    [self.labelJobName setFont:kFontMyriadProRegular(17)];
-    [self.labelStartDate setFont:kFontMyriadProRegular(17)];
-    [self.labelEndDate setFont:kFontMyriadProRegular(17)];
+    CGFloat fontSize = 17;
+    if ([[UIScreen mainScreen] bounds].size.height == 480 || [[UIScreen mainScreen] bounds].size.width == 480)
+        fontSize = 14;
+    [self.labelJobName setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelStartDate setFont:kFontMyriadProRegular(fontSize)];
+    [self.labelEndDate setFont:kFontMyriadProRegular(fontSize)];
     
     
     // job name

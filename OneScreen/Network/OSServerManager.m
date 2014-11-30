@@ -51,12 +51,12 @@ static OSServerManager *_sharedOSServerManager = nil;
     [self.serverManager storeData:calCheck];
 }
 
-- (void)retrieveCalCheckForSensor:(NSString *)sensor oldest:(BOOL)oldest
+- (void)retrieveCalCheckForSensor:(NSString *)sensor first:(BOOL)first
 {
-    if (!oldest)
+    if (!first)
         [self.serverManager retrieveData:sensor];
     else
-        [self.serverManager retrieveOldestData:sensor];
+        [self.serverManager retrieveFirstData:sensor];
 }
 
 - (void)retrieveCalibrationDateForSensor:(NSString *)sensor
@@ -180,7 +180,7 @@ static OSServerManager *_sharedOSServerManager = nil;
         NSString *salt_name = [data objectForKey:kDataSaltSolutionKey];
         NSDate *date = [NSDate dateWithString:[data objectForKey:kDataDateKey] withFormat:kUploadDataDateFormat];
         
-        [self.modelManager setCalCheckForSensor:ssn date:date rh:rh temp:temp salt_name:salt_name oldest:NO];
+        [self.modelManager setCalCheckForSensor:ssn date:date rh:rh temp:temp salt_name:salt_name first:NO];
         
         // notification it
         [[NSNotificationCenter defaultCenter] postNotificationName:kLastCalCheckChanged object:nil];
@@ -188,8 +188,8 @@ static OSServerManager *_sharedOSServerManager = nil;
         // retrieve data
         [self.serverManager retrieveData:[data objectForKey:kDataSensorSerialKey]];
         
-        // oldest data
-        [self.serverManager retrieveOldestData:[data objectForKey:kDataSensorSerialKey]];
+        // first data
+        [self.serverManager retrieveFirstData:[data objectForKey:kDataSensorSerialKey]];
     }
     else
     {
@@ -209,22 +209,22 @@ static OSServerManager *_sharedOSServerManager = nil;
         NSString *salt_name = [data objectForKey:kDataSaltSolutionKey];
         NSDate *date = [NSDate dateWithString:[data objectForKey:kDataDateKey] withFormat:kUploadDataDateFormat];
         
-        [self.modelManager setCalCheckForSensor:ssn date:date rh:rh temp:temp salt_name:salt_name oldest:NO];
+        [self.modelManager setCalCheckForSensor:ssn date:date rh:rh temp:temp salt_name:salt_name first:NO dummy:NO];
         
-        if (self.delegate && [self.delegate respondsToSelector:@selector(didRetrieveCalCheck:success:oldest:)])
-            [self.delegate didRetrieveCalCheck:ssn success:YES oldest:NO];
+        if (self.delegate)
+            [self.delegate didRetrieveCalCheck:ssn success:YES first:NO];
         
         // notification calcheck changed
         [[NSNotificationCenter defaultCenter] postNotificationName:kLastCalCheckChanged object:ssn];
     }
     else
     {
-        if (self.delegate && [self.delegate respondsToSelector:@selector(didRetrieveCalCheck:success:oldest:)])
-            [self.delegate didRetrieveCalCheck:ssn success:NO oldest:NO];
+        if (self.delegate)
+            [self.delegate didRetrieveCalCheck:ssn success:NO first:NO];
     }
 }
 
-- (void)serverManager:(ServerManager *)serverManager didRetrieveOldestData:(NSString *)ssn data:(NSDictionary *)data success:(BOOL)success
+- (void)serverManager:(ServerManager *)serverManager didRetrieveFirstData:(NSString *)ssn data:(NSDictionary *)data success:(BOOL)success
 {
     if (success)
     {
@@ -235,18 +235,18 @@ static OSServerManager *_sharedOSServerManager = nil;
         NSString *salt_name = [data objectForKey:kDataSaltSolutionKey];
         NSDate *date = [NSDate dateWithString:[data objectForKey:kDataDateKey] withFormat:kUploadDataDateFormat];
         
-        [self.modelManager setCalCheckForSensor:ssn date:date rh:rh temp:temp salt_name:salt_name oldest:YES];
+        [self.modelManager setCalCheckForSensor:ssn date:date rh:rh temp:temp salt_name:salt_name first:YES dummy:NO];
         
-        if (self.delegate && [self.delegate respondsToSelector:@selector(didRetrieveCalCheck:success:oldest:)])
-            [self.delegate didRetrieveCalCheck:ssn success:YES oldest:YES];
+        if (self.delegate)
+            [self.delegate didRetrieveCalCheck:ssn success:YES first:YES];
         
         // notification calcheck changed
-        [[NSNotificationCenter defaultCenter] postNotificationName:kOldestCalCheckChanged object:ssn];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kFirstCalCheckChanged object:ssn];
     }
     else
     {
-        if (self.delegate && [self.delegate respondsToSelector:@selector(didRetrieveCalCheck:success:oldest:)])
-            [self.delegate didRetrieveCalCheck:ssn success:NO oldest:YES];
+        if (self.delegate)
+            [self.delegate didRetrieveCalCheck:ssn success:NO first:YES];
     }
     
 }

@@ -17,6 +17,6 @@
 @property (nonatomic, assign) id<ServerGatewayDelegate> delegate;
 
 - (void)storeData:(NSDictionary *)data accessToken:(NSString*)access;
-- (void)retrieveData:(NSString *)ssn oldest:(BOOL)oldest accessToken:(NSString*)access;
+- (void)retrieveData:(NSString *)ssn first:(BOOL)first accessToken:(NSString*)access;
 
 @end

@@ -15,6 +15,7 @@
 #import "OSReportManager.h"
 #import "ReaderViewController.h"
 #import "ForceLandscape.h"
+#import "OSSaltSolutionManager.h"
 
 #define USE_SEARCHBAR       0
 
@@ -25,7 +26,7 @@
 
 @property (nonatomic, retain) NSString *ssn;
 @property (nonatomic) BOOL retrievedLatestCalCheck;
-@property (nonatomic) BOOL retrievedOldestCalCheck;
+@property (nonatomic) BOOL retrievedFirstCalCheck;
 @property (nonatomic) BOOL retrievedCalibrationDate;
 @property (nonatomic) BOOL isShownName;
 @property (nonatomic) BOOL isSelected;
@@ -43,6 +44,7 @@
     UIResponder *currentResponder;
     OSSensorCell *editingCell;
     UIButton *btnDelete;
+    BOOL refreshPressed;
 }
 
 @property (nonatomic, retain) UISwipeGestureRecognizer *rightGesture;
@@ -143,6 +145,8 @@
 
 - (void)loadData:(BOOL)bRefreshData
 {
+    refreshPressed = bRefreshData;
+    
     // load array
     self.arrayProcessingSensors = [[NSMutableArray alloc] init];
     NSMutableArray *arraySensors = [[OSModelManager sharedInstance] retrieveSensors];
@@ -153,7 +157,7 @@
         sensor.ssn = s.ssn;
         sensor.retrievedCalibrationDate = NO;
         sensor.retrievedLatestCalCheck = NO;
-        sensor.retrievedOldestCalCheck = NO;
+        sensor.retrievedFirstCalCheck = NO;
         sensor.isShownName = YES;
         
         [self.arrayProcessingSensors addObject:sensor];
@@ -165,22 +169,22 @@
         // retrieve data
         if (bRefreshData)
         {
-            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:NO];
-            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:YES];
+            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn first:NO];
+            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn first:YES];
             [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:ssn];
         }
         else
         {
             // check is existing
-            CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:ssn];
+            CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:ssn];
             if (!firstCalCheck)
-                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:YES];
+                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn first:YES];
             else
-                sensor.retrievedOldestCalCheck = YES;
+                sensor.retrievedFirstCalCheck = YES;
             
             CDCalCheck *lastCalCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
             if (!lastCalCheck)
-                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn oldest:NO];
+                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn first:NO];
             else
                 sensor.retrievedLatestCalCheck = YES;
             
@@ -411,7 +415,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
 {
     BOOL bEnd = YES;
     for (OSProcessingSensor *s in self.arrayProcessingSensors) {
-        if (s.retrievedCalibrationDate && s.retrievedLatestCalCheck && s.retrievedOldestCalCheck)
+        if (s.retrievedCalibrationDate && s.retrievedLatestCalCheck && s.retrievedFirstCalCheck)
         {
             //
         }
@@ -461,7 +465,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
     });
 }
 
-- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success oldest:(BOOL)oldest
+- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success first:(BOOL)first
 {
     dispatch_async(dispatch_get_main_queue(), ^() {
         OSProcessingSensor *sensor = nil;
@@ -473,12 +477,44 @@ static OSSensorCell *_prototypeSensorCell = nil;
             }
         }
         
+        BOOL shouldBeRemoved = NO;
         if (sensor)
         {
-            if (oldest)
-                sensor.retrievedOldestCalCheck = YES;
-            else
+            if (first) {
+                sensor.retrievedFirstCalCheck = YES;
+                
+                // check "inactive" salt solution
+                CDCalCheck *calCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:ssn];
+                if (calCheck != nil) {
+                    if ([[OSSaltSolutionManager sharedInstance] isInactiveSolution:calCheck.salt_name]) {
+                        shouldBeRemoved = YES;
+                    }
+                }
+            }
+            else {
                 sensor.retrievedLatestCalCheck = YES;
+                
+                // check "inactive" salt solution
+                CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
+                if (calCheck != nil) {
+                    if ([[OSSaltSolutionManager sharedInstance] isInactiveSolution:calCheck.salt_name]) {
+                        shouldBeRemoved = YES;
+                    }
+                }
+            }
+        }
+        
+        // when refreshing manually, check "inactive" and remove
+        if (refreshPressed) {
+            
+            if (shouldBeRemoved) {
+                // remove from db
+                CDSensor *s = [[OSModelManager sharedInstance] getSensorForSerial:sensor.ssn];
+                [[OSModelManager sharedInstance] removeSensorFromInventory:s];
+                
+                // remove from array
+                [self.arrayProcessingSensors removeObject:sensor];
+            }
         }
         
         [self checkEndRefresh];
@@ -502,7 +538,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
     if (!sensor)
         return YES;
     
-    if (sensor.retrievedCalibrationDate && sensor.retrievedLatestCalCheck && sensor.retrievedOldestCalCheck)
+    if (sensor.retrievedCalibrationDate && sensor.retrievedLatestCalCheck && sensor.retrievedFirstCalCheck)
         return YES;
     return NO;
 }
@@ -661,7 +697,7 @@ static OSSensorCell *_prototypeSensorCell = nil;
     
     [self checkEndRefresh];
     
-    timer = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self selector:@selector(onTimer:) userInfo:Nil repeats:NO];
+    timer = [NSTimer scheduledTimerWithTimeInterval:20.0 target:self selector:@selector(onTimer:) userInfo:Nil repeats:NO];
 }
 
 - (void)onTimer:(id)sender

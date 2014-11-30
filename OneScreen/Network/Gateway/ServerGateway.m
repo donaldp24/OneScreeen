@@ -191,10 +191,10 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                            }];
 }
 
-- (void)retrieveData:(NSString *)ssn oldest:(BOOL)oldest accessToken:(NSString *)access {
+- (void)retrieveData:(NSString *)ssn first:(BOOL)first accessToken:(NSString *)access {
     
     NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=get_cal_check&access_token=%@&ssn=%@", access, ssn];
-    if (oldest)
+    if (first)
         getString = [NSString stringWithFormat:@"%@&oldest=true", getString];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
@@ -223,10 +223,10 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                
                                NSLog(@"response for retrieveData: %@", dict);
                                
-                               if (!oldest)
+                               if (!first)
                                    [[self delegate] serverGatewayDidRetrieve:ssn data:dict];
                                else
-                                   [[self delegate] serverGatewayDidRetrieveOldest:ssn data:dict];
+                                   [[self delegate] serverGatewayDidRetrieveFirst:ssn data:dict];
                            }];
 }
 

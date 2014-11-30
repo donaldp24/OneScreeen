@@ -41,13 +41,16 @@
 - (void)removeSensorFromJob:(CDJob *)job sensor:(CDSensor *)sensor;
 - (void)setLastReadingTimeForSensor:(CDSensor *)sensor lastTime:(NSDate *)lastTime;
 
+- (void)undeleteSensors;
+
 
 #pragma mark - calcheck
 - (NSMutableArray *)retrieveCalCheckForSensor:(NSString *)ssn;
-- (CDCalCheck *)getOldestCalCheckForSensor:(NSString *)ssn;
+- (CDCalCheck *)getFirstCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getLatestCalCheckForSensor:(NSString *)ssn;
+- (CDCalCheck *)getDummyCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getCalCheckForSensor:(NSString *)ssn date:(NSDate *)date;
-- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name oldest:(BOOL)oldest;
+- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name first:(BOOL)first dummy:(BOOL)dummy;
 
 
 #pragma mark - calibration date

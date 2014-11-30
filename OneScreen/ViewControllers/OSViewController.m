@@ -60,7 +60,7 @@ typedef enum {
     OSJobEditingStatusNewJobCreated
 } OSJobEditingStatus;
 
-@interface OSViewController () <ScanManagerDelegate, OSServerManagerDelegate, UIGestureRecognizerDelegate, UITableViewDataSource, UITableViewDelegate, OSSaltsCellDelegate, UIActionSheetDelegate>
+@interface OSViewController () <ScanManagerDelegate, OSServerManagerDelegate, UIGestureRecognizerDelegate, UITableViewDataSource, UITableViewDelegate, OSSaltsCellDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
 
 {
     NSTimeInterval prevTakenTime;
@@ -75,6 +75,7 @@ typedef enum {
     CDJob *newJob;
 }
 
+@property (weak, nonatomic) IBOutlet UILabel *labelCurrentJobTitle;
 @property (weak, nonatomic) IBOutlet UILabel *labelCurrentJob;
 
 @property (weak, nonatomic) IBOutlet UIImageView *ivBluetoothIcon;
@@ -151,6 +152,8 @@ typedef enum {
 @property (nonatomic, retain) NSString *currSensor;
 @property (nonatomic, retain) OSSaltSolution *currSalt;
 
+@property (nonatomic, retain) UIAlertView *alertForFaildMessage;
+
 @end
 
 @implementation OSViewController
@@ -165,6 +168,9 @@ typedef enum {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
+
+    // [[OSModelManager sharedInstance] undeleteSensors];
+    
     self.currSensor = @"";
     
     // start scan
@@ -176,8 +182,14 @@ typedef enum {
     [self.serverManager loginWithUserName:kGlobalUserName password:kGlobalUserPass];
     
     // initialize fonts
-    [self.labelRh setFont:kFontBebasNeue(kRhFontSize)];
-    [self.labelTemp setFont:kFontBebasNeue(kTempFontSize)];
+    if ([[UIScreen mainScreen] bounds].size.height == 480) {
+        [self.labelRh setFont:kFontBebasNeue(kRhFontSize - 10)];
+        [self.labelTemp setFont:kFontBebasNeue(kTempFontSize - 10)];
+    }
+    else {
+        [self.labelRh setFont:kFontBebasNeue(kRhFontSize)];
+        [self.labelTemp setFont:kFontBebasNeue(kTempFontSize)];
+    }
     [self.labelAmbientRh setFont:kFontBebasNeue(kAmbientRhFontSize)];
     [self.labelAmbientTemp setFont:kFontBebasNeue(kAmbientTempFontSize)];
     
@@ -252,7 +264,7 @@ typedef enum {
 
     // notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedData:) name:kLastCalCheckChanged object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedOldestData:) name:kOldestCalCheckChanged object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedFirstData:) name:kFirstCalCheckChanged object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedCalibrationDate:) name:kCalibrationDateChanged object:nil];
     
     prevLoginTryTime = 0;
@@ -270,9 +282,19 @@ typedef enum {
     newJob = nil;
     
 #if USE_JOBEDITOR_IN_MAIN_SCREEN
-    self.btnUpDownArrowForViewJob.hidden = NO;
-    [self initViewJob];
+    if (kUseJobsFunction == 1) {
+        self.btnUpDownArrowForViewJob.hidden = NO;
+        [self initViewJob];
+    }
 #endif
+    
+    if (kUseJobsFunction == 1) {
+        self.labelCurrentJob.hidden = NO;
+        self.labelCurrentJobTitle.hidden = NO;
+    } else {
+        self.labelCurrentJob.hidden = YES;
+        self.labelCurrentJobTitle.hidden = YES;
+    }
     
 }
 
@@ -447,6 +469,14 @@ typedef enum {
         }
         else
         {
+            // check first cal check
+            CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:sensorSerial];
+            if (firstCalCheck == nil) {
+                // store dummy cal check
+                [[OSModelManager sharedInstance] setCalCheckForSensor:sensorSerial date:[NSDate date] rh:rh temp:temp_f salt_name:/*self.currSalt.solution*/[OSSaltSolutionManager sharedInstance].defaultSolution.salt_name first:NO dummy:YES];
+                [[OSModelManager sharedInstance] saveContext];
+            }
+            
             [self onSensorChanged:sensorSerial];
         }
         self.currSensor = sensorSerial;
@@ -518,6 +548,27 @@ typedef enum {
     
     self.labelResult.hidden = NO;
     self.labelForResult.hidden = NO;
+    
+    // show alert when cal check result is not "PASSED"
+    
+    if (result != CalCheckResultPass)
+    {
+        if (self.alertForFaildMessage != nil)
+            return;
+        
+        self.alertForFaildMessage = [[UIAlertView alloc] initWithTitle:@"Calibration Checking Failed"
+                                                               message:@"Be sure to allow enough time for the Cal Check and Sensor to come to equilibrium before checking again. Ambient temperature fluctuations may require additional equilibration time."
+                                                              delegate:self
+                                                     cancelButtonTitle:@"OK"
+                                                     otherButtonTitles:nil];
+        [self.alertForFaildMessage show];
+    }
+}
+
+#pragma mark - UIAlertViewDelegate
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    self.alertForFaildMessage = nil;
 }
 
 // calculate expiration date from calibration date
@@ -616,12 +667,12 @@ typedef enum {
     // check certification
     CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:self.currSensor];
     NSDate *calibrationDate = (cdCalibrationDate == nil) ? nil : cdCalibrationDate.calibrationDate;
-    CDCalCheck *oldestData = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:self.currSensor];
+    CDCalCheck *firstData = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:self.currSensor];
     NSDate *firstCalCheckDate;
-    if (oldestData == nil)
+    if (firstData == nil)
         firstCalCheckDate = nil;
     else
-        firstCalCheckDate = oldestData.date;
+        firstCalCheckDate = firstData.date;
     if ([OSCertificationManager shouldRecertificationWithCalibrationDate:calibrationDate firstCalCheckDate:firstCalCheckDate])
     {
         if (bShowAlert)
@@ -673,13 +724,13 @@ typedef enum {
 
 - (void)retrieveDataForSensor:(NSString *)sensorSerial
 {
-    CDCalCheck *oldestCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:sensorSerial];
-    if (!oldestCalCheck)
-        [self.serverManager retrieveCalCheckForSensor:sensorSerial oldest:NO];
+    CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:sensorSerial];
+    if (!firstCalCheck)
+        [self.serverManager retrieveCalCheckForSensor:sensorSerial first:NO];
     
     CDCalCheck *latestCalCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:sensorSerial];
     if (!latestCalCheck)
-        [self.serverManager retrieveCalCheckForSensor:sensorSerial oldest:YES];
+        [self.serverManager retrieveCalCheckForSensor:sensorSerial first:YES];
 }
 
 - (void)onRetrievedData:(NSNotification *)notification
@@ -689,7 +740,7 @@ typedef enum {
     });
 }
 
-- (void)onRetrievedOldestData:(NSNotification *)notification
+- (void)onRetrievedFirstData:(NSNotification *)notification
 {
     dispatch_async(dispatch_get_main_queue(), ^(){
         // check calibration due
@@ -712,15 +763,19 @@ typedef enum {
 {
     // show calibration date
     CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:self.currSensor];
-    CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getOldestCalCheckForSensor:self.currSensor];
+    CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:self.currSensor];
     
     NSDate *calibrationDate = nil;
     if (cdCalibrationDate != nil)
         calibrationDate = cdCalibrationDate.calibrationDate;
     
     NSDate *firstCalCheckDate = nil;
-    if (firstCalCheck != nil)
+    if (firstCalCheck != nil) {
         firstCalCheckDate = firstCalCheck.date;
+        if ([[OSSaltSolutionManager sharedInstance] isInactiveSolution:firstCalCheck.salt_name]) {
+            //
+        }
+    }
     
     if (calibrationDate != nil)
     {
@@ -767,6 +822,19 @@ typedef enum {
         return;
     
     OSSaltSolution *saltSoltion = [[OSSaltSolutionManager sharedInstance] saltSolutionWithSolution:calCheck.salt_name];
+    
+    // check "inactive" 
+    if (saltSoltion == nil || [[OSSaltSolutionManager sharedInstance] isInactiveSolution:saltSoltion.salt_name])
+    {
+        return;
+    }
+    
+    // check dummy calcheck
+    if ([calCheck.isdummy boolValue])
+    {
+        return;
+    }
+    
     if (saltSoltion.calculable)
     {
         CalCheckResult result = [[OSSaltSolutionManager sharedInstance] calCheckWithRh:[calCheck.rh floatValue] temp_f:[calCheck.temp floatValue] saltSolution:saltSoltion];
@@ -780,7 +848,7 @@ typedef enum {
     self.labelLastRH.text = [NSString stringWithFormat:@"%.1f", [calCheck.rh floatValue]];
     self.labelLastTemp.text = [NSString stringWithFormat:@"%.1f", [calCheck.temp floatValue]];
     //self.labelLastSaltSolution.text = saltSoltion.name;
-    self.labelLastSaltSolution.text = saltSoltion.solution;
+    self.labelLastSaltSolution.text = saltSoltion.salt_name;
 }
 
 - (void)setProgress:(CGFloat)percentage
@@ -827,7 +895,7 @@ typedef enum {
 // user tap a salt solution
 - (void)didCellTap:(OSSaltsCell *)cell
 {
-    [self.btnSalts setTitle:cell.saltSolution.name forState:UIControlStateNormal];
+    [self.btnSalts setTitle:cell.saltSolution.desc forState:UIControlStateNormal];
     [self onSaltChanged:cell.saltSolution];
     
     self.heightConstraintOfDropdown.constant = 0;
@@ -864,7 +932,7 @@ typedef enum {
     [data setObject:self.currSensor forKey:kDataSensorSerialKey];
     [data setObject:@((int)((rh + 0.05) * 10)) forKey:kDataRhKey];
     [data setObject:@((int)((temp + 0.05) * 10)) forKey:kDataTempKey];
-    [data setObject:saltSolution.solution forKey:kDataSaltSolutionKey];
+    [data setObject:saltSolution.salt_name forKey:kDataSaltSolutionKey];
     [data setObject:[[NSDate date] toStringWithFormat:kUploadDataDateFormat] forKey:kDataDateKey];
     
     [self.serverManager storeCalCheck:data];
@@ -1002,9 +1070,13 @@ CGFloat firstX = 0, firstY = 0;
         [currentResponder resignFirstResponder];
     }
     
-    // show action sheet
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Menu" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Sensor Inventory", @"Jobs", nil];
-    [actionSheet showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
+    if (kUseJobsFunction == 1) {
+        // show action sheet
+        UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Menu" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Sensor Inventory", @"Jobs", nil];
+        [actionSheet showFromBarButtonItem:self.navigationItem.rightBarButtonItem animated:YES];
+    } else {
+        [self performSegueWithIdentifier:@"gotoInventory" sender:self];
+    }
 }
 
 #pragma mark - action sheet delegate
@@ -1042,7 +1114,7 @@ CGFloat firstX = 0, firstY = 0;
     }
 }
 
-- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success oldest:(BOOL)oldest
+- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success first:(BOOL)first
 {
     if (success)
     {
@@ -1118,7 +1190,8 @@ CGFloat firstX = 0, firstY = 0;
 - (IBAction)onSwipeDown:(id)sender
 {
 #if USE_JOBEDITOR_IN_MAIN_SCREEN
-    [self showViewJob];
+    if (kUseJobsFunction == 1)
+        [self showViewJob];
 #endif
 }
 
