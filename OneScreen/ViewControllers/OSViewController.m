@@ -508,6 +508,14 @@ typedef enum {
         // sensor serial
         self.labelSensorSerial.text = sensorSerial;
         
+        BOOL isSensorChanged = NO;
+        if (self.currSensor == nil || self.currSensor.length == 0)
+            isSensorChanged = YES;
+        else if (![self.currSensor isEqual:sensorSerial])
+            isSensorChanged = YES;
+        
+        self.currSensor = sensorSerial;
+        
         // check first cal check data
         if (sensorInfo.retrievedFirstCalCheck &&
             sensorInfo.retrievedLastCalCheck &&
@@ -525,8 +533,7 @@ typedef enum {
             }
         }
         
-        if (self.currSensor != nil &&
-            [self.currSensor isEqual:sensorSerial]) {
+        if (!isSensorChanged) {
             // same sensor
             
             // check retrieved first & last cal check data
@@ -540,8 +547,11 @@ typedef enum {
                 [self retrieveCalibrationData:sensorSerial];
             }
         }
+        else {
+            [self onSensorChanged:self.currSensor];
+        }
         
-        self.currSensor = sensorSerial;
+        
         CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:self.currSensor];
         if (sensor) {
             [[OSModelManager sharedInstance] setLastReadingTimeForSensor:sensor lastTime:[NSDate date]];
@@ -679,7 +689,14 @@ typedef enum {
     if (self.currSensor == nil || self.currSensor.length == 0)
         return;
     
-    NSDictionary *dicData = [self.dicSensorData objectForKey:self.currSensor];
+    if (!self.dicSensorData)
+        return;
+    
+    SensorInfo *sensorInfo = [self.dicSensorData objectForKey:self.currSensor];
+    if (!sensorInfo)
+        return;
+    
+    NSDictionary *dicData = sensorInfo.lastSensorData;
     if (dicData == nil)
         return;
     
@@ -1059,7 +1076,14 @@ typedef enum {
     if (!storable)
         return;
     
-    NSDictionary *sensorData = [self.dicSensorData objectForKey:self.currSensor];
+    if (!self.dicSensorData)
+        return;
+    
+    SensorInfo *sensorInfo = [self.dicSensorData objectForKey:self.currSensor];
+    if (!sensorInfo)
+        return;
+    
+    NSDictionary *sensorData = sensorInfo.lastSensorData;
     /*
     if (sensorData == nil)
         return;
