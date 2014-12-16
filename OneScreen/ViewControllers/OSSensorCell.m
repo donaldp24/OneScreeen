@@ -10,6 +10,7 @@
 #import "OSModelManager.h"
 #import "NSDate+String.h"
 #import "OSCertificationManager.h"
+#import "OSSaltSolutionManager.h"
 
 #define kBackgroundColorForSelected     [UIColor colorWithRed:1 green:1 blue:1 alpha:0.1]
 #define kBackgroundColorForNonSelected  [UIColor colorWithRed:0 green:0 blue:0 alpha:0.3]
@@ -108,6 +109,10 @@
     [self.labelSaltName setFont:kFontMyriadProRegular(fontSize)];
     
     CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
+    // check dummy one
+    if (calCheck != nil && [[OSSaltSolutionManager sharedInstance] isDefaultSolution:calCheck.salt_name])
+        calCheck = nil;
+    
     CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:ssn];
     CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:ssn];
     CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:ssn];

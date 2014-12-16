@@ -21,6 +21,7 @@
 @interface OSServerManager : NSObject
 
 @property (nonatomic, retain) id<OSServerManagerDelegate> delegate;
+@property (nonatomic) BOOL isLoggedIn;
 
 + (OSServerManager *)sharedInstance;
 

@@ -49,9 +49,8 @@
 - (CDCalCheck *)getFirstCalCheckForSensor:(NSString *)ssn;
 - (void)printCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getLatestCalCheckForSensor:(NSString *)ssn;
-- (CDCalCheck *)getDummyCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getCalCheckForSensor:(NSString *)ssn date:(NSDate *)date;
-- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name first:(BOOL)first dummy:(BOOL)dummy;
+- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name first:(BOOL)first;
 
 
 #pragma mark - calibration date

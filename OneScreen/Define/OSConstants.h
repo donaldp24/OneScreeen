@@ -12,8 +12,9 @@
 #define kDateTimeFormatWithTimezone             @"yyyy-MM-dd HH:mm:ss ZZZ"
 #define kDateTimeFormat                         @"yyyy-MM-dd HH:mm:ss"
 #define kDateFormat                             @"MMM dd, yyyy"
-#define kUploadDataDateFormat                   @"yyyy-MM-dd"
+#define kUploadDataDateFormat                   @"yyyy-MM-dd HH:mm:ss"
 #define KJSONDateTimeFormat                     @"yyyy-MM-dd'T'HH:mm:ss.SSSz"
+
 //#define kShortDateFormat                        @"yy-M-d"
 #define kShortDateFormat                        @"MMM dd, yyyy"
 
@@ -31,9 +32,10 @@
 #define kDataDateKey                            @"date"
 
 // notifications
-#define kCalibrationDateChanged                 @"calibration date changed"
-#define kLastCalCheckChanged                        @"calcheck data changed"
-#define kFirstCalCheckChanged                      @"first calcheck data changed"
+//#define kCalibrationDateChanged                 @"calibration date changed"
+//#define kLastCalCheckChanged                        @"calcheck data changed"
+//#define kFirstCalCheckChanged                      @"first calcheck data changed"
+#define kDataChanged                      @"data for cal cert due changed"
 
 // colors for cal check due
 #define kDefaultDueDateColor        [UIColor colorWithRed:0 green:255 blue:0 alpha:0.8]

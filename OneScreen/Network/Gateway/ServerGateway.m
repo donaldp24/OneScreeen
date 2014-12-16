@@ -154,7 +154,7 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
     NSString *salt_name = data[kDataSaltSolutionKey];
     NSString *date = data[kDataDateKey];
     
-    NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=upload_cal_check&access_token=%@&ssn=%@&rh=%d&temp=%d&salt_name=%@&date=%@", access, ssn, [rh intValue], [temp intValue], [salt_name urlencode], date];
+    NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=upload_cal_check&access_token=%@&ssn=%@&rh=%d&temp=%d&salt_name=%@&date=%@", access, ssn, [rh intValue], [temp intValue], [salt_name urlencode], [date urlencode]];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     

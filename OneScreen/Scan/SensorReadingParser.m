@@ -12,7 +12,7 @@ static int const kRHValueOffset = 8;
 static int const kTempValueOffset = 10;
 static int const kRHAmbientValueOffset = 4;
 static int const kTempAmbientValueOffset = 6;
-static int const kBatteryLevelValueOffset = 18;
+static int const kBatteryLevelValueOffset = 24;
 static int const kSerialNumberValueOffset = 12;
 
 @interface SensorReadingParser ()
@@ -44,8 +44,8 @@ static int const kSerialNumberValueOffset = 12;
     float sensorRH = [self RHFromBytes:[[manufactureData subdataWithRange:NSMakeRange(rhValueOffset, 2)] bytes]];
     float ambientSensorRH = [self RHFromBytes:[[manufactureData subdataWithRange:NSMakeRange(rhAmbientValueOffset, 2)] bytes]];
     
-    UInt16 sensorTemp = [self temperatureFromBytes:[[manufactureData subdataWithRange:NSMakeRange(tempValueOffset, 2)] bytes]];
-    UInt16 ambientSensorTemp = [self temperatureFromBytes:[[manufactureData subdataWithRange:NSMakeRange(tempAmbientValueOffset, 2)] bytes]];
+    float sensorTemp = [self temperatureFromBytes:[[manufactureData subdataWithRange:NSMakeRange(tempValueOffset, 2)] bytes]];
+    float ambientSensorTemp = [self temperatureFromBytes:[[manufactureData subdataWithRange:NSMakeRange(tempAmbientValueOffset, 2)] bytes]];
  
     NSDateFormatter * dFormatter = [[NSDateFormatter alloc] init];
     [dFormatter setDateFormat:@"yyyy-mm-dd-HH-MM"];

@@ -10,6 +10,7 @@
 #import "NSDate+String.h"
 #import "OSModelManager.h"
 #import "OSCertificationManager.h"
+#import "OSSaltSolutionManager.h"
 
 #define STR(string) (string) ? (string) : @""
 
@@ -159,6 +160,10 @@ static OSReportManager *_sharedReportManager = nil;
     for (NSString *ssn in arraySensors) {
         CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:ssn];
         CDCalCheck *lastCalCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
+        // check dummy one
+        if (lastCalCheck != nil && [[OSSaltSolutionManager sharedInstance] isDefaultSolution:lastCalCheck.salt_name])
+            lastCalCheck = nil;
+        
         CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:ssn];
         CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:ssn];
         
@@ -487,6 +492,10 @@ static OSReportManager *_sharedReportManager = nil;
     for (NSString *ssn in arraySensors) {
         CDReading *reading = [[OSModelManager sharedInstance] getLastReadingForSensor:ssn ofJob:jobUid];
         CDCalCheck *calCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:reading.ssn];
+        // check dummy one
+        if (calCheck != nil && [[OSSaltSolutionManager sharedInstance] isDefaultSolution:calCheck.salt_name])
+            calCheck = nil;
+        
         CDSensor *sensor = [[OSModelManager sharedInstance] getSensorForSerial:reading.ssn];
         CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:reading.ssn];
         

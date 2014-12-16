@@ -183,6 +183,11 @@
                 sensor.retrievedFirstCalCheck = YES;
             
             CDCalCheck *lastCalCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:ssn];
+            
+            // check dummy one
+            if (lastCalCheck != nil && [[OSSaltSolutionManager sharedInstance] isDefaultSolution:lastCalCheck.salt_name])
+                lastCalCheck = nil;
+            
             if (!lastCalCheck)
                 [[OSServerManager sharedInstance] retrieveCalCheckForSensor:ssn first:NO];
             else

@@ -2,7 +2,7 @@
 //  CDCalCheck.h
 //  OneScreen
 //
-//  Created by Xiaoxue Han on 23/11/14.
+//  Created by Xiaoxue Han on 03/12/14.
 //  Copyright (c) 2014 wagnermeter. All rights reserved.
 //
 
@@ -17,6 +17,5 @@
 @property (nonatomic, retain) NSString * salt_name;
 @property (nonatomic, retain) NSString * ssn;
 @property (nonatomic, retain) NSNumber * temp;
-@property (nonatomic, retain) NSNumber * isdummy;
 
 @end

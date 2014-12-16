@@ -29,7 +29,6 @@
 		D01A314319DD3D49008C924F /* OSSaltSolutionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D01A314219DD3D49008C924F /* OSSaltSolutionManager.m */; };
 		D01A314619DD479C008C924F /* OSSaltSolution.m in Sources */ = {isa = PBXBuildFile; fileRef = D01A314519DD479C008C924F /* OSSaltSolution.m */; };
 		D01D6E6919DCC34300EF4B37 /* NSString+UrlEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = D01D6E6819DCC34300EF4B37 /* NSString+UrlEncoding.m */; };
-		D0210C7C1A2161D100AF4791 /* CDCalCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = D0210C7B1A2161D100AF4791 /* CDCalCheck.m */; };
 		D022423619DB307A002B0E6D /* OSServerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D022423519DB307A002B0E6D /* OSServerManager.m */; };
 		D022423A19DB373E002B0E6D /* iToast.m in Sources */ = {isa = PBXBuildFile; fileRef = D022423919DB373E002B0E6D /* iToast.m */; };
 		D02A36B919EED4F500322C00 /* OSReportManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D02A36B819EED4F500322C00 /* OSReportManager.m */; };
@@ -110,6 +109,7 @@
 		D0BEAB6719D3CC5D00514B19 /* ServerGateway.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BEAB6119D3CC5D00514B19 /* ServerGateway.m */; };
 		D0BEAB6819D3CC5D00514B19 /* ServerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BEAB6519D3CC5D00514B19 /* ServerManager.m */; };
 		D0BEAB6C19D3CD0200514B19 /* SFHFKeychainUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BEAB6B19D3CD0200514B19 /* SFHFKeychainUtils.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		D0C707E81A2E41140013CBF3 /* CDCalCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C707E71A2E41140013CBF3 /* CDCalCheck.m */; };
 		D0D5D30419E3761C005FF944 /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D5D30019E3761C005FF944 /* libTestFlight.a */; };
 		D0D5D30619E37708005FF944 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D5D30519E37708005FF944 /* libz.dylib */; };
 		D0E505A619E88F0600B2E45C /* OSSensorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E505A519E88F0600B2E45C /* OSSensorCell.m */; };
@@ -177,8 +177,6 @@
 		D01A314519DD479C008C924F /* OSSaltSolution.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSSaltSolution.m; sourceTree = "<group>"; };
 		D01D6E6719DCC34300EF4B37 /* NSString+UrlEncoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+UrlEncoding.h"; sourceTree = "<group>"; };
 		D01D6E6819DCC34300EF4B37 /* NSString+UrlEncoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+UrlEncoding.m"; sourceTree = "<group>"; };
-		D0210C7A1A2161D100AF4791 /* CDCalCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDCalCheck.h; sourceTree = "<group>"; };
-		D0210C7B1A2161D100AF4791 /* CDCalCheck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDCalCheck.m; sourceTree = "<group>"; };
 		D022423419DB307A002B0E6D /* OSServerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSServerManager.h; sourceTree = "<group>"; };
 		D022423519DB307A002B0E6D /* OSServerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSServerManager.m; sourceTree = "<group>"; };
 		D022423819DB373E002B0E6D /* iToast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iToast.h; sourceTree = "<group>"; };
@@ -316,6 +314,8 @@
 		D0BEAB6619D3CC5D00514B19 /* ServerManagerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerManagerDelegate.h; sourceTree = "<group>"; };
 		D0BEAB6A19D3CD0200514B19 /* SFHFKeychainUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFHFKeychainUtils.h; sourceTree = "<group>"; };
 		D0BEAB6B19D3CD0200514B19 /* SFHFKeychainUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFHFKeychainUtils.m; sourceTree = "<group>"; };
+		D0C707E61A2E41140013CBF3 /* CDCalCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDCalCheck.h; sourceTree = "<group>"; };
+		D0C707E71A2E41140013CBF3 /* CDCalCheck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDCalCheck.m; sourceTree = "<group>"; };
 		D0D5D30019E3761C005FF944 /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
 		D0D5D30119E3761C005FF944 /* TestFlight+AsyncLogging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TestFlight+AsyncLogging.h"; sourceTree = "<group>"; };
 		D0D5D30219E3761C005FF944 /* TestFlight+ManualSessions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TestFlight+ManualSessions.h"; sourceTree = "<group>"; };
@@ -551,8 +551,8 @@
 				D0BDE8231A0054D10033A553 /* CDJob.m */,
 				D0007C071A0232A500235E69 /* CDSensor.h */,
 				D0007C081A0232A500235E69 /* CDSensor.m */,
-				D0210C7A1A2161D100AF4791 /* CDCalCheck.h */,
-				D0210C7B1A2161D100AF4791 /* CDCalCheck.m */,
+				D0C707E61A2E41140013CBF3 /* CDCalCheck.h */,
+				D0C707E71A2E41140013CBF3 /* CDCalCheck.m */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -1013,7 +1013,7 @@
 				D0BEAB6C19D3CD0200514B19 /* SFHFKeychainUtils.m in Sources */,
 				D01A314319DD3D49008C924F /* OSSaltSolutionManager.m in Sources */,
 				D00C2F3E19F11BD20041EB09 /* OSAppContext.m in Sources */,
-				D0210C7C1A2161D100AF4791 /* CDCalCheck.m in Sources */,
+				D0C707E81A2E41140013CBF3 /* CDCalCheck.m in Sources */,
 				D02CB32A19F01061003A23B8 /* ReaderThumbQueue.m in Sources */,
 				D0BEAAF419D3B9CB00514B19 /* main.m in Sources */,
 				D0BEAB4119D3BA7500514B19 /* SBJsonParser.m in Sources */,
