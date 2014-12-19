@@ -150,6 +150,11 @@ static OSSaltSolutionManager *_sharedSaltSolutionManager = nil;
         RH_interpolated = [OSSaltSolutionManager YInterpWithX1:45 Y1:Salt_Base[8] X2:50 Y2:Salt_Base[9] Xi:TEMP_C];
         Delta_interpolated = [OSSaltSolutionManager YInterpWithX1:45 Y1:Salt_delta[8] X2:50 Y2:Salt_delta[9] Xi:TEMP_C];
     }
+    
+    //[12/19/14, 6:08:45 AM] Tim: // add additional 0.5%RH tolerance to both upper and lower end for temperature fluctuations
+    //[12/19/14, 6:09:02 AM] Tim: Delta_interpolated += 0.5;
+    Delta_interpolated += 0.5;
+    
     // Debug.Print "entered case statement"
     if (RH >= (RH_interpolated - Delta_interpolated) - 2 && RH <= (RH_interpolated + Delta_interpolated) + 2) // ADJUSTED VALID RH RANGE
         return CalCheckResultPass;

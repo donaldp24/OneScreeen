@@ -18,7 +18,6 @@
     
     [TestFlight takeOff:@"dfba855e-fe1a-4a76-97bc-ef5306809bb3"];
     
-    // crashlytics
     [Crashlytics startWithAPIKey:@"02eaa877844435ac8f0e7707e5087c6a937afdd5"];
     
     NSString *storyboardName = @"Main_iPhone";

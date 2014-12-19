@@ -87,8 +87,9 @@ static OSReportManager *_sharedReportManager = nil;
     CGFloat yPos = 0.0;
     
     // render first page
-    [self renderFirstPageForSensors:dateStr];
-    [self drawPageNumber:currentPage++ + 1];
+    // commented-2014-12-19, Tim required to remove first page
+    //[self renderFirstPageForSensors:dateStr];
+    //[self drawPageNumber:currentPage++ + 1];
     
     // render contents page
     BOOL isStart = YES;

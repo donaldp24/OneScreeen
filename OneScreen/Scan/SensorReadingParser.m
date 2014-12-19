@@ -77,6 +77,14 @@ static int const kSerialNumberValueOffset = 12;
     }
     rh = (-6.0f + (125.0f * rh / 65536.0f));
     //  rh = (UInt16)roundf(-6.0f + (125.0f * (rh/256 + (rh & 0xff) * 256) / 65536.0f));
+    
+    //[12/19/14, 6:11:21 AM] Tim: // adjust caluclated RH value to support coinciding with Easy Reader readings.
+    //[12/19/14, 6:12:14 AM] Tim: RH += 0.5; // adjust for all readings
+    //[12/19/14, 6:13:03 AM] Tim: RH > 100? RH = 100, RH = RH;  // enforce 100 as max possible RH reading.
+    rh += 0.5;
+    if (rh > 100)
+        rh = 100;
+    
     return rh;
 }
 

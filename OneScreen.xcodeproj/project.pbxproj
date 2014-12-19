@@ -69,10 +69,10 @@
 		D02CB33019F01061003A23B8 /* ThumbsMainToolbar.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30919F01061003A23B8 /* ThumbsMainToolbar.m */; };
 		D02CB33119F01061003A23B8 /* ThumbsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30B19F01061003A23B8 /* ThumbsViewController.m */; };
 		D02CB33219F01061003A23B8 /* UIXToolbarView.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30D19F01061003A23B8 /* UIXToolbarView.m */; };
-		D02CB33519F08986003A23B8 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D02CB33419F08986003A23B8 /* Crashlytics.framework */; };
 		D0375C4419F4A9D600F64359 /* CDReading.m in Sources */ = {isa = PBXBuildFile; fileRef = D0375C4319F4A9D600F64359 /* CDReading.m */; };
 		D05CCF8B19ECCAFE00747064 /* OSRotateNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */; };
 		D05CCF8E19ECD88100747064 /* OSDummyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8D19ECD88100747064 /* OSDummyViewController.m */; };
+		D073C95A1A438E6400180CED /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D073C9591A438E6400180CED /* Crashlytics.framework */; };
 		D082AEE11A0A8FFA000D60BD /* Main_iPhone3.5.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D082AEDF1A0A8FFA000D60BD /* Main_iPhone3.5.storyboard */; };
 		D08964C919E67F2E00FFF5CE /* CDCalibrationDate.m in Sources */ = {isa = PBXBuildFile; fileRef = D08964C819E67F2E00FFF5CE /* CDCalibrationDate.m */; };
 		D0BDE8211A0053610033A553 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0BDE81F1A0053610033A553 /* Main_iPhone.storyboard */; };
@@ -239,13 +239,13 @@
 		D02CB30B19F01061003A23B8 /* ThumbsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThumbsViewController.m; sourceTree = "<group>"; };
 		D02CB30C19F01061003A23B8 /* UIXToolbarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIXToolbarView.h; sourceTree = "<group>"; };
 		D02CB30D19F01061003A23B8 /* UIXToolbarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIXToolbarView.m; sourceTree = "<group>"; };
-		D02CB33419F08986003A23B8 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		D0375C4219F4A9D600F64359 /* CDReading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDReading.h; sourceTree = "<group>"; };
 		D0375C4319F4A9D600F64359 /* CDReading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDReading.m; sourceTree = "<group>"; };
 		D05CCF8919ECCAFE00747064 /* OSRotateNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSRotateNavigationController.h; sourceTree = "<group>"; };
 		D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSRotateNavigationController.m; sourceTree = "<group>"; };
 		D05CCF8C19ECD88100747064 /* OSDummyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSDummyViewController.h; sourceTree = "<group>"; };
 		D05CCF8D19ECD88100747064 /* OSDummyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSDummyViewController.m; sourceTree = "<group>"; };
+		D073C9591A438E6400180CED /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		D082AEE01A0A8FFA000D60BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone3.5.storyboard; sourceTree = "<group>"; };
 		D08964C719E67F2E00FFF5CE /* CDCalibrationDate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDCalibrationDate.h; sourceTree = "<group>"; };
 		D08964C819E67F2E00FFF5CE /* CDCalibrationDate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDCalibrationDate.m; sourceTree = "<group>"; };
@@ -343,7 +343,7 @@
 				D0BEAAEA19D3B9CB00514B19 /* CoreGraphics.framework in Frameworks */,
 				D0BEAAEC19D3B9CB00514B19 /* UIKit.framework in Frameworks */,
 				D0BEAAE819D3B9CB00514B19 /* Foundation.framework in Frameworks */,
-				D02CB33519F08986003A23B8 /* Crashlytics.framework in Frameworks */,
+				D073C95A1A438E6400180CED /* Crashlytics.framework in Frameworks */,
 				D0D5D30419E3761C005FF944 /* libTestFlight.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -580,7 +580,7 @@
 		D0BEAAE619D3B9CB00514B19 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D02CB33419F08986003A23B8 /* Crashlytics.framework */,
+				D073C9591A438E6400180CED /* Crashlytics.framework */,
 				D0D5D30519E37708005FF944 /* libz.dylib */,
 				D0BEAAE719D3B9CB00514B19 /* Foundation.framework */,
 				D0BEAAE919D3B9CB00514B19 /* CoreGraphics.framework */,
@@ -1179,7 +1179,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Volumes/Macintosh\\ 2/work/xxh/OneScreen",
+					/Volumes/Macintosh,
+					2/work/xxh/OneScreen,
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OneScreen/OneScreen-Prefix.pch";
@@ -1205,7 +1207,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Volumes/Macintosh\\ 2/work/xxh/OneScreen",
+					/Volumes/Macintosh,
+					2/work/xxh/OneScreen,
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OneScreen/OneScreen-Prefix.pch";
