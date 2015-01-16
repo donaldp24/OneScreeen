@@ -1220,7 +1220,7 @@
 					"$(PROJECT_DIR)/Library/TestFlight",
 				);
 				PRODUCT_NAME = CalMaster;
-				PROVISIONING_PROFILE = "5fb3ef5e-d35a-4c27-b4e3-8d9ffb15223b";
+				PROVISIONING_PROFILE = "993e2d95-8ef9-4f10-811f-0fc0f5dc1fad";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
