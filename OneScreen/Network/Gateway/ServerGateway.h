@@ -6,17 +6,25 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ServerGatewayDelegate.h"
+
+typedef enum {
+    GatewayErrorNoError,
+    GatewayErrorInvalidGrant
+} GatewayError;
 
 @interface ServerGateway : NSObject
 
-- (void)lookupSSN:(NSString*)ssn accessToken:(NSString*)access;
-- (void)uploadDataFileContents:(NSData*)data atFilePath:(NSString*)filePath accessToken:(NSString*)accessToken;
-- (void)loginWithUsername:(NSString *)username password: (NSString*)password;
+- (void)lookupSSN:(NSString*)ssn accessToken:(NSString*)access complete:(void(^)(NSDictionary *ret, NSString *ssn))block;
 
-@property (nonatomic, assign) id<ServerGatewayDelegate> delegate;
+- (void)uploadDataFileContents:(NSData*)data atFilePath:(NSString*)filePath accessToken:(NSString*)accessToken complete:(void(^)(NSError *error))block;
 
-- (void)storeData:(NSDictionary *)data accessToken:(NSString*)access;
-- (void)retrieveData:(NSString *)ssn first:(BOOL)first accessToken:(NSString*)access;
+- (void)loginWithUsername:(NSString *)username password: (NSString*)password complete:(void(^)(NSString *accessToken))block;
+
+- (void)storeCalCheck:(NSString *)ssn rh:(int)rh temp:(int)temp salt_name:(NSString *)salt_name date:(NSString *)date accessToken:(NSString*)access complete:(void(^)(BOOL success))block;
+
+- (void)retrieveCalCheck:(NSString *)ssn
+                   first:(BOOL)first
+             accessToken:(NSString*)access
+                complete:(void(^)(NSDictionary *data))block;
 
 @end

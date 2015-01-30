@@ -32,6 +32,7 @@
 		D022423619DB307A002B0E6D /* OSServerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D022423519DB307A002B0E6D /* OSServerManager.m */; };
 		D022423A19DB373E002B0E6D /* iToast.m in Sources */ = {isa = PBXBuildFile; fileRef = D022423919DB373E002B0E6D /* iToast.m */; };
 		D02A36B919EED4F500322C00 /* OSReportManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D02A36B819EED4F500322C00 /* OSReportManager.m */; };
+		D02CA63F1A7A2F2F00941A0A /* CDCalCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CA63E1A7A2F2F00941A0A /* CDCalCheck.m */; };
 		D02CB30E19F01061003A23B8 /* AppIcon-057.png in Resources */ = {isa = PBXBuildFile; fileRef = D02CB2D519F01061003A23B8 /* AppIcon-057.png */; };
 		D02CB30F19F01061003A23B8 /* AppIcon-072.png in Resources */ = {isa = PBXBuildFile; fileRef = D02CB2D619F01061003A23B8 /* AppIcon-072.png */; };
 		D02CB31019F01061003A23B8 /* AppIcon-114.png in Resources */ = {isa = PBXBuildFile; fileRef = D02CB2D719F01061003A23B8 /* AppIcon-114.png */; };
@@ -70,6 +71,8 @@
 		D02CB33119F01061003A23B8 /* ThumbsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30B19F01061003A23B8 /* ThumbsViewController.m */; };
 		D02CB33219F01061003A23B8 /* UIXToolbarView.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30D19F01061003A23B8 /* UIXToolbarView.m */; };
 		D0375C4419F4A9D600F64359 /* CDReading.m in Sources */ = {isa = PBXBuildFile; fileRef = D0375C4319F4A9D600F64359 /* CDReading.m */; };
+		D03F5B391A784A1000D88A94 /* OSSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D03F5B381A784A1000D88A94 /* OSSyncManager.m */; };
+		D03F5B3D1A784E7300D88A94 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = D03F5B3C1A784E7300D88A94 /* Reachability.m */; };
 		D05CCF8B19ECCAFE00747064 /* OSRotateNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */; };
 		D05CCF8E19ECD88100747064 /* OSDummyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8D19ECD88100747064 /* OSDummyViewController.m */; };
 		D073C95A1A438E6400180CED /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D073C9591A438E6400180CED /* Crashlytics.framework */; };
@@ -107,9 +110,7 @@
 		D0BEAB5319D3BB4400514B19 /* SensorReadingParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BEAB5019D3BB4400514B19 /* SensorReadingParser.m */; };
 		D0BEAB5D19D3BD2F00514B19 /* NSDate+String.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BEAB5C19D3BD2F00514B19 /* NSDate+String.m */; };
 		D0BEAB6719D3CC5D00514B19 /* ServerGateway.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BEAB6119D3CC5D00514B19 /* ServerGateway.m */; };
-		D0BEAB6819D3CC5D00514B19 /* ServerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BEAB6519D3CC5D00514B19 /* ServerManager.m */; };
 		D0BEAB6C19D3CD0200514B19 /* SFHFKeychainUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = D0BEAB6B19D3CD0200514B19 /* SFHFKeychainUtils.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		D0C707E81A2E41140013CBF3 /* CDCalCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = D0C707E71A2E41140013CBF3 /* CDCalCheck.m */; };
 		D0D5D30419E3761C005FF944 /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D5D30019E3761C005FF944 /* libTestFlight.a */; };
 		D0D5D30619E37708005FF944 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D5D30519E37708005FF944 /* libz.dylib */; };
 		D0E505A619E88F0600B2E45C /* OSSensorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E505A519E88F0600B2E45C /* OSSensorCell.m */; };
@@ -183,6 +184,8 @@
 		D022423919DB373E002B0E6D /* iToast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iToast.m; sourceTree = "<group>"; };
 		D02A36B719EED4F500322C00 /* OSReportManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSReportManager.h; sourceTree = "<group>"; };
 		D02A36B819EED4F500322C00 /* OSReportManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSReportManager.m; sourceTree = "<group>"; };
+		D02CA63D1A7A2F2F00941A0A /* CDCalCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDCalCheck.h; sourceTree = "<group>"; };
+		D02CA63E1A7A2F2F00941A0A /* CDCalCheck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDCalCheck.m; sourceTree = "<group>"; };
 		D02CB2D519F01061003A23B8 /* AppIcon-057.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-057.png"; sourceTree = "<group>"; };
 		D02CB2D619F01061003A23B8 /* AppIcon-072.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-072.png"; sourceTree = "<group>"; };
 		D02CB2D719F01061003A23B8 /* AppIcon-114.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "AppIcon-114.png"; sourceTree = "<group>"; };
@@ -241,6 +244,10 @@
 		D02CB30D19F01061003A23B8 /* UIXToolbarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIXToolbarView.m; sourceTree = "<group>"; };
 		D0375C4219F4A9D600F64359 /* CDReading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDReading.h; sourceTree = "<group>"; };
 		D0375C4319F4A9D600F64359 /* CDReading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDReading.m; sourceTree = "<group>"; };
+		D03F5B371A784A1000D88A94 /* OSSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSSyncManager.h; sourceTree = "<group>"; };
+		D03F5B381A784A1000D88A94 /* OSSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSSyncManager.m; sourceTree = "<group>"; };
+		D03F5B3B1A784E7300D88A94 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		D03F5B3C1A784E7300D88A94 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		D05CCF8919ECCAFE00747064 /* OSRotateNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSRotateNavigationController.h; sourceTree = "<group>"; };
 		D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSRotateNavigationController.m; sourceTree = "<group>"; };
 		D05CCF8C19ECD88100747064 /* OSDummyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSDummyViewController.h; sourceTree = "<group>"; };
@@ -306,16 +313,10 @@
 		D0BEAB5919D3BBC700514B19 /* OSConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSConstants.h; sourceTree = "<group>"; };
 		D0BEAB5B19D3BD2F00514B19 /* NSDate+String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+String.h"; sourceTree = "<group>"; };
 		D0BEAB5C19D3BD2F00514B19 /* NSDate+String.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+String.m"; sourceTree = "<group>"; };
-		D0BEAB6019D3CC5D00514B19 /* ServerGateway.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerGateway.h; sourceTree = "<group>"; };
-		D0BEAB6119D3CC5D00514B19 /* ServerGateway.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerGateway.m; sourceTree = "<group>"; };
-		D0BEAB6219D3CC5D00514B19 /* ServerGatewayDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerGatewayDelegate.h; sourceTree = "<group>"; };
-		D0BEAB6419D3CC5D00514B19 /* ServerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerManager.h; sourceTree = "<group>"; };
-		D0BEAB6519D3CC5D00514B19 /* ServerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerManager.m; sourceTree = "<group>"; };
-		D0BEAB6619D3CC5D00514B19 /* ServerManagerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerManagerDelegate.h; sourceTree = "<group>"; };
+		D0BEAB6019D3CC5D00514B19 /* ServerGateway.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ServerGateway.h; path = Gateway/ServerGateway.h; sourceTree = "<group>"; };
+		D0BEAB6119D3CC5D00514B19 /* ServerGateway.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ServerGateway.m; path = Gateway/ServerGateway.m; sourceTree = "<group>"; };
 		D0BEAB6A19D3CD0200514B19 /* SFHFKeychainUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFHFKeychainUtils.h; sourceTree = "<group>"; };
 		D0BEAB6B19D3CD0200514B19 /* SFHFKeychainUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFHFKeychainUtils.m; sourceTree = "<group>"; };
-		D0C707E61A2E41140013CBF3 /* CDCalCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDCalCheck.h; sourceTree = "<group>"; };
-		D0C707E71A2E41140013CBF3 /* CDCalCheck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDCalCheck.m; sourceTree = "<group>"; };
 		D0D5D30019E3761C005FF944 /* libTestFlight.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libTestFlight.a; sourceTree = "<group>"; };
 		D0D5D30119E3761C005FF944 /* TestFlight+AsyncLogging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TestFlight+AsyncLogging.h"; sourceTree = "<group>"; };
 		D0D5D30219E3761C005FF944 /* TestFlight+ManualSessions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TestFlight+ManualSessions.h"; sourceTree = "<group>"; };
@@ -540,6 +541,24 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
+		D03F5B361A7849FB00D88A94 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				D03F5B371A784A1000D88A94 /* OSSyncManager.h */,
+				D03F5B381A784A1000D88A94 /* OSSyncManager.m */,
+			);
+			path = Sync;
+			sourceTree = "<group>";
+		};
+		D03F5B3A1A784E7300D88A94 /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				D03F5B3B1A784E7300D88A94 /* Reachability.h */,
+				D03F5B3C1A784E7300D88A94 /* Reachability.m */,
+			);
+			path = Reachability;
+			sourceTree = "<group>";
+		};
 		D08964C019E67F1B00FFF5CE /* Entity */ = {
 			isa = PBXGroup;
 			children = (
@@ -551,8 +570,8 @@
 				D0BDE8231A0054D10033A553 /* CDJob.m */,
 				D0007C071A0232A500235E69 /* CDSensor.h */,
 				D0007C081A0232A500235E69 /* CDSensor.m */,
-				D0C707E61A2E41140013CBF3 /* CDCalCheck.h */,
-				D0C707E71A2E41140013CBF3 /* CDCalCheck.m */,
+				D02CA63D1A7A2F2F00941A0A /* CDCalCheck.h */,
+				D02CA63E1A7A2F2F00941A0A /* CDCalCheck.m */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -596,18 +615,19 @@
 				D0007C0E1A0252FF00235E69 /* iTunesArtwork */,
 				D0007C0C1A02525D00235E69 /* iTunesArtwork@2x */,
 				D00C2F3B19F11BC40041EB09 /* AppContext */,
-				D02A36B619EED4E300322C00 /* Report */,
-				D005B7B419E5EB4C0073336A /* Expiration */,
+				D0BEAB5A19D3BC1800514B19 /* Categories */,
 				D005B7A319E5E8670073336A /* Certification */,
-				D01A314019DD3D3D008C924F /* SaltSolution */,
 				D0F984F919D8A89D003B2E74 /* CoreData */,
 				D0F984EC19D8A358003B2E74 /* customfonts */,
+				D0BEAB5819D3BBAE00514B19 /* Define */,
+				D005B7B419E5EB4C0073336A /* Expiration */,
 				D00DB25119D50CB400C62136 /* Helper */,
 				D0BEAB5E19D3CC5D00514B19 /* Network */,
+				D02A36B619EED4E300322C00 /* Report */,
+				D01A314019DD3D3D008C924F /* SaltSolution */,
 				D005B7A419E5E8670073336A /* ViewControllers */,
-				D0BEAB5A19D3BC1800514B19 /* Categories */,
-				D0BEAB5819D3BBAE00514B19 /* Define */,
 				D0BEAB4919D3BB4400514B19 /* Scan */,
+				D03F5B361A7849FB00D88A94 /* Sync */,
 				D0BEAAF619D3B9CB00514B19 /* OSAppDelegate.h */,
 				D0BEAAF719D3B9CB00514B19 /* OSAppDelegate.m */,
 				D0BDE81F1A0053610033A553 /* Main_iPhone.storyboard */,
@@ -651,12 +671,13 @@
 		D0BEAB1F19D3BA7500514B19 /* Library */ = {
 			isa = PBXGroup;
 			children = (
-				D02CB2D319F01061003A23B8 /* pdfviewer */,
-				D0D5D2FF19E3761C005FF944 /* TestFlight */,
 				D022423719DB373E002B0E6D /* iToast */,
-				D0BEAB6919D3CD0200514B19 /* SFHFKeychainUtils */,
 				D0BEAB2019D3BA7500514B19 /* JSON */,
 				D0BEAB2E19D3BA7500514B19 /* LROAuth2 */,
+				D02CB2D319F01061003A23B8 /* pdfviewer */,
+				D03F5B3A1A784E7300D88A94 /* Reachability */,
+				D0BEAB6919D3CD0200514B19 /* SFHFKeychainUtils */,
+				D0D5D2FF19E3761C005FF944 /* TestFlight */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -741,32 +762,12 @@
 		D0BEAB5E19D3CC5D00514B19 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				D0BEAB5F19D3CC5D00514B19 /* Gateway */,
-				D0BEAB6319D3CC5D00514B19 /* Manager */,
+				D0BEAB6019D3CC5D00514B19 /* ServerGateway.h */,
+				D0BEAB6119D3CC5D00514B19 /* ServerGateway.m */,
 				D022423419DB307A002B0E6D /* OSServerManager.h */,
 				D022423519DB307A002B0E6D /* OSServerManager.m */,
 			);
 			path = Network;
-			sourceTree = "<group>";
-		};
-		D0BEAB5F19D3CC5D00514B19 /* Gateway */ = {
-			isa = PBXGroup;
-			children = (
-				D0BEAB6019D3CC5D00514B19 /* ServerGateway.h */,
-				D0BEAB6119D3CC5D00514B19 /* ServerGateway.m */,
-				D0BEAB6219D3CC5D00514B19 /* ServerGatewayDelegate.h */,
-			);
-			path = Gateway;
-			sourceTree = "<group>";
-		};
-		D0BEAB6319D3CC5D00514B19 /* Manager */ = {
-			isa = PBXGroup;
-			children = (
-				D0BEAB6419D3CC5D00514B19 /* ServerManager.h */,
-				D0BEAB6519D3CC5D00514B19 /* ServerManager.m */,
-				D0BEAB6619D3CC5D00514B19 /* ServerManagerDelegate.h */,
-			);
-			path = Manager;
 			sourceTree = "<group>";
 		};
 		D0BEAB6919D3CD0200514B19 /* SFHFKeychainUtils */ = {
@@ -967,6 +968,7 @@
 				D005B7B719E5EB5E0073336A /* OSExpirationManager.m in Sources */,
 				D0BEAB3F19D3BA7500514B19 /* SBJSON.m in Sources */,
 				D02CB32419F01061003A23B8 /* ReaderContentView.m in Sources */,
+				D03F5B3D1A784E7300D88A94 /* Reachability.m in Sources */,
 				D0BEAB3E19D3BA7500514B19 /* NSString+SBJSON.m in Sources */,
 				D02CB32F19F01061003A23B8 /* ReaderViewController.m in Sources */,
 				D0BEAB5119D3BB4400514B19 /* EmulatorReadingParser.m in Sources */,
@@ -993,6 +995,7 @@
 				D0E505A619E88F0600B2E45C /* OSSensorCell.m in Sources */,
 				D0BEAB5319D3BB4400514B19 /* SensorReadingParser.m in Sources */,
 				D0BEAAF819D3B9CB00514B19 /* OSAppDelegate.m in Sources */,
+				D03F5B391A784A1000D88A94 /* OSSyncManager.m in Sources */,
 				D0BEAB4019D3BA7500514B19 /* SBJsonBase.m in Sources */,
 				D02CB32E19F01061003A23B8 /* ReaderThumbView.m in Sources */,
 				D01756B819F2DCC00044F573 /* OSJobCell.m in Sources */,
@@ -1013,7 +1016,6 @@
 				D0BEAB6C19D3CD0200514B19 /* SFHFKeychainUtils.m in Sources */,
 				D01A314319DD3D49008C924F /* OSSaltSolutionManager.m in Sources */,
 				D00C2F3E19F11BD20041EB09 /* OSAppContext.m in Sources */,
-				D0C707E81A2E41140013CBF3 /* CDCalCheck.m in Sources */,
 				D02CB32A19F01061003A23B8 /* ReaderThumbQueue.m in Sources */,
 				D0BEAAF419D3B9CB00514B19 /* main.m in Sources */,
 				D0BEAB4119D3BA7500514B19 /* SBJsonParser.m in Sources */,
@@ -1021,13 +1023,13 @@
 				D02CB32119F01061003A23B8 /* ReaderConstants.m in Sources */,
 				D005B7AB19E5E8670073336A /* OSSaltsCell.m in Sources */,
 				D02CB32719F01061003A23B8 /* ReaderMainToolbar.m in Sources */,
-				D0BEAB6819D3CC5D00514B19 /* ServerManager.m in Sources */,
 				D05CCF8B19ECCAFE00747064 /* OSRotateNavigationController.m in Sources */,
 				D0BEAB5219D3BB4400514B19 /* ScanManager.m in Sources */,
 				D0BEAB4819D3BA7500514B19 /* NSURL+QueryInspector.m in Sources */,
 				D0BEAB3D19D3BA7500514B19 /* NSObject+SBJSON.m in Sources */,
 				D0BEAB4419D3BA7500514B19 /* LROAuth2Client.m in Sources */,
 				D0BEAB6719D3CC5D00514B19 /* ServerGateway.m in Sources */,
+				D02CA63F1A7A2F2F00941A0A /* CDCalCheck.m in Sources */,
 				D08964C919E67F2E00FFF5CE /* CDCalibrationDate.m in Sources */,
 				D0F9850219D8AA74003B2E74 /* OSModelManager.m in Sources */,
 				D0BEAB4319D3BA7500514B19 /* LROAuth2AccessToken.m in Sources */,

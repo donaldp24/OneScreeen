@@ -19,7 +19,7 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
 
 @implementation ServerGateway
 
-- (void)lookupSSN:(NSString *)ssn accessToken:(NSString *)accessToken {
+- (void)lookupSSN:(NSString *)ssn accessToken:(NSString *)accessToken complete:(void (^)(NSDictionary *, NSString *))block {
     NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=ssn_lookup&access_token=%@&ssn=%@",accessToken,ssn];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
@@ -37,7 +37,7 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (!response) {
-                                   [[self delegate] serverGatewaydidFailLookup:self];
+                                   block(nil, serialNumber);
                                    return;
                                }
                                
@@ -48,15 +48,14 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                
                                NSLog(@"sn: %@", serialNumber);
                                
-                               [[self delegate] serverGateway:self
-                                              didFinishLookup:dict
-                                                       forSSN:serialNumber];
+                               block(dict, serialNumber);
                            }];
 }
 
 - (void)uploadDataFileContents:(NSData *)data
                     atFilePath:(NSString *)filePath
                    accessToken:(NSString *)accessToken
+                      complete:(void (^)(NSError *))block
 {
     NSString *fileName = [filePath lastPathComponent];
     NSString *paramString = [NSString stringWithFormat:@"action=mod_reports_api&method=upload&access_token=%@", accessToken];
@@ -94,18 +93,15 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                    NSError *error = [NSError errorWithDomain:kErrorDomain
                                                                         code:GatewayErrorInvalidGrant
                                                                     userInfo:@{NSLocalizedDescriptionKey: dict[kErrorDescriptionKey]}];
-                                   [[self delegate] serverGatewaydidFailUpload:self withError:error];
+                                   block(error);
                                    return;
                                }
-                               
-                               
-                               
-                               [[self delegate] serverGateway:self didFinishUploadingFile:nil];
+                               block(nil);
                            }];
 }
 
 
-- (void)loginWithUsername:(NSString *)username password: (NSString*)password {
+- (void)loginWithUsername:(NSString *)username password: (NSString*)password complete:(void (^)(NSString *))block {
 
     NSString * authRequestURL = [NSString stringWithFormat:@"%@%@", kServerURL, @"action=auth&step=token"];
     //    NSString * username = @"ishiwata";
@@ -138,23 +134,17 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                NSLog(@"RECEIVED DATA : %@", responseString);
                                NSLog(@"ACCESS TOKEN : %@", accessToken);
                                if(accessToken) {
-
-                               [[self delegate] serverGatewayDidExtractAccessToken:accessToken];
+                                   block(accessToken);
                                }
                                else {
-                                   [[self delegate]serverGatewayDidFailExtractAccessToken:accessToken];
+                                   block(nil);
                                }
                            }];
 }
 
-- (void)storeData:(NSDictionary *)data accessToken:(NSString *)access {
-    NSString *ssn = data[kDataSensorSerialKey];
-    NSNumber *rh = data[kDataRhKey];
-    NSNumber *temp = data[kDataTempKey];
-    NSString *salt_name = data[kDataSaltSolutionKey];
-    NSString *date = data[kDataDateKey];
-    
-    NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=upload_cal_check&access_token=%@&ssn=%@&rh=%d&temp=%d&salt_name=%@&date=%@", access, ssn, [rh intValue], [temp intValue], [salt_name urlencode], [date urlencode]];
+- (void)storeCalCheck:(NSString *)ssn rh:(int)rh temp:(int)temp salt_name:(NSString *)salt_name date:(NSString *)date accessToken:(NSString *)access complete:(void (^)(BOOL))block {
+
+    NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=upload_cal_check&access_token=%@&ssn=%@&rh=%d&temp=%d&salt_name=%@&date=%@", access, ssn, rh, temp, [salt_name urlencode], [date urlencode]];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     
@@ -167,15 +157,12 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
     
     NSLog(@"request : %@", url);
     
-    NSDictionary *storingData = data;
-    
-    //__block NSString *serialNumber = [ssn copy];
     
     [NSURLConnection sendAsynchronousRequest:request
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (!response) {
-                                   [[self delegate] serverGatewayDidStore:storingData withResponse:nil];
+                                   block(NO);
                                    NSLog(@"store failed : %@", connectionError);
                                    return;
                                }
@@ -187,11 +174,12 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                
                                NSLog(@"response for storeData: %@", dict);
                                
-                               [[self delegate] serverGatewayDidStore:storingData withResponse:dict];
+                               NSNumber *success = [dict objectForKey:@"success"];
+                               block([success boolValue]);
                            }];
 }
 
-- (void)retrieveData:(NSString *)ssn first:(BOOL)first accessToken:(NSString *)access {
+- (void)retrieveCalCheck:(NSString *)ssn first:(BOOL)first accessToken:(NSString *)access complete:(void (^)(NSDictionary *))block {
     
     NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=get_cal_check&access_token=%@&ssn=%@", access, ssn];
     if (first)
@@ -206,13 +194,11 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
     
     [request setHTTPMethod:@"GET"];
     
-    //__block NSString *serialNumber = [ssn copy];
-    
     [NSURLConnection sendAsynchronousRequest:request
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (!response) {
-                                   [[self delegate] serverGatewayDidRetrieve:ssn data:nil];
+                                   block(nil);
                                    return;
                                }
                                
@@ -223,10 +209,8 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                
                                NSLog(@"response for retrieveData: %@", dict);
                                
-                               if (!first)
-                                   [[self delegate] serverGatewayDidRetrieve:ssn data:dict];
-                               else
-                                   [[self delegate] serverGatewayDidRetrieveFirst:ssn data:dict];
+                               block(dict);
+
                            }];
 }
 

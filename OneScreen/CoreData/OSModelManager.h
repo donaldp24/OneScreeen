@@ -50,7 +50,17 @@
 - (void)printCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getLatestCalCheckForSensor:(NSString *)ssn;
 - (CDCalCheck *)getCalCheckForSensor:(NSString *)ssn date:(NSDate *)date;
-- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name first:(BOOL)first;
+
+- (void)setCalCheckForSensor:(NSString *)ssn
+                        date:(NSDate *)date
+                          rh:(CGFloat)rh
+                        temp:(CGFloat)temp
+                   salt_name:(NSString *)salt_name
+                       first:(BOOL)first
+            stored_on_server:(BOOL)stored_on_server;
+
+- (void)setStoredOnServerForCalCheck:(CDCalCheck *)calCheck
+                    stored_on_server:(BOOL)stored_on_server;
 
 
 #pragma mark - calibration date

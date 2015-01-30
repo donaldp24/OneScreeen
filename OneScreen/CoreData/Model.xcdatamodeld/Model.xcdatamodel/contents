@@ -5,6 +5,7 @@
         <attribute name="rh" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="salt_name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="ssn" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="stored_on_server" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="temp" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
     </entity>
     <entity name="CDCalibrationDate" representedClassName="CDCalibrationDate" syncable="YES">
@@ -36,7 +37,7 @@
         <attribute name="ssn" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="CDCalCheck" positionX="0" positionY="0" width="128" height="120"/>
+        <element name="CDCalCheck" positionX="0" positionY="0" width="128" height="135"/>
         <element name="CDCalibrationDate" positionX="0" positionY="0" width="128" height="75"/>
         <element name="CDJob" positionX="0" positionY="0" width="128" height="135"/>
         <element name="CDReading" positionX="0" positionY="0" width="128" height="165"/>

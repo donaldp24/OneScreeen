@@ -8,28 +8,31 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol OSServerManagerDelegate <NSObject>
-
-@optional
-- (void)didLogin:(BOOL)success;
-- (void)didRetrieveCalibrationDate:(NSString *)ssn success:(BOOL)success;
-- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success first:(BOOL)first;
-- (void)didStoreCalCheck:(NSString *)ssn success:(BOOL)success;
-
-@end
-
 @interface OSServerManager : NSObject
 
-@property (nonatomic, retain) id<OSServerManagerDelegate> delegate;
 @property (nonatomic) BOOL isLoggedIn;
 
 + (OSServerManager *)sharedInstance;
+- (BOOL)hasConnectivity;
 
-- (void)storeCalCheck:(NSDictionary *)calCheck;
-- (void)retrieveCalCheckForSensor:(NSString *)sensor first:(BOOL)first;
-- (void)retrieveCalibrationDateForSensor:(NSString *)sensor;
+- (void)storeCalCheck:(NSString *)ssn
+                   rh:(float)rh
+                 temp:(float)temp
+            salt_name:(NSString *)salt_name
+                 date:(NSDate *)date
+             complete:(void(^)(BOOL success))block;
 
-- (void)loginWithUserName:(NSString *)userName password:(NSString *)password;
+- (void)retrieveCalCheckForSensor:(NSString *)sensor
+                            first:(BOOL)first
+                         complete:(void(^)(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date))block;
+
+- (void)retrieveCalibrationDateForSensor:(NSString *)sensor
+                                complete:(void(^)(BOOL success, NSDate *date))block;
+
+- (BOOL)loginWithUserName:(NSString *)userName
+                 password:(NSString *)password
+                 complete:(void(^)(BOOL))block;
+
 - (void)logout;
 
 @end

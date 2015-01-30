@@ -20,6 +20,7 @@
 #import "OSCertificationManager.h"
 #import "OSModelManager.h"
 #import "OSAppContext.h"
+#import "OSSyncManager.h"
 
 const int scanDelay = 5;
 
@@ -50,6 +51,8 @@ const int scanDelay = 5;
 
 #define kTopConstantOfNewJobNormal  (30)
 #define kTopConstantOfNewJobEditing (15)
+
+#define EVENT_RETRIEVED_DATA_FAILED  @"retrieved data failed"
 
 static OSViewController *_sharedOSViewController = nil;
 
@@ -92,7 +95,7 @@ typedef enum {
 
 @end
 
-@interface OSViewController () <ScanManagerDelegate, OSServerManagerDelegate, UIGestureRecognizerDelegate, UITableViewDataSource, UITableViewDelegate, OSSaltsCellDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
+@interface OSViewController () <ScanManagerDelegate, UIGestureRecognizerDelegate, UITableViewDataSource, UITableViewDelegate, OSSaltsCellDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
 
 {
     NSTimeInterval prevTakenTime;
@@ -179,6 +182,7 @@ typedef enum {
 
 @property (retain, nonatomic) ScanManager *scanManager;
 @property (nonatomic, retain) OSServerManager *serverManager;
+@property (nonatomic, retain) OSSyncManager *syncManager;
 
 @property (nonatomic, retain) NSMutableDictionary *dicSensorData;
 @property (nonatomic, retain) NSString *currSensor;
@@ -210,9 +214,16 @@ typedef enum {
     //[self.scanManager startScan];
     
     self.serverManager = [OSServerManager sharedInstance];
-    self.serverManager.delegate = self;
-    [self.serverManager loginWithUserName:kGlobalUserName password:kGlobalUserPass];
+    [self.serverManager loginWithUserName:kGlobalUserName password:kGlobalUserPass complete:^(BOOL success) {
+        if (success)
+            [self showToastMessage:@"Logged in"];
+        else
+            [self showToastMessage:@"Login failed"];
+    }];
     
+    // sync manager
+    self.syncManager = [OSSyncManager sharedInstance];
+        
     // initialize fonts
     if ([[UIScreen mainScreen] bounds].size.height == 480) {
         [self.labelRh setFont:kFontBebasNeue(kRhFontSize - 10)];
@@ -299,6 +310,7 @@ typedef enum {
     //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedFirstData:) name:kFirstCalCheckChanged object:nil];
     //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedCalibrationDate:) name:kCalibrationDateChanged object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDataChanged:) name:kDataChanged object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onRetrievedDataFailed:) name:EVENT_RETRIEVED_DATA_FAILED object:nil];
     
     
     prevLoginTryTime = 0;
@@ -337,8 +349,6 @@ typedef enum {
     [super viewWillAppear:animated];
     
     timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(onTimer:) userInfo:nil repeats:YES];
-    
-    self.serverManager.delegate = self;
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardShowing:)
@@ -508,32 +518,9 @@ typedef enum {
         // sensor serial
         self.labelSensorSerial.text = sensorSerial;
         
-        BOOL isSensorChanged = NO;
-        if (self.currSensor == nil || self.currSensor.length == 0)
-            isSensorChanged = YES;
-        else if (![self.currSensor isEqual:sensorSerial])
-            isSensorChanged = YES;
+        [self _checkFirstCalCheck:sensorInfo];
         
-        self.currSensor = sensorSerial;
-        
-        // check first cal check data
-        if (sensorInfo.retrievedFirstCalCheck &&
-            sensorInfo.retrievedLastCalCheck &&
-            !sensorInfo.requestedStoringFirstCalCheck) {
-            
-            // check first cal check
-            CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:sensorSerial];
-            if (firstCalCheck == nil) {
-                // store dummy cal check
-                NSLog(@"Storing dummy data : %@", sensorInfo.firstSensorData);
-                [self storeCalCheck:sensorInfo.firstSensorData salt_name:[[OSSaltSolutionManager sharedInstance] defaultSolution].salt_name];
-            }
-            else {
-                sensorInfo.requestedStoringFirstCalCheck = YES;
-            }
-        }
-        
-        if (!isSensorChanged) {
+        if (self.currSensor != nil && [self.currSensor isEqualToString:sensorSerial]) {
             // same sensor
             
             // check retrieved first & last cal check data
@@ -548,7 +535,7 @@ typedef enum {
             }
         }
         else {
-            [self onSensorChanged:self.currSensor];
+            [self onSensorChanged:sensorSerial];
         }
         
         
@@ -573,6 +560,31 @@ typedef enum {
                 self.btnStore.enabled = NO;
         }
     });
+}
+
+- (void) _checkFirstCalCheck:(SensorInfo *)sensorInfo {
+    
+
+    
+    if (sensorInfo == nil)
+        return;
+    
+        NSLog(@"_checkFirstCalCheck :%@", sensorInfo.ssn);
+    
+    if (sensorInfo.retrievedFirstCalCheck == true &&
+        sensorInfo.retrievedLastCalCheck == true &&
+        sensorInfo.requestedStoringFirstCalCheck == false) {
+        
+        // check first cal check
+        CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:sensorInfo.ssn];
+        if (firstCalCheck == nil) {
+            
+            NSLog(@"Storing dummy first cal check : %@", firstCalCheck.ssn);
+            
+            // store dummy cal check
+            [self storeCalCheck:sensorInfo.firstSensorData salt_name:[[OSSaltSolutionManager sharedInstance] defaultSolution].salt_name autosaving:true];
+        }
+    }
 }
 
 - (NSString *)resultForCalcResult:(CalCheckResult)result
@@ -726,7 +738,7 @@ typedef enum {
     [self showCalibrationAndCalDue];
     
     // show last data locally
-    [self showLastCalData:self.currSensor];
+    [self showLastCalData:newSensorSerial];
     
     // check certification
     [self setLabelWarningCalibrationChecking:NO];
@@ -734,10 +746,19 @@ typedef enum {
     // fetching information from server
     [self retrieveDataForSensor:newSensorSerial];
     
+    
     // fetching calibration date
-    CDCalibrationDate *cdCalibrationData = [[OSModelManager sharedInstance] getCalibrationDateForSensor:newSensorSerial];
-    if (!cdCalibrationData)
-        [self.serverManager retrieveCalibrationDateForSensor:newSensorSerial];
+    [self retrieveCalibrationData:newSensorSerial];
+    
+    // synchronizing
+    NSMutableArray *arrayList = [[OSModelManager sharedInstance] retrieveCalCheckForSensor:newSensorSerial];
+    for (int i = 0; i < arrayList.count; i++) {
+        CDCalCheck *calCheck = [arrayList objectAtIndex:i];
+        if (![calCheck.stored_on_server boolValue]) {
+            if (![calCheck.salt_name isEqualToString:[[OSSaltSolutionManager sharedInstance] defaultSolution].salt_name])
+                [[OSSyncManager sharedInstance] addCalcheckToSyncList:calCheck];
+        }
+    }
 }
 
 - (void)retrieveCalibrationData:(NSString *)newSensorSerial {
@@ -754,28 +775,20 @@ typedef enum {
     
     sensorInfo.requestedCalibrationDate = YES;
     
-    [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:newSensorSerial];
-    /*
-    OSServerManager.sharedInstance().retrieveCalibration(newSensorSerial, new Callback<OSServerManager.ResCalibration>() {
-        @Override
-        public void success(OSServerManager.ResCalibration resCalibration, Response response) {
-            EventBus.getDefault().post(new OSEvent(OSConstants.kDataChanged, newSensorSerial));
+    [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:newSensorSerial complete:^(BOOL success, NSDate *date) {
+        if (success) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:newSensorSerial];
             
-            sensorInfo._retrievedCalibrationDate = true;
+            sensorInfo.retrievedCalibrationDate = true;
             
-            showToastMessage("Retrieved calibration date");
+            // [self showToastMessage:@"Retrieved calibration date"];
         }
-        
-        @Override
-        public void failure(RetrofitError retrofitError) {
+        else {
+            sensorInfo.retrievedCalibrationDate = true;
             
-            sensorInfo._retrievedCalibrationDate = true;
-            
-            showToastMessage("Retrieve calibration date failed");
+            // [self showToastMessage:@"Retrieve calibration date failed"];
         }
-    });
-    //}
-     */
+    }];
 }
 
 // check calibration due and will represent it on UIs
@@ -841,9 +854,11 @@ typedef enum {
 
 - (void)retrieveDataForSensor:(NSString *)sensorSerial
 {
+    /*
     // get data after logged in
     if (![OSServerManager sharedInstance].isLoggedIn)
         return;
+     */
     
     if (self.dicSensorData == nil)
         return;
@@ -855,7 +870,21 @@ typedef enum {
     CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:sensorSerial];
     if (!firstCalCheck || !sensorInfo.requestedFirstCalCheck) {
         sensorInfo.requestedFirstCalCheck = YES;
-        [self.serverManager retrieveCalCheckForSensor:sensorSerial first:YES];
+        NSLog(@"Retrieving first cal check : %@", sensorSerial);
+        [self.serverManager retrieveCalCheckForSensor:sensorSerial first:YES complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date) {
+            if (success) {
+                NSLog(@"success - Retrieved first cal check : %@", sensorSerial);
+                sensorInfo.retrievedFirstCalCheck = true;
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:sensorSerial];
+            }
+            else {
+                NSLog(@"failed - Retrieved first cal check : %@", sensorSerial);
+                sensorInfo.retrievedFirstCalCheck = true;
+                
+                [[NSNotificationCenter defaultCenter] postNotificationName:EVENT_RETRIEVED_DATA_FAILED object:sensorSerial];
+            }
+        }];
     }
     
     CDCalCheck *latestCalCheck = [[OSModelManager sharedInstance] getLatestCalCheckForSensor:sensorSerial];
@@ -867,7 +896,20 @@ typedef enum {
     
     if (!latestCalCheck || !sensorInfo.requestedLastCalCheck) {
         sensorInfo.requestedLastCalCheck = YES;
-        [self.serverManager retrieveCalCheckForSensor:sensorSerial first:NO];
+        NSLog(@"Retrieving last cal check : %@", sensorSerial);
+        [self.serverManager retrieveCalCheckForSensor:sensorSerial first:NO complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date) {
+            
+            if (success) {
+                NSLog(@"success - Retrieved last cal check : %@", sensorSerial);
+                sensorInfo.retrievedLastCalCheck = true;
+                [[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:ssn];
+            }
+            else {
+                NSLog(@"failed - Retrieved last cal check : %@", sensorSerial);
+                sensorInfo.retrievedLastCalCheck = true;
+                [[NSNotificationCenter defaultCenter] postNotificationName:EVENT_RETRIEVED_DATA_FAILED object:sensorSerial];
+            }
+        }];
     }
 }
 
@@ -913,6 +955,15 @@ typedef enum {
         // check calibration due
         [self setLabelWarningCalibrationChecking:NO];
     });
+}
+
+- (void)onRetrievedDataFailed:(NSNotification *)notification
+{
+    NSString *ssn = (NSString *)notification.object;
+    if (self.dicSensorData != nil) {
+        SensorInfo *sensorInfo = [self.dicSensorData objectForKey:ssn];
+        [self _checkFirstCalCheck:sensorInfo];
+    }
 }
 
 - (void)showCalibrationAndCalDue
@@ -1084,45 +1135,27 @@ typedef enum {
         return;
     
     NSDictionary *sensorData = sensorInfo.lastSensorData;
-    /*
-    if (sensorData == nil)
-        return;
     
-    //CGFloat progress = [[sensorData objectForKey:kSensorDataBatteryKey] floatValue];
-    float rh = [[sensorData objectForKey:kSensorDataRHKey] floatValue];
-    float temp = [[sensorData objectForKey:kSensorDataTemperatureKey] floatValue];
-   
-    NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
-    
-    [data setObject:self.currSensor forKey:kDataSensorSerialKey];
-    [data setObject:@((int)((rh + 0.05) * 10)) forKey:kDataRhKey];
-    [data setObject:@((int)((temp + 0.05) * 10)) forKey:kDataTempKey];
-    [data setObject:saltSolution.salt_name forKey:kDataSaltSolutionKey];
-    [data setObject:[[NSDate date] toStringWithFormat:kUploadDataDateFormat] forKey:kDataDateKey];
-    
-    [self.serverManager storeCalCheck:data];
-     */
-    
-    [self storeCalCheck:sensorData salt_name:saltSolution.salt_name];
+    [self storeCalCheck:sensorData salt_name:saltSolution.salt_name autosaving:false];
 }
 
-- (void)storeCalCheck:(NSDictionary *)sensorData salt_name:(NSString *)salt_name
+- (void)storeCalCheck:(NSDictionary *)sensorData salt_name:(NSString *)salt_name autosaving:(BOOL)autosaving
 {
     if (sensorData == nil) {
         return;
     }
     
-    if (![OSServerManager sharedInstance].isLoggedIn)
-        return;
+    //if (![OSServerManager sharedInstance].isLoggedIn)
+    //    return;
     
     
     //CGFloat progress = [[sensorData objectForKey:kSensorDataBatteryKey] floatValue];
     float rh = [[sensorData objectForKey:kSensorDataRHKey] floatValue];
     float temp = [[sensorData objectForKey:kSensorDataTemperatureKey] floatValue];
     
-    NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
-    
     NSString *ssn = [sensorData objectForKey:kSensorDataSerialNumberKey];
+    
+    NSDate *date = [[NSDate alloc] init];
     
     if (!self.dicSensorData)
         return;
@@ -1133,13 +1166,55 @@ typedef enum {
     
     sensorInfo.requestedStoringFirstCalCheck = YES;
     
-    [data setObject:ssn forKey:kDataSensorSerialKey];
-    [data setObject:@((int)((rh + 0.05) * 10)) forKey:kDataRhKey];
-    [data setObject:@((int)((temp + 0.05) * 10)) forKey:kDataTempKey];
-    [data setObject:salt_name forKey:kDataSaltSolutionKey];
-    [data setObject:[[NSDate date] toStringWithFormat:kUploadDataDateFormat] forKey:kDataDateKey];
-    
-    [self.serverManager storeCalCheck:data];
+    if (!autosaving) {
+        [self.serverManager storeCalCheck:ssn rh:rh temp:temp salt_name:salt_name date:date complete:^(BOOL success) {
+            if (success) {
+                [[OSModelManager sharedInstance] setCalCheckForSensor:ssn
+                                                                 date:date
+                                                                   rh:rh
+                                                                 temp:temp
+                                                            salt_name:salt_name
+                                                                first:false
+                                                     stored_on_server:YES];
+                
+                // notification calcheck changed
+                [[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:ssn];
+                
+                [self showToastMessage:@"Storing on server successfully"];
+            }
+            else {
+                [[OSModelManager sharedInstance] setCalCheckForSensor:ssn
+                                                                 date:date
+                                                                   rh:rh
+                                                                 temp:temp
+                                                            salt_name:salt_name
+                                                                first:false
+                                                     stored_on_server:NO];
+                // notification calcheck changed
+                [[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:ssn];
+                
+                // retrieve cal check & add it to synclist
+                CDCalCheck *calCheck = [[OSModelManager sharedInstance] getCalCheckForSensor:ssn date:date];
+                [self showToastMessage:@"Stored locally"];
+                if (calCheck != nil) {
+                    [[OSSyncManager sharedInstance] addCalcheckToSyncList:calCheck];
+                }
+            }
+        }];
+    }
+    else {
+        // store it locally
+        [[OSModelManager sharedInstance] setCalCheckForSensor:ssn
+                                                         date:date
+                                                           rh:rh
+                                                         temp:temp
+                                                    salt_name:salt_name
+                                                        first:false
+                                             stored_on_server:YES];
+        
+        // notification calcheck changed
+        [[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:ssn];
+    }
 }
 
 - (void)showMessageForRecertification
@@ -1293,70 +1368,6 @@ CGFloat firstX = 0, firstY = 0;
         [self performSegueWithIdentifier:@"gotoJobs" sender:self];
 }
 
-#pragma mark - Server delegate
-- (void)didLogin:(BOOL)success
-{
-    if (success)
-    {
-        [self showToastMessage:@"Logged in"];
-    }
-    else
-    {
-        [self showToastMessage:@"Login failed"];
-    }
-}
-
-- (void)didRetrieveCalibrationDate:(NSString *)ssn success:(BOOL)success
-{
-    if (self.dicSensorData) {
-        SensorInfo *sensorInfo = [self.dicSensorData objectForKey:ssn];
-        if (sensorInfo)
-            sensorInfo.retrievedCalibrationDate = true;
-    }
-    
-    if (success)
-    {
-        [self showToastMessage:@"Retrieved calibration date"];
-    }
-    else
-    {
-        [self showToastMessage:@"Retrieve calibration date failed"];
-    }
-}
-
-- (void)didRetrieveCalCheck:(NSString *)ssn success:(BOOL)success first:(BOOL)first
-{
-    if (self.dicSensorData) {
-        SensorInfo *sensorInfo = [self.dicSensorData objectForKey:ssn];
-        if (sensorInfo) {
-            if (first)
-                sensorInfo.retrievedFirstCalCheck = YES;
-            else
-                sensorInfo.retrievedLastCalCheck = YES;
-        }
-    }
-    
-    if (success)
-    {
-        [self showToastMessage:@"Retrieved cal check"];
-    }
-    else
-    {
-        [self showToastMessage:@"Retrieve cal check failed"];
-    }
-}
-
-- (void)didStoreCalCheck:(NSString *)ssn success:(BOOL)success
-{
-    if (success)
-    {
-        [self showToastMessage:@"Stored successfully"];
-    }
-    else
-    {
-        [self showToastMessage:@"Store failed"];
-    }
-}
 
 - (void)showToastMessage:(NSString *)msg
 {
@@ -1366,14 +1377,18 @@ CGFloat firstX = 0, firstY = 0;
 #pragma mark - timer proc
 - (void)onTimer:(id)sender
 {
+    /*
     NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
     if (now - prevLoginTryTime > 10)
     {
         dispatch_async(dispatch_get_main_queue(), ^() {
             prevLoginTryTime = now;
-            [self.serverManager loginWithUserName:kGlobalUserName password:kGlobalUserPass];
+            [self.serverManager loginWithUserName:kGlobalUserName password:kGlobalUserPass complete:^(BOOL success) {
+                //
+            }];
         });
     }
+    */
     
 #if USE_JOBEDITOR_IN_MAIN_SCREEN
     if (![OSAppContext sharedInstance].isJobStarted)

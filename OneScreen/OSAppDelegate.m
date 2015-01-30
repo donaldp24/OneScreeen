@@ -53,6 +53,7 @@
     // orientation is portrate first
     self.allowRotateToLandscape = NO;
     
+   
     return YES;
 }
 							
@@ -78,7 +79,9 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    [[OSServerManager sharedInstance] loginWithUserName:kGlobalUserName password:kGlobalUserPass];
+    [[OSServerManager sharedInstance] loginWithUserName:kGlobalUserName password:kGlobalUserPass complete:^(BOOL success) {
+        //
+    }];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

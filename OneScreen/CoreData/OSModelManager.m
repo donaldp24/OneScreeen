@@ -236,7 +236,6 @@
     if (ssn == nil || ssn.length == 0)
         return;
     
-    CDCalCheck *ret = nil;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription
                                    entityForName:@"CDCalCheck"
@@ -362,7 +361,7 @@
     {
         for (CDCalCheck *calCheck in fetchedObjects) {
             //if ([calCheck.date compareWithoutHour:date])
-            if ([calCheck.date compare:date])
+            if ([calCheck.date compare:date] == NSOrderedSame)
             {
                 ret = calCheck;
                 break;
@@ -429,7 +428,13 @@
     [self saveContext];
 }
 
-- (void)setCalCheckForSensor:(NSString *)ssn date:(NSDate *)date rh:(CGFloat)rh temp:(CGFloat)temp salt_name:(NSString *)salt_name first:(BOOL)first
+- (void)setCalCheckForSensor:(NSString *)ssn
+                        date:(NSDate *)date
+                          rh:(CGFloat)rh
+                        temp:(CGFloat)temp
+                   salt_name:(NSString *)salt_name
+                       first:(BOOL)first
+            stored_on_server:(BOOL)stored_on_server
 {
     if (ssn == nil || ssn.length == 0)
         return;
@@ -438,6 +443,7 @@
 
     if (!first)
     {
+        /*
         // search later calcheck
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         NSEntityDescription *entity = [NSEntityDescription
@@ -475,10 +481,13 @@
                 [self deleteObject:calCheck];
             }
         }
+         */
         
         NSLog(@"storing data for serial : %@, first = NO", ssn);
         // search equal calcheck
-        CDCalCheck *existCalCheck = [NSEntityDescription
+        CDCalCheck *existCalCheck = [self getCalCheckForSensor:ssn date:date];
+        if (!existCalCheck)
+            existCalCheck = [NSEntityDescription
                              insertNewObjectForEntityForName:@"CDCalCheck"
                              inManagedObjectContext:self.managedObjectContext];
         existCalCheck.ssn = ssn;
@@ -486,6 +495,7 @@
         existCalCheck.rh = @(rh);
         existCalCheck.temp = @(temp);
         existCalCheck.salt_name = salt_name;
+        existCalCheck.stored_on_server = @(stored_on_server);
 
         [self saveContext];
     }
@@ -493,6 +503,7 @@
     {
         NSLog(@"storing data for serial : %@, first = YES", ssn);
         
+        /*
         // search prior calcheck
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         NSEntityDescription *entity = [NSEntityDescription
@@ -529,6 +540,7 @@
                 [self deleteObject:calCheck];
             }
         }
+         */
         
         // search equal calcheck
         CDCalCheck *existCalCheck = [self getCalCheckForSensor:ssn date:date];
@@ -541,11 +553,20 @@
         existCalCheck.rh = @(rh);
         existCalCheck.temp = @(temp);
         existCalCheck.salt_name = salt_name;
+        existCalCheck.stored_on_server = @(stored_on_server);
         
         [self saveContext];
 
     }
 }
+
+- (void)setStoredOnServerForCalCheck:(CDCalCheck *)calCheck
+                    stored_on_server:(BOOL)stored_on_server
+{
+    calCheck.stored_on_server = @(stored_on_server);
+    [self saveContext];
+}
+
 
 - (void)setSensor:(NSString *)ssn
 {
