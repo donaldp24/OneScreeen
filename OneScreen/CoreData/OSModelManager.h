@@ -13,6 +13,7 @@
 #import "CDSensor.h"
 #import "CDJob.h"
 #import "CDReading.h"
+#import "SensorData.h"
 
 @interface OSModelManager : NSObject
 
@@ -62,6 +63,8 @@
 - (void)setStoredOnServerForCalCheck:(CDCalCheck *)calCheck
                     stored_on_server:(BOOL)stored_on_server;
 
+- (void)setStoredOnServerForSensor:(NSString *)ssn date:(NSDate *)date stored_on_server:(BOOL)stored_on_server;
+
 
 #pragma mark - calibration date
 - (CDCalibrationDate *)getCalibrationDateForSensor:(NSString *)ssn;
@@ -80,6 +83,6 @@
 // reading
 - (CDReading *)getLastReadingForSensor:(NSString *)ssn ofJob:(NSString *)jobUuid;
 - (NSMutableArray *)getSensorSerialsForJob:(NSString *)jobUid;
-- (void)saveReadingForJob:(NSString *)jobUid sensorData:(NSDictionary *)dicInfo;
+- (void)saveReadingForJob:(NSString *)jobUid sensorData:(SensorData *)sensorData;
 
 @end

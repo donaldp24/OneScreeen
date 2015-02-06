@@ -28,6 +28,9 @@
 //#define kLastCalCheckChanged                        @"calcheck data changed"
 //#define kFirstCalCheckChanged                      @"first calcheck data changed"
 #define kDataChanged                      @"data for cal cert due changed"
+#define kLoginSuccess                     @"login success"
+#define kReadingTaken                     @"reading taken"
+#define kSaltChanged                      @"salt changed notification"
 
 // colors for cal check due
 #define kDefaultDueDateColor        [UIColor colorWithRed:0 green:255 blue:0 alpha:0.8]

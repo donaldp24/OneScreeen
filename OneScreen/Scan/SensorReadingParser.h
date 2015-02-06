@@ -7,9 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SensorData.h"
 
 @interface SensorReadingParser : NSObject
 
-- (NSDictionary*)parseData:(NSData*)manufactureData withOffset:(NSInteger)offset;
+- (SensorData *)parseData:(NSData*)manufactureData withOffset:(NSInteger)offset;
 
 @end

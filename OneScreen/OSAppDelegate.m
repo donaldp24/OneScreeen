@@ -21,23 +21,17 @@
     [Crashlytics startWithAPIKey:@"02eaa877844435ac8f0e7707e5087c6a937afdd5"];
     
     NSString *storyboardName = @"Main_iPhone";
-    if ([[UIScreen mainScreen] bounds].size.height == 480 || [[UIScreen mainScreen] bounds].size.width == 480) {
+    if ([[UIScreen mainScreen] bounds].size.height == 480 ||
+        [[UIScreen mainScreen] bounds].size.width == 480) {
         storyboardName = @"Main_iPhone3.5";
     }
     
-    //[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait];
-#if 1
+
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:storyboardName bundle:nil];
     UITabBarController *rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"rootNav"];
     self.window.rootViewController = rootViewController;
     [self.window makeKeyAndVisible];
-#else
-    // test Reset Password view
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:[KNStoryboardManager getMainStoryboardName] bundle:nil];
-    UIViewController *rootViewController = [storyboard instantiateViewControllerWithIdentifier:@"passwordResetNavController"];
-    self.window.rootViewController = rootViewController;
-    [self.window makeKeyAndVisible];
-#endif
+
 
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     
@@ -80,7 +74,8 @@
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [[OSServerManager sharedInstance] loginWithUserName:kGlobalUserName password:kGlobalUserPass complete:^(BOOL success) {
-        //
+        if (success)
+            [[NSNotificationCenter defaultCenter] postNotificationName:kLoginSuccess object:nil];
     }];
 }
 

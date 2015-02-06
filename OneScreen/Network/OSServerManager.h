@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ServerGateway.h"
 
 @interface OSServerManager : NSObject
 
@@ -20,14 +21,14 @@
                  temp:(float)temp
             salt_name:(NSString *)salt_name
                  date:(NSDate *)date
-             complete:(void(^)(BOOL success))block;
+             complete:(void(^)(BOOL success, ErrorType errorType))block;
 
 - (void)retrieveCalCheckForSensor:(NSString *)sensor
                             first:(BOOL)first
-                         complete:(void(^)(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date))block;
+                         complete:(void(^)(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date, ErrorType errorType))block;
 
 - (void)retrieveCalibrationDateForSensor:(NSString *)sensor
-                                complete:(void(^)(BOOL success, NSDate *date))block;
+                                complete:(void(^)(BOOL success, NSDate *date, ErrorType errorType))block;
 
 - (BOOL)loginWithUserName:(NSString *)userName
                  password:(NSString *)password

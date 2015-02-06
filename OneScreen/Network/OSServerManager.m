@@ -134,7 +134,7 @@ static NSString * const kServiceNameForKeychain = @"DMIOS";
                  temp:(float)temp
             salt_name:(NSString *)salt_name
                  date:(NSDate *)date
-             complete:(void(^)(BOOL success))block
+             complete:(void(^)(BOOL success, ErrorType errorType))block
 {
     int int_rh = (int)(rh * 10);
     int int_temp = (int)(temp *10);
@@ -151,73 +151,91 @@ static NSString * const kServiceNameForKeychain = @"DMIOS";
 
 - (void)retrieveCalCheckForSensor:(NSString *)sensor
                             first:(BOOL)first
-                         complete:(void (^)(BOOL, NSString *, float, float, NSString *, NSDate *))block
+                         complete:(void (^)(BOOL, NSString *, float, float, NSString *, NSDate *, ErrorType))block
 {
     [self.serverGateway retrieveCalCheck:sensor
                                    first:first
                              accessToken:[self accessToken]
-                                complete:^(NSDictionary *data) {
-                                    if (data == nil) {
-                                        block(NO, sensor, 0.f, 0.f, nil, nil);
+                                complete:^(NSDictionary *data, ErrorType errorType) {
+                                    if (data == nil ||
+                                        ![data isKindOfClass:[NSDictionary class]]) {
+                                        block(NO, sensor, 0.f, 0.f, nil, nil, errorType);
                                     }
                                     else {
                                         NSNumber *SUCCESS = [data objectForKey:@"success"];
-                                        bool success = [SUCCESS boolValue];
-                                        if (success) {
-                                            NSString *ssn = [data objectForKey:@"ssn"];
-                                            NSNumber *RH = [data objectForKey:@"rh"];
-                                            NSNumber *TEMP = [data objectForKey:@"temp"];
-                                            NSString *salt_name = [data objectForKey:@"salt_name"];
-                                            NSString *strDate = [data objectForKey:@"date"];
-                                            
-                                            
-                                            
-                                            float rh = [RH intValue] / 10.f;
-                                            float temp = [TEMP intValue] / 10.f;
-                                            NSDate *date = [NSDate dateWithString:strDate withFormat:kUploadDataDateFormat];
-                                            
-                                            // store cal check
-                                            [self.modelManager setCalCheckForSensor:ssn date:date rh:rh temp:temp salt_name:salt_name first:first stored_on_server:YES];
-                                            
-                                            // notification calcheck changed
-                                            // [[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:ssn];
-                                           
-                                            block(YES, ssn, rh, temp, salt_name, date);
+                                        if (SUCCESS == nil) {
+                                            block(NO, sensor, 0.f, 0.f, nil, nil, errorType);
                                         }
                                         else {
-                                            block(NO, sensor, 0.f, 0.f, nil, nil);
+                                            bool success = [SUCCESS boolValue];
+                                            if (success) {
+                                                NSString *ssn = [data objectForKey:@"ssn"];
+                                                NSNumber *RH = [data objectForKey:@"rh"];
+                                                NSNumber *TEMP = [data objectForKey:@"temp"];
+                                                NSString *salt_name = [data objectForKey:@"salt_name"];
+                                                NSString *strDate = [data objectForKey:@"date"];
+                                                
+                                                
+                                                
+                                                float rh = [RH intValue] / 10.f;
+                                                float temp = [TEMP intValue] / 10.f;
+                                                NSDate *date = [NSDate dateWithString:strDate withFormat:kUploadDataDateFormat];
+                                                
+                                                // store cal check
+                                                //[self.modelManager setCalCheckForSensor:ssn date:date rh:rh temp:temp salt_name:salt_name first:first stored_on_server:YES];
+                                                
+                                                // notification calcheck changed
+                                                // [[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:ssn];
+                                               
+                                                block(YES, ssn, rh, temp, salt_name, date, errorType);
+                                            }
+                                        
+                                            else {
+                                                block(NO, sensor, 0.f, 0.f, nil, nil, errorType);
+                                            }
                                         }
                                     }
                                 }];
 }
 
 - (void)retrieveCalibrationDateForSensor:(NSString *)sensor
-                                complete:(void (^)(BOOL, NSDate *))block
+                                complete:(void (^)(BOOL, NSDate *, ErrorType))block
 {
     [self.serverGateway lookupSSN:sensor
                       accessToken:self.accessToken
-                         complete:^(NSDictionary *dic, NSString *ssn) {
-        if (dic == nil) {
-            block(NO, nil);
+                         complete:^(NSDictionary *dic, NSString *ssn, ErrorType errorType) {
+        if (dic == nil ||
+            ![dic isKindOfClass:[NSDictionary class]])
+        {
+            block(NO, nil, errorType);
         }
-        else {
+        else
+        {
             id expirationDate = [dic objectForKey:@"date"];
-            
-            if (expirationDate && !([expirationDate isKindOfClass:[NSNull class]])) {
-                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                [formatter setDateFormat:@"YYYY-MM-dd"];
-                NSDate * dte = [formatter dateFromString:expirationDate];
-                
-                // store calibration date
-                [self.modelManager setCalibrationDate:dte sensorSerial:ssn];
-                
-                // notification calibration date changted
-                //[[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:ssn];
-                
-                block(YES, dte);
+            if (expirationDate == nil)
+            {
+                block(NO, nil, errorType);
             }
-            else {
-                block(NO, nil);
+            else
+            {
+                if (expirationDate && !([expirationDate isKindOfClass:[NSNull class]]))
+                {
+                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                    [formatter setDateFormat:@"YYYY-MM-dd"];
+                    NSDate * dte = [formatter dateFromString:expirationDate];
+                    
+                    // store calibration date
+                    [self.modelManager setCalibrationDate:dte sensorSerial:ssn];
+                    
+                    // notification calibration date changted
+                    //[[NSNotificationCenter defaultCenter] postNotificationName:kDataChanged object:ssn];
+                    
+                    block(YES, dte, errorType);
+                }
+                else
+                {
+                    block(NO, nil, errorType);
+                }
             }
         }
     }];

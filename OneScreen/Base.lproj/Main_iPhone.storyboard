@@ -221,7 +221,7 @@
                                         <state key="disabled">
                                             <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
-                                        <state key="highlighted" title="Store Cal Check" image="btn_highlight"/>
+                                        <state key="highlighted" backgroundImage="btn_highlight"/>
                                         <connections>
                                             <action selector="onStoreCalCheck:" destination="B6Z-13-UD0" eventType="touchUpInside" id="lGO-QD-ebc"/>
                                         </connections>
@@ -1321,7 +1321,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3US-pC-AG1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1240" y="-187"/>
+            <point key="canvasLocation" x="1435" y="-311"/>
         </scene>
         <!--Job Detail View Controller-->
         <scene sceneID="lTa-jf-LOO">

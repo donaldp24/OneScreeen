@@ -140,7 +140,7 @@ static const int kPackageID = 0xDEB93390;
 
     NSMutableData* dataToParse = nil;
     NSInteger offset;
-    NSDictionary *sensorData;
+    SensorData *sensorData;
 
     if (manufacturedData) {
         if(![[manufacturedData subdataWithRange:NSMakeRange(0, 4)] isEqualToData:

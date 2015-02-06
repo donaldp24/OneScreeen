@@ -7,17 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-
-//extern NSString * const kSensorDataBatteryKey;
-//extern NSString * const kSensorDataRHKey;
-//extern NSString * const kSensorDataRHAmbientKey;
-//extern NSString * const kSensorDataTemperatureKey;
-//extern NSString * const kSensorDataTemperatureAmbientKey;
-//extern NSString * const kSensorDataReadingTimestampKey;
-//extern NSString * const kSensorDataSerialNumberKey;
+#import "SensorData.h"
 
 @interface EmulatorReadingParser : NSObject
 
-- (NSDictionary*)parseData:(NSData*)manufactureData withOffset:(NSInteger)offset;
+- (SensorData *)parseData:(NSData*)manufactureData withOffset:(NSInteger)offset;
 
 @end

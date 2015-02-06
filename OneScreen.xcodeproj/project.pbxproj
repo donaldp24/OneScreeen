@@ -71,6 +71,9 @@
 		D02CB33119F01061003A23B8 /* ThumbsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30B19F01061003A23B8 /* ThumbsViewController.m */; };
 		D02CB33219F01061003A23B8 /* UIXToolbarView.m in Sources */ = {isa = PBXBuildFile; fileRef = D02CB30D19F01061003A23B8 /* UIXToolbarView.m */; };
 		D0375C4419F4A9D600F64359 /* CDReading.m in Sources */ = {isa = PBXBuildFile; fileRef = D0375C4319F4A9D600F64359 /* CDReading.m */; };
+		D03BFCC41A841415007B6A6C /* OSCalCheckManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D03BFCC31A841415007B6A6C /* OSCalCheckManager.m */; };
+		D03BFCC71A842174007B6A6C /* SensorData.m in Sources */ = {isa = PBXBuildFile; fileRef = D03BFCC61A842174007B6A6C /* SensorData.m */; };
+		D03BFCCA1A8423F9007B6A6C /* SensorInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = D03BFCC91A8423F9007B6A6C /* SensorInfo.m */; };
 		D03F5B391A784A1000D88A94 /* OSSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D03F5B381A784A1000D88A94 /* OSSyncManager.m */; };
 		D03F5B3D1A784E7300D88A94 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = D03F5B3C1A784E7300D88A94 /* Reachability.m */; };
 		D05CCF8B19ECCAFE00747064 /* OSRotateNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = D05CCF8A19ECCAFE00747064 /* OSRotateNavigationController.m */; };
@@ -244,6 +247,12 @@
 		D02CB30D19F01061003A23B8 /* UIXToolbarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIXToolbarView.m; sourceTree = "<group>"; };
 		D0375C4219F4A9D600F64359 /* CDReading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDReading.h; sourceTree = "<group>"; };
 		D0375C4319F4A9D600F64359 /* CDReading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDReading.m; sourceTree = "<group>"; };
+		D03BFCC21A841415007B6A6C /* OSCalCheckManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSCalCheckManager.h; sourceTree = "<group>"; };
+		D03BFCC31A841415007B6A6C /* OSCalCheckManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSCalCheckManager.m; sourceTree = "<group>"; };
+		D03BFCC51A842174007B6A6C /* SensorData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorData.h; sourceTree = "<group>"; };
+		D03BFCC61A842174007B6A6C /* SensorData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorData.m; sourceTree = "<group>"; };
+		D03BFCC81A8423F9007B6A6C /* SensorInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorInfo.h; sourceTree = "<group>"; };
+		D03BFCC91A8423F9007B6A6C /* SensorInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorInfo.m; sourceTree = "<group>"; };
 		D03F5B371A784A1000D88A94 /* OSSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSSyncManager.h; sourceTree = "<group>"; };
 		D03F5B381A784A1000D88A94 /* OSSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OSSyncManager.m; sourceTree = "<group>"; };
 		D03F5B3B1A784E7300D88A94 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
@@ -541,6 +550,17 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
+		D03BFCC11A8413F6007B6A6C /* CalCheck */ = {
+			isa = PBXGroup;
+			children = (
+				D03BFCC21A841415007B6A6C /* OSCalCheckManager.h */,
+				D03BFCC31A841415007B6A6C /* OSCalCheckManager.m */,
+				D03BFCC81A8423F9007B6A6C /* SensorInfo.h */,
+				D03BFCC91A8423F9007B6A6C /* SensorInfo.m */,
+			);
+			path = CalCheck;
+			sourceTree = "<group>";
+		};
 		D03F5B361A7849FB00D88A94 /* Sync */ = {
 			isa = PBXGroup;
 			children = (
@@ -615,6 +635,7 @@
 				D0007C0E1A0252FF00235E69 /* iTunesArtwork */,
 				D0007C0C1A02525D00235E69 /* iTunesArtwork@2x */,
 				D00C2F3B19F11BC40041EB09 /* AppContext */,
+				D03BFCC11A8413F6007B6A6C /* CalCheck */,
 				D0BEAB5A19D3BC1800514B19 /* Categories */,
 				D005B7A319E5E8670073336A /* Certification */,
 				D0F984F919D8A89D003B2E74 /* CoreData */,
@@ -733,6 +754,8 @@
 				D0BEAB4E19D3BB4400514B19 /* ScanManagerDelegate.h */,
 				D0BEAB4F19D3BB4400514B19 /* SensorReadingParser.h */,
 				D0BEAB5019D3BB4400514B19 /* SensorReadingParser.m */,
+				D03BFCC51A842174007B6A6C /* SensorData.h */,
+				D03BFCC61A842174007B6A6C /* SensorData.m */,
 			);
 			path = Scan;
 			sourceTree = "<group>";
@@ -963,6 +986,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D02CB32819F01061003A23B8 /* ReaderThumbCache.m in Sources */,
+				D03BFCCA1A8423F9007B6A6C /* SensorInfo.m in Sources */,
 				D02CB33019F01061003A23B8 /* ThumbsMainToolbar.m in Sources */,
 				D022423619DB307A002B0E6D /* OSServerManager.m in Sources */,
 				D005B7B719E5EB5E0073336A /* OSExpirationManager.m in Sources */,
@@ -988,6 +1012,7 @@
 				D01756C119F2EA240044F573 /* OSJobDetailViewController.m in Sources */,
 				D022423A19DB373E002B0E6D /* iToast.m in Sources */,
 				D02CB33119F01061003A23B8 /* ThumbsViewController.m in Sources */,
+				D03BFCC71A842174007B6A6C /* SensorData.m in Sources */,
 				D02CB32619F01061003A23B8 /* ReaderMainPagebar.m in Sources */,
 				D0BEAB4719D3BA7500514B19 /* NSString+QueryString.m in Sources */,
 				D02CB32519F01061003A23B8 /* ReaderDocument.m in Sources */,
@@ -999,6 +1024,7 @@
 				D0BEAB4019D3BA7500514B19 /* SBJsonBase.m in Sources */,
 				D02CB32E19F01061003A23B8 /* ReaderThumbView.m in Sources */,
 				D01756B819F2DCC00044F573 /* OSJobCell.m in Sources */,
+				D03BFCC41A841415007B6A6C /* OSCalCheckManager.m in Sources */,
 				D005B7AD19E5E8670073336A /* OSViewController.m in Sources */,
 				D0BDE8241A0054D10033A553 /* CDJob.m in Sources */,
 				D01756BE19F2E17C0044F573 /* OSJobsTableViewController.m in Sources */,

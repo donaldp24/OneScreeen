@@ -26,7 +26,7 @@ static int const kSerialNumberValueOffset = 12;
 
 @implementation EmulatorReadingParser
 
-- (NSDictionary*)parseData:(NSData *)manufactureData withOffset:(NSInteger)offset {
+- (SensorData *)parseData:(NSData *)manufactureData withOffset:(NSInteger)offset {
 
     int batteryLevelValueOffset = kBatteryLevelValueOffset + (int)offset;
     int rhValueOffset = kRHValueOffset + (int)offset;
@@ -34,7 +34,7 @@ static int const kSerialNumberValueOffset = 12;
     int tempValueOffset = kTempValueOffset + (int)offset;
     int tempAmbientValueOffset = kTempAmbientValueOffset + (int)offset;
 
-    NSMutableDictionary *sensorData = [NSMutableDictionary dictionary];
+    SensorData *sensorData = [[SensorData alloc] init];
     
     NSString* serialNumberString = [self serialNumberFromData:manufactureData withOffset:offset];
     //if (serialNumberString == nil || serialNumberString.length != 12)
@@ -47,21 +47,17 @@ static int const kSerialNumberValueOffset = 12;
     
     float sensorTemp = [self temperatureFromBytes:[[manufactureData subdataWithRange:NSMakeRange(tempValueOffset, 2)] bytes]];
     float ambientSensorTemp = [self temperatureFromBytes:[[manufactureData subdataWithRange:NSMakeRange(tempAmbientValueOffset, 2)] bytes]];
- 
-    NSDateFormatter * dFormatter = [[NSDateFormatter alloc] init];
-    [dFormatter setDateFormat:@"yyyy-mm-dd-HH-MM"];
-    NSString * readingTimeStamp = [dFormatter stringFromDate:[NSDate date]];
-    
-    [sensorData setObject:@(batteryLevel) forKey:kSensorDataBatteryKey];
-    [sensorData setObject:@(sensorRH) forKey:kSensorDataRHKey];
-    [sensorData setObject:@(ambientSensorRH) forKey:kSensorDataRHAmbientKey];
-    [sensorData setObject:@(sensorTemp) forKey:kSensorDataTemperatureKey];
-    [sensorData setObject:@(ambientSensorTemp) forKey:kSensorDataTemperatureAmbientKey];
-    [sensorData setObject:readingTimeStamp forKey:kSensorDataReadingTimestampKey];
-    [sensorData setObject:[serialNumberString uppercaseString] forKey:kSensorDataSerialNumberKey];
+   
+    sensorData.batteryLevel = batteryLevel;
+    sensorData.rh = sensorRH;
+    sensorData.ambientRh = ambientSensorRH;
+    sensorData.temp = sensorTemp;
+    sensorData.ambientTemp = ambientSensorTemp;
+    sensorData.readingTimeStamp = [NSDate date];
+    sensorData.ssn = [serialNumberString uppercaseString];
     
     // return immutable dictionary
-    return [NSDictionary dictionaryWithDictionary:sensorData];
+    return sensorData;
 }
 
 - (float)RHFromBytes:(const void *)bytes {

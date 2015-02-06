@@ -13,22 +13,3 @@
 + (OSViewController *)sharedInstance;
 
 @end
-
-@interface SensorInfo : NSObject
-
-@property (nonatomic, retain) NSString *ssn;
-@property (nonatomic, retain) NSDictionary *firstSensorData;
-@property (nonatomic, retain) NSDictionary *lastSensorData;
-@property (nonatomic) BOOL retrievedFirstCalCheck;
-@property (nonatomic) BOOL retrievedLastCalCheck;
-@property (nonatomic) BOOL requestedFirstCalCheck;
-@property (nonatomic) BOOL requestedLastCalCheck;
-
-@property (nonatomic) BOOL retrievedCalibrationDate;
-@property (nonatomic) BOOL requestedCalibrationDate;
-
-@property (nonatomic) BOOL requestedStoringFirstCalCheck;
-
-- (id)initWithSsn:(NSString *)ssn;
-
-@end

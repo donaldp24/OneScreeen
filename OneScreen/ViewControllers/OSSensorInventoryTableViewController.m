@@ -169,15 +169,15 @@
         // retrieve data
         if (bRefreshData)
         {
-            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:finalSsn first:NO complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date) {
+            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:finalSsn first:NO complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date, ErrorType errorType) {
                 [self didRetrieveCalCheck:finalSsn success:success first:NO];
             }];
             
-            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:finalSsn first:YES complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date) {
+            [[OSServerManager sharedInstance] retrieveCalCheckForSensor:finalSsn first:YES complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date, ErrorType errorType) {
                 [self didRetrieveCalCheck:finalSsn success:success first:YES];
             }];
             
-            [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:finalSsn complete:^(BOOL success, NSDate *date) {
+            [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:finalSsn complete:^(BOOL success, NSDate *date, ErrorType errorType) {
                 [self didRetrieveCalibrationDate:finalSsn success:success];
             }];
         }
@@ -186,7 +186,7 @@
             // check is existing
             CDCalCheck *firstCalCheck = [[OSModelManager sharedInstance] getFirstCalCheckForSensor:finalSsn];
             if (!firstCalCheck && CALLING_API_WHEN_NO_DATA)
-                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:finalSsn first:YES complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date) {
+                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:finalSsn first:YES complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date, ErrorType errorType) {
                     [self didRetrieveCalibrationDate:finalSsn success:success];
                 }];
             else
@@ -199,7 +199,7 @@
                 lastCalCheck = nil;
             
             if (!lastCalCheck && CALLING_API_WHEN_NO_DATA)
-                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:finalSsn first:NO complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date) {
+                [[OSServerManager sharedInstance] retrieveCalCheckForSensor:finalSsn first:NO complete:^(BOOL success, NSString *ssn, float rh, float temp, NSString *salt_name, NSDate *date, ErrorType errorType) {
                     [self didRetrieveCalCheck:finalSsn success:success first:NO];
                 }];
             else
@@ -207,7 +207,7 @@
             
             CDCalibrationDate *cdCalibrationDate = [[OSModelManager sharedInstance] getCalibrationDateForSensor:finalSsn];
             if (!cdCalibrationDate && CALLING_API_WHEN_NO_DATA)
-                [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:finalSsn complete:^(BOOL success, NSDate *date) {
+                [[OSServerManager sharedInstance] retrieveCalibrationDateForSensor:finalSsn complete:^(BOOL success, NSDate *date, ErrorType errorType) {
                     [self didRetrieveCalibrationDate:finalSsn success:success];
                 }];
             else

@@ -9,6 +9,7 @@
 #import "OSModelManager.h"
 #import "NSDate+convenience.h"
 #import "NSDate+String.h"
+#import "OSSaltSolutionManager.h"
 
 @implementation OSModelManager
 
@@ -296,7 +297,15 @@
     else
     {
         if(fetchedObjects && fetchedObjects.count > 0) {
-            ret = [fetchedObjects objectAtIndex:0];
+            for (CDCalCheck *calCheck in fetchedObjects) {
+                if ([calCheck.salt_name isEqualToString:[[OSSaltSolutionManager sharedInstance] defaultSolution].salt_name]) {
+                    continue;
+                }
+                else {
+                    ret = calCheck;
+                    break;
+                }
+            }
         }
     }
     return ret;
@@ -563,8 +572,20 @@
 - (void)setStoredOnServerForCalCheck:(CDCalCheck *)calCheck
                     stored_on_server:(BOOL)stored_on_server
 {
+    if (calCheck == nil)
+        return;
+    
     calCheck.stored_on_server = @(stored_on_server);
     [self saveContext];
+}
+
+- (void)setStoredOnServerForSensor:(NSString *)ssn date:(NSDate *)date stored_on_server:(BOOL)stored_on_server
+{
+    if (ssn == nil || date == nil)
+        return;
+    
+    CDCalCheck *calCheck = [self getCalCheckForSensor:ssn date:date];
+    [self setStoredOnServerForCalCheck:calCheck stored_on_server:stored_on_server];
 }
 
 
@@ -887,39 +908,24 @@
     return arraySensorSerials;
 }
 
-- (void)saveReadingForJob:(NSString *)jobUid sensorData:(NSDictionary *)dicInfo
+- (void)saveReadingForJob:(NSString *)jobUid sensorData:(SensorData *)sensorData
 {
-    if (dicInfo == nil || ![dicInfo isKindOfClass:[NSDictionary class]])
+    if (sensorData == nil)
         return;
-    /*
-    NSString * const kSensorDataBatteryKey = @"battery";
-    NSString * const kSensorDataRHKey = @"rh";
-    NSString * const kSensorDataRHAmbientKey = @"rhAmbient";
-    NSString * const kSensorDataTemperatureKey = @"temp";
-    NSString * const kSensorDataTemperatureAmbientKey = @"tempAmbient";
-    NSString * const kSensorDataReadingTimestampKey = @"readingTimestamp";
-    NSString * const kSensorDataSerialNumberKey = @"serial";
-     */
-    CGFloat rh = [[dicInfo objectForKey:kSensorDataRHKey] floatValue];
-    CGFloat temp = [[dicInfo objectForKey:kSensorDataTemperatureKey] floatValue];
-    CGFloat ambRh = [[dicInfo objectForKey:kSensorDataRHAmbientKey] floatValue];
-    CGFloat ambTemp = [[dicInfo objectForKey:kSensorDataTemperatureAmbientKey] floatValue];
-    int battery = [[dicInfo objectForKey:kSensorDataBatteryKey] intValue];
     
-    NSString *ssn = [dicInfo objectForKey:kSensorDataSerialNumberKey];
-    
-    if (ssn == nil || ssn.length == 0)
+    if (sensorData.ssn == nil || sensorData.ssn.length == 0)
         return;
     
     CDReading *reading = [NSEntityDescription
                           insertNewObjectForEntityForName:@"CDReading"
                           inManagedObjectContext:self.managedObjectContext];
-    reading.rh = @(rh);
-    reading.temp = @(temp);
-    reading.ambRh = @(ambRh);
-    reading.ambTemp = @(ambTemp);
-    reading.ssn = ssn;
-    reading.battery = @(battery);
+    
+    reading.rh = @(sensorData.rh);
+    reading.temp = @(sensorData.temp);
+    reading.ambRh = @(sensorData.ambientRh);
+    reading.ambTemp = @(sensorData.ambientTemp);
+    reading.ssn = sensorData.ssn;
+    reading.battery = @(sensorData.batteryLevel);
     reading.timestamp = [NSDate date];
     reading.jobUid = jobUid;
     

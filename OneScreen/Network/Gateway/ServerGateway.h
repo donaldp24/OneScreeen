@@ -12,19 +12,34 @@ typedef enum {
     GatewayErrorInvalidGrant
 } GatewayError;
 
+typedef enum {
+    ErrorTypeSuccess,
+    ErrorTypeNetError,
+    ErrorTypeParseError
+} ErrorType;
+
 @interface ServerGateway : NSObject
 
-- (void)lookupSSN:(NSString*)ssn accessToken:(NSString*)access complete:(void(^)(NSDictionary *ret, NSString *ssn))block;
+- (void)lookupSSN:(NSString*)ssn
+      accessToken:(NSString*)access
+         complete:(void(^)(NSDictionary *ret, NSString *ssn, ErrorType errorType))block;
 
-- (void)uploadDataFileContents:(NSData*)data atFilePath:(NSString*)filePath accessToken:(NSString*)accessToken complete:(void(^)(NSError *error))block;
+//- (void)uploadDataFileContents:(NSData*)data atFilePath:(NSString*)filePath accessToken:(NSString*)accessToken complete:(void(^)(NSError *error))block;
 
-- (void)loginWithUsername:(NSString *)username password: (NSString*)password complete:(void(^)(NSString *accessToken))block;
+- (void)loginWithUsername:(NSString *)username
+                 password: (NSString*)password
+                 complete:(void(^)(NSString *accessToken))block;
 
-- (void)storeCalCheck:(NSString *)ssn rh:(int)rh temp:(int)temp salt_name:(NSString *)salt_name date:(NSString *)date accessToken:(NSString*)access complete:(void(^)(BOOL success))block;
+- (void)storeCalCheck:(NSString *)ssn
+                   rh:(int)rh temp:(int)temp
+            salt_name:(NSString *)salt_name
+                 date:(NSString *)date
+          accessToken:(NSString*)access
+             complete:(void(^)(BOOL success, ErrorType errorType))block;
 
 - (void)retrieveCalCheck:(NSString *)ssn
                    first:(BOOL)first
              accessToken:(NSString*)access
-                complete:(void(^)(NSDictionary *data))block;
+                complete:(void(^)(NSDictionary *data, ErrorType errorType))block;
 
 @end

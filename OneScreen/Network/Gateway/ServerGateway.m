@@ -19,7 +19,9 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
 
 @implementation ServerGateway
 
-- (void)lookupSSN:(NSString *)ssn accessToken:(NSString *)accessToken complete:(void (^)(NSDictionary *, NSString *))block {
+- (void)lookupSSN:(NSString *)ssn
+      accessToken:(NSString *)accessToken
+         complete:(void (^)(NSDictionary *, NSString *, ErrorType))block {
     NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=ssn_lookup&access_token=%@&ssn=%@",accessToken,ssn];
     
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
@@ -37,21 +39,32 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (!response) {
-                                   block(nil, serialNumber);
+                                   NSLog(@"lookupSSN failed : response is nil, %@", connectionError);
+                                   block(nil, serialNumber, ErrorTypeNetError);
                                    return;
                                }
                                
                                NSString *responseString = [[NSString alloc] initWithData:data
                                                                                 encoding:NSUTF8StringEncoding];
+                               
+                               if (!responseString) {
+                                   NSLog(@"lookupSSN failed : response is nil");
+                                   block(nil, serialNumber, ErrorTypeParseError);
+                                   return;
+                               }
+                               
                                SBJSON *parser = [[SBJSON alloc] init];
                                NSDictionary *dict = [parser objectWithString:responseString];
+                               if (![dict isKindOfClass:[NSDictionary class]]) {
+                                   NSLog(@"lookupSSN(%@) failed, response is not dictionary", serialNumber);
+                                   block(nil, serialNumber, ErrorTypeParseError);
+                                   return;
+                               }
                                
-                               NSLog(@"sn: %@", serialNumber);
-                               
-                               block(dict, serialNumber);
+                               block(dict, serialNumber, ErrorTypeSuccess);
                            }];
 }
-
+/*
 - (void)uploadDataFileContents:(NSData *)data
                     atFilePath:(NSString *)filePath
                    accessToken:(NSString *)accessToken
@@ -99,9 +112,11 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                block(nil);
                            }];
 }
+*/
 
-
-- (void)loginWithUsername:(NSString *)username password: (NSString*)password complete:(void (^)(NSString *))block {
+- (void)loginWithUsername:(NSString *)username
+                 password: (NSString*)password
+                 complete:(void (^)(NSString *))block {
 
     NSString * authRequestURL = [NSString stringWithFormat:@"%@%@", kServerURL, @"action=auth&step=token"];
     //    NSString * username = @"ishiwata";
@@ -123,26 +138,42 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
     [NSURLConnection sendAsynchronousRequest:request
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                               
                                NSString *responseString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-
-                               //NSError * error = nil;
-
-                               SBJSON *parser = [[SBJSON alloc] init];
-                               NSDictionary *dict = [parser objectWithString:responseString];
-                               NSString * accessToken = [dict valueForKey:@"access_token"];
-
-                               NSLog(@"RECEIVED DATA : %@", responseString);
-                               NSLog(@"ACCESS TOKEN : %@", accessToken);
-                               if(accessToken) {
-                                   block(accessToken);
+                               if (responseString == nil) {
+                                   NSLog(@"login : response string is nil");
+                                   block(nil);
                                }
                                else {
-                                   block(nil);
+                                   NSLog(@"RECEIVED DATA : %@", responseString);
+
+                                   SBJSON *parser = [[SBJSON alloc] init];
+                                   NSDictionary *dict = [parser objectWithString:responseString];
+                                   if (dict == nil ||
+                                       ![dict isKindOfClass:[NSDictionary class]]) {
+                                       block(nil);
+                                   }
+                                   else {
+                                       NSString * accessToken = [dict valueForKey:@"access_token"];
+                                       if(accessToken) {
+                                           NSLog(@"ACCESS TOKEN : %@", accessToken);
+                                           block(accessToken);
+                                       }
+                                       else {
+                                           block(nil);
+                                       }
+                                   }
                                }
                            }];
 }
 
-- (void)storeCalCheck:(NSString *)ssn rh:(int)rh temp:(int)temp salt_name:(NSString *)salt_name date:(NSString *)date accessToken:(NSString *)access complete:(void (^)(BOOL))block {
+- (void)storeCalCheck:(NSString *)ssn
+                   rh:(int)rh
+                 temp:(int)temp
+            salt_name:(NSString *)salt_name
+                 date:(NSString *)date
+          accessToken:(NSString *)access
+             complete:(void (^)(BOOL, ErrorType))block {
 
     NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=upload_cal_check&access_token=%@&ssn=%@&rh=%d&temp=%d&salt_name=%@&date=%@", access, ssn, rh, temp, [salt_name urlencode], [date urlencode]];
     
@@ -162,24 +193,45 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (!response) {
-                                   block(NO);
                                    NSLog(@"store failed : %@", connectionError);
+                                   block(NO, ErrorTypeNetError);
                                    return;
                                }
                                
                                NSString *responseString = [[NSString alloc] initWithData:data
                                                                                 encoding:NSUTF8StringEncoding];
+                               if (!responseString) {
+                                   NSLog(@"store failed : responseString is nil");
+                                   block(NO, ErrorTypeParseError);
+                                   return;
+                               }
+                               
                                SBJSON *parser = [[SBJSON alloc] init];
                                NSDictionary *dict = [parser objectWithString:responseString];
+                               
+                               if (![dict isKindOfClass:[NSDictionary class]]) {
+                                   NSLog(@"store failed : response is not dictionary");
+                                   block(NO, ErrorTypeParseError);
+                                   return;
+                               }
                                
                                NSLog(@"response for storeData: %@", dict);
                                
                                NSNumber *success = [dict objectForKey:@"success"];
-                               block([success boolValue]);
+                               if (!success) {
+                                   NSLog(@"store failed : response didn't contain 'success'");
+                                   block(NO, ErrorTypeParseError);
+                                   return;
+                               }
+                               
+                               block([success boolValue], ErrorTypeSuccess);
                            }];
 }
 
-- (void)retrieveCalCheck:(NSString *)ssn first:(BOOL)first accessToken:(NSString *)access complete:(void (^)(NSDictionary *))block {
+- (void)retrieveCalCheck:(NSString *)ssn
+                   first:(BOOL)first
+             accessToken:(NSString *)access
+                complete:(void (^)(NSDictionary *, ErrorType))block {
     
     NSString *getString = [NSString stringWithFormat:@"action=mod_reports_api&method=get_cal_check&access_token=%@&ssn=%@", access, ssn];
     if (first)
@@ -198,18 +250,31 @@ static NSString * const kErrorDomain = @"DMIOSNETWORKERROR";
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (!response) {
-                                   block(nil);
+                                   NSLog(@"retrieveCalCheck failed : %@", connectionError);
+                                   block(nil, ErrorTypeNetError);
                                    return;
                                }
                                
                                NSString *responseString = [[NSString alloc] initWithData:data
                                                                                 encoding:NSUTF8StringEncoding];
+                               if (!responseString) {
+                                   NSLog(@"retrieveCalCheck failed : responseString is nil");
+                                   block(nil, ErrorTypeParseError);
+                                   return;
+                               }
+                               
                                SBJSON *parser = [[SBJSON alloc] init];
                                NSDictionary *dict = [parser objectWithString:responseString];
                                
+                               if (![dict isKindOfClass:[NSDictionary class]]) {
+                                   NSLog(@"retrieveCalCheck failed : response is not dictionary");
+                                   block(nil, ErrorTypeParseError);
+                                   return;
+                               }
+                               
                                NSLog(@"response for retrieveData: %@", dict);
                                
-                               block(dict);
+                               block(dict, ErrorTypeSuccess);
 
                            }];
 }

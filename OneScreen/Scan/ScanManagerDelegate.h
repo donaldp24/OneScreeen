@@ -6,13 +6,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SensorData.h"
 
 @class ScanManager;
 
 @protocol ScanManagerDelegate <NSObject>
 
 @required
-- (void)scanManager:(ScanManager*)scanManager didFindSensor:(NSDictionary*)sensorData;
+- (void)scanManager:(ScanManager*)scanManager didFindSensor:(SensorData *)sensorData;
 - (void)scanManager:(ScanManager*)scanManager didFindElseDevice:(id)sender;
 
 @optional

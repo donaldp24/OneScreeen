@@ -12,6 +12,26 @@
 
 static OSSyncManager *_sharedSyncManager = nil;
 
+
+
+@implementation SensorDataWithSaltName
+
+- (BOOL)isEqual:(id)object {
+    if ([super isEqual:object])
+        return YES;
+    
+    SensorDataWithSaltName *b = (SensorDataWithSaltName *)object;
+    if (b == nil || ![b isKindOfClass:[SensorDataWithSaltName class]])
+        return NO;
+    
+    if ([b.ssn isEqualToString:self.ssn] &&
+        [b.date compare:self.date] == NSOrderedSame)
+        return YES;
+    return NO;
+}
+
+@end
+
 @interface OSSyncManager ()
 
 @property (nonatomic, retain) NSMutableArray *queue;
@@ -42,46 +62,52 @@ static OSSyncManager *_sharedSyncManager = nil;
     return self;
 }
 
-- (void)addCalcheckToSyncList:(CDCalCheck *)calCheck {
-    if (calCheck == nil)
-        return;
-    
+- (void)addCalcheckToSyncList:(NSString *)ssn rh:(float)rh temp:(float)temp salt_name:(NSString *)salt_name date:(NSDate *)date {
     [self.lock lock];
-    [self.queue addObject:calCheck];
+    SensorDataWithSaltName *entry = [[SensorDataWithSaltName alloc] init];
+    if (![self.queue containsObject:entry])
+        [self.queue addObject:entry];
     [self.lock unlock];
 }
 
 - (void)run:(id)obj {
     while (!self.done) {
-        if ([[OSServerManager sharedInstance] hasConnectivity]) {
+        if ([[OSServerManager sharedInstance] hasConnectivity] &&
+            [[OSServerManager sharedInstance] isLoggedIn]) {
+            
             [self.lock lock];
             // get a cal check from the list
-            CDCalCheck *calCheck = nil;
+            SensorDataWithSaltName *entry = nil;
             if (self.queue.count == 0) {
-                calCheck = nil;
+                entry = nil;
             }
             else {
-                calCheck = [self.queue objectAtIndex:0];
-                [self.queue removeObject:calCheck];
+                entry = [self.queue objectAtIndex:0];
+                [self.queue removeObject:entry];
             }
-            if (calCheck == nil) {
+            
+            if (entry == nil) {
                 [NSThread sleepForTimeInterval:2.0f];
             }
             else {
-                CDCalCheck *finalCalCheck = calCheck;
                 // try to store this cal check on server
-                NSLog(@"storing cal check : %@ (%@)", finalCalCheck.ssn, finalCalCheck.date);
+                NSLog(@"storing cal check : %@ (%@)", entry.ssn, entry.date);
                 
-                [[OSServerManager sharedInstance] storeCalCheck:finalCalCheck.ssn rh:[finalCalCheck.rh floatValue] temp:[finalCalCheck.temp floatValue] salt_name:finalCalCheck.salt_name date:finalCalCheck.date complete:^(BOOL success) {
+                [[OSServerManager sharedInstance] storeCalCheck:entry.ssn
+                                                             rh:entry.rh
+                                                           temp:entry.temp
+                                                      salt_name:entry.salt_name
+                                                           date:entry.date
+                                                       complete:^(BOOL success, ErrorType errorType) {
                     if (success) {
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [[OSModelManager sharedInstance] setStoredOnServerForCalCheck:finalCalCheck stored_on_server:YES];
+                            [[OSModelManager sharedInstance] setStoredOnServerForSensor:entry.ssn date:entry.date stored_on_server:YES];
                         }];
                     }
                     else {
                         // add it to last one of the queue
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [self addCalcheckToSyncList:finalCalCheck];
+                            [self addCalcheckToSyncList:entry.ssn rh:entry.rh temp:entry.temp salt_name:entry.salt_name date:entry.date];
                         }];
                     }
                 }];
