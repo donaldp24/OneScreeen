@@ -229,6 +229,8 @@ typedef enum {
     self.tableView.layer.borderColor = [UIColor colorWithRed:243/255.0 green:143/255.0 blue:29/255.0 alpha:1.0].CGColor;
     self.tableView.layer.borderWidth = 1.0;
     
+    self.heightConstraintOfDropdown.constant = 0;
+    
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(backgroundTap:)];
     [self.view addGestureRecognizer:tap];
     

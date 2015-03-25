@@ -326,11 +326,12 @@
                                             <outletCollection property="gestureRecognizers" destination="V83-ef-nQU" appends="YES" id="h2f-jv-2YA"/>
                                         </connections>
                                     </view>
-                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="mMf-ig-eD2">
+                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="mMf-ig-eD2">
+                                        <rect key="frame" x="125" y="65" width="187" height="100"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="187" id="lLB-Fa-VCt"/>
-                                            <constraint firstAttribute="height" id="lPh-X9-wW4"/>
+                                            <constraint firstAttribute="height" constant="100" id="lPh-X9-wW4"/>
                                         </constraints>
                                         <color key="separatorColor" red="0.95294117647058818" green="0.5607843137254902" blue="0.11372549019607843" alpha="1" colorSpace="calibratedRGB"/>
                                         <prototypes>
